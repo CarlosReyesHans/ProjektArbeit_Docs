@@ -1,0 +1,56 @@
+2020.05.22
+This notepad contains shortcuts for ALTIUM
+
+
+DONE
+@2020.05.20 - No problem with Plugin
+Check introduction to PCB transport
+Then Keys
+
+NOTES About Altium
+
+NEtlabels only provide connection within the same sheet and cables
+Ports provide connections between different sheets.
+
+
+STEPS to follow depending on the design phase
+
+PCB
+	Footprint Manager --- Validate the Components
+	Set Origin --- EDit Menu
+	Stack Layer Manager --- Design Menu
+	Set the grid - Right Properties Menu (1mm)
+	PCB Planning Mode -- By clicking 1 in the workspace
+	Edit Size - Design tab
+			Hit 2 or 3 --- Change view modes in workspace
+	Update the PCB File -	Back to Schematic in Design Tab
+	Execute changes and verify errors
+	The pieces are separated in Rooms
+
+	Check the Rules in Design <<< There are unary and binary rules
+
+	Hide the flying connections - View tab -> connection --> hide or show 
+	3d model -- shift pressed until the rotary icon appears -->> move
+	Switch from layers - while clicking press L
+
+BEFORE ROUTING 
+
+	Change the routing roules -- width and pads  Example: pads from mcu 0.3 mm  the default min 10,20 and 100 mil
+	ctrl+w for routing >> shift and freezes and properties can be reviewed
+	Drops vias are the ones that croces to the other side, VIA DIAMETER + VIA HOLE SIZE
+	+ KEY to drop vias >> GO THROUGH DIFFERENT LAYERS +/-
+	Vias can be dropped alse from the tab
+	TAB -->> selects all the route
+	CTRL + ALT + G -->> Gloss the routes >> Route TAB and click Gloss Route
+
+WHILE ROUTING
+
+	ctrl +h --->> selects the copper that is in contact
+
+
+	Check the design rules << There is a packet with the rules from the manufacturer!!
+
+
+KEYBOARDS SHORTCUTS
+Ctrl+M ---->>> Measure from point to point
+shift+ctrl+t/h >>>> Align to the top//distribute horizontaly
