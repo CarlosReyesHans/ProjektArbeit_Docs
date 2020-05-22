@@ -1,0 +1,29 @@
+PROJEKTARBEIT schedule of activities
+
+THE IDEA
+
+IS TO HAVE AN OPEN SOURCE DEVICE THAT COMPLIES AN ALREADY TESTED PROTOCOL
+
+wITH THIS WE WOULD HAVE A TOOL TO CHARACTERIZE THE PERFORMANCE OF GIVEN DATA WITHIN A TSN NETWORK
+
+SO, WE WOULD THE INVESTIGATE THE BENCHMARKS AND HOW MANY OTHER DEVICES DO ALREADY EXIST 
+
+Date	Week of the project		Description
+04.08		2					Preliminars
+04.29		5		0					Kick-off meeting (official start) - Aproximate duration 4 months -till 28th August 08.28
+
+05.29		9		4			1ST PCB	With limited features Report
+06.24		13		8			1st	EtherCAT Slave Report - Only Communication and basic Temperature reading feature
+07.24		17		12			2nd EtherCAT Slave Report - Basic Device Features
+07.28								End of Lecture Time
+07.29								Start of the Examination Time	
+08.1-15							Probably the examination for embedded systems
+08.27		22		17			2nd PCB Report	
+		
+08.28		22		17			Preliminar end of the project
+09.xx								Request the examination for Entwurf von dependable systems
+09.09								Information Theory Examination
+10.01								Start of the WinterSemester 2020/2021
+10.09								End of examination period
+11.01								Start of the lectures period WiSe 20/21
+03.31								End of the WiSe2021

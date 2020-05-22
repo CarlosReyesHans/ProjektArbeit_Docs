@@ -1,0 +1,88 @@
+2020.05.12
+ALTIUM INTRODUCTION SESSION
+
+
+Check the libraries from STM32 Nucleo boards for Altium
+	Modifying a Library
+
+
+	Ask Jannick
+	>>>		Is there alaready a library from HANS Robot??
+	>>		Which one of these if RS Components is not available? Farnell,DigiKey,Arrow,Newark or Mouser?
+DONE
+	Only BOM
+	Continuing checking the Gerber File and other thing
+Assembly Material List created
+From the Electrical Scheme copy the needed parts into the project
+
+
+General Notes
+	Regardin the F446, it has 3 layers, TOP, MID 1 and BOTTOM layer; moreover, it has 2 GNDs
+?	and 1 PWR layer? Is it a path or a continuos GND/PWR layer? 6 Layers in total.
+	Source SchDoc and PCB Doc
+	
+	PLACES TO LOOK FOR MANUFACTURERS COMPONENTS
+		snapEDA, ultraLibrarian -->> looking for footprint, symbol and models
+		
+		
+	
+TIPS AND TRICKS
+	Use the netlink labels for connect between components (upper toolbar for wiring, right click)
+
+
+
+Wordlist
+TOP PAST MASK ->> Is the GERBER description that has the pads to solder the elements on the top layer.
+LAYERS - Each of the surfaces that will have an specific path design to interconnect the 
+			elements, and that will be stacked upon each other to save space.
+PATHS or VIAS --->> The ways made of copper that are on the PCB
+Archs -->> when a path should be modified to be a curve-like path to avoid another element
+MCAD --->>> Solidworks Inventor etc, different than ECAD
+FOOTPRINT --->> Is the size and pads according to the real dimension of a device/model
+SYMBOLS AND 3DMODEL
+lentils!!!
+
+To promote me as a co-host
+Different against what had been done.
+
+
+/************************************************************************************
+*	FROM WEBINAR
+*************************************************************************************/
+
+
+Cloud based collaboration platform (Git-wise)
+	Working remotely and colaboration to keep updated between teams
+	Controlling project access-->> To avoid send data externaly
+		This is actually Version Control
+			The Workspace is just a shared directory with the users but also external people
+				MAKE Project Available in the right-click menu (git based)
+				"Open project" from the ALtium365 Overview
+				Modify
+				(Other side) Right Click, Version Control =>> Refresh
+				Add Comments with a Comment Pannel (As channel communication)
+					This are updated on the fly, while changes on the files needs to be done manually
+						with the version control menu.
+				Show Differences by right Clicking
+	Single source of components --->>	Repository or Server
+	Example MCAD Collaboration
+
+
+			Acquire to save it into the workspace
+			Annotate schematic quitely?? while adding
+			Layer stack management  -->> To have information of layers
+			MCAD Ci Designer -->> Push with a comment to stay communicated
+				Shape the board >>> 
+					SolidWork -->> Altium CoDesigner Tab-->>Pull from the repository as if were a piece
+						Modifying the piece and save the changes -->> Push and comment
+						(Other side) Then pull from the MCAD Tab .
+	Sahre to manufactorer as an iption in the top right corner
+		Share on the web =>> The Viewer can actually shows information for each path or element
+			SCH, BOM, PCB and 3D
+			
+	Licensing -->> Standard does not have the revision information after looking for the online info.
+	
+
+		
+					
+			

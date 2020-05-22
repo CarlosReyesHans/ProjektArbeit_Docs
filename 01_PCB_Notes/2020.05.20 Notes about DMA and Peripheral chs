@@ -1,0 +1,69 @@
+Notes about the Correspondent Pins
+
+	PORT Distributions ==>> From Datasheet pp 58-62 !!
+	DMA Mapping ==>>	From Reference Manual pp 207 !!
+
+
+For PWM to control the LED Rings
+
+General Purpose with up to 4 channesl for PWM generation
+	1 Channel per LED Rings
+	Following Timers have their own Stream and Channel of DMA1/2 PWM COMPATIBLE
+		This considers the clock bus source
+		Considering the Channels @ GPIO
+		
+		DMA1 CH 5 - S2-X TIM3 	APB1 CLK-Bus
+
+		
+		DMA1 CH 3 - S1-X TIM2 	APB1 CLK-Bus all @ PORTA <<  Collides with QUADSPI
+		DMA1 CH 6 - S2-X TIM5 	APB1 CLK-Bus all @ PORTA <<  Collides with TIM2
+		DMA1 CH 2 - S0-X TIM4	APB1 CLK-Bus all @ PORTB <<  Collides with QUADSPI
+		
+		The following could be used but they are advance and fit for other apps
+		
+		DMA2 CH 0-X - SX TIM8 	APB2 CLK-Bus
+		DMA2 CH 7-X - SX TIM1	APB2 CLK-Bus
+		
+		DMA1 CH 7 - S1-X TIM6 	<< NO PWM, BASIC TIMER
+		DMA2 CH 3 - S7 QUADSPI
+		DMA2 CH 4 - S0-1 SPI4	<< This will be used instead of QUADSPI
+		
+		
+		Conclusion, first implementation:
+			One Led-Ring per DMA Channel, we start with TIM3 and try to run the control with
+				Streams from the DMA, if not then differents.
+				(TIM3 or TIM1 or TIM8)
+				(TIM4 AND TIM2/5)
+	
+			Second implementation:
+				3 Led-Rings in one channel + 1 in second channel, using its streams
+		
+For SPI Devices EtherCAT/IMU
+What about the DMA??
+	SPI Standard 		4 pins (IMU)
+	SPI Dual			4 pins
+	SPI QUADSPI			6 pins (EtherCAT)
+	
+	SPI2	DMA1 CH 0 - S3-4 @PORTC/D	<<
+	
+	SPI1	DMA2 CH 3 - S0-5 @PORTA		<< DMA Quasi collides with QUADSPI/GPIO collides with TIM3
+
+		Conlusion, firs implementation:
+			SPI	for IMU is the SPI2
+			SPI for LAN9252 will be QUAD in an optimal implementation, regular implementation will use 
+				standard SPI
+			
+For UARTS GeneralPurpose/1-WIRE
+	What about synchronous and asynchronous? The 1-wire half-duplex can be asynchronous
+	What about DMA?	All are compatible with DMA
+	
+	USART2		DMA1	<< Same as UART4/5
+	UART4/5		DMA1 CH 4 - S 0,2,4,7
+	
+	Conclusion
+			USART2 is going to be used for the 1-Wire HalfDuplex conexion
+			For the General Purposes there are many available, so it is not a problem.
+
+Regarding Clock sources
+	It uses the internal clock soource
+	no external components << even though it could be not that accurate

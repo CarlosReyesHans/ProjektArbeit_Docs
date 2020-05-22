@@ -1,0 +1,86 @@
+C8
+r6
+sw2
+p3
+
+Using different connectors
+After Jannick Comments
+THIS IS THE BEST OPTION
+1 2XP LedRings Power Supply (Independent PowerSupply)
+1 2XP Power Supply 
+
+1 4xP Connector LED Rings (only signal)
+1 12xP SPI Connector (10+2*GND)
+1 2xp	1wire Connector
+1 6xp JTAG Connector (1-wire+Debug+GND)
+
+
+5 Connectors in total /24 pins
+
+
+THIS IS THE BEST OPTION
+1 2XP LedRings Power Supply (Independent PowerSupply)
+1 2XP Power Supply 
+
+1 4xP Connector LED Rings (only signal)
+1 12xP SPI Connector (10+2*GND)
+1 4xp UART Connector (1-wire+Debug+GND)
+
+5 Connectors in total /24 pins
+
+4 4xP Connectors LED Rings
+1 2xP Temperature CONNECTOR
+1 2xP Power Supply
+1 4XP SPI IMU CONNECTOR
+1 6xP SPI EtherCAT Connector
+1 3xP UART Connector
+
+1? 2xP BISS-C Connector
+
+8 Connectors in total /16+14 --> 30 pins
+
+
+1 2XP Power Supply 
+
+1 12xP Connector LED Rings (3*4)
+1 12xP SPI Connector (10+GND)
+1 4xp UART Connector (1-wire+Debug+GND)
+
+4 Connectors in total /30 pins 
+
+
+
+
+Components from RS Elektrotechnik
+Libraries from Altium
+	C:\Users\Public\Documents\Altium\AD20\Library\ExportIntLib
+
+MOLEX MICRO FIT 3.0 << Power supply 
+
+Molex PICO-CLASP (USED BEFORE)
+	for the encoders << This would be better to use
+
+501189-3010 Molex Pico-Clasp Female 1mm, 30-polig / 2-reihig Gerade, Kabelmontage
+
+
+HEADER
+
+501331-0307 Molex PICO-CLASP Leiterplatten-Stiftleiste gerade, 3-polig / 1-reihig, Raster 1mm, 
+501331-0607	Molex PICO-CLASP Leiterplatten-Stiftleiste gerade, 6-polig
+501331-1207 
+			https://de.rs-online.com/web/p/leiterplatten-header/0406657/
+
+
+
+501190-2017 Molex PICO-CLASP Leiterplatten-Stiftleiste gerade, 20-polig / 2-reihig, Raster 1mm, Lötanschluss, 1A
+			https://de.rs-online.com/web/p/leiterplatten-header/0188709/
+***********************************
+
+Molex PICO-BLADE (FOUND)
+CONNECTOR
+
+51021-0400	Molex PicoBlade Female 1.25mm, 4-polig / 1-reihig Gerade, Kabelmontage
+
+HEADER
+Molex PICO-BLADE 90 degrees surface montage
+53261-0471	Molex PICOBLADE Leiterplatten-Stiftleiste 90°, 4-polig / 1-reihig, Raster 1,25mm, Lötanschluss, 1A

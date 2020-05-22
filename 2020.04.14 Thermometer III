@@ -1,0 +1,46 @@
+2020.04.13
+2 hrs til 17:00
+2020.04.14
+13:00
+2020.04.20
+09:00
+RTOS and the Thermometer
+
+///////////////////////////////////////////////////
+////////		TEMPERATURE SENSORs III
+///////////////////////////////////////////////////
+
+
+
+TO-DO
+
+	-tests with the leds
+	-set the git
+
+	-implement the reading out of the termometer with RTOS
+
+
+
+DONE
+	-Install the Project
+	-implement the USB UART communication port (propper functions)
+	-WOuld it be better to use the USB OTG?? Research a bit about it.
+		NO, IT IS NOT NEEDED IN THIS DEVELOPMENT AND DEBUGGING PHASE.
+		THE DATA THAT WILL BE COMMUNICATED TO THE PC IS NOT A LARGE AMOUNT. SO IT CAN BE COVERED BY A REGULAR UART PORT.
+
+
+Constrain
+
+The Skip Rom instruction is being used due to practicity
+	Consequences:
+		Only one Temperature Sensor can be addressed
+		
+	Possible improvements
+		Add two or more temperature sensors
+		the CRC function should be implemented that might take effort.
+		
+No further configuration of the temperature sensor, it uses the default configuration
+	Consequences:
+		Only 12 bit conversations @750ms
+	Possible improvements
+		Add the configuration instructions to enable 9 bit convertions @93.75ms

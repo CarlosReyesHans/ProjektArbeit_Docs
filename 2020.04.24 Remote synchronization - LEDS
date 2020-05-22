@@ -1,0 +1,47 @@
+2020.04.24
+Configuration of the GUI environments within personal and Hans laptop
+
+***************************
+****		TODO
+***************************
+Check messages from REnner
+Finish really the last presentation as kickoff
+	practice it
+
+SETUP a Copy of the repository in GIT LAB from Hans
+
+Continue Working
+	High priority
+		Translates the logic from example by using the DMA
+			Clean up the PWM code. Add a task to configure it. A master TASK
+		https://github.com/MaJerle/stm32-ws2812b-tim-pwm-dma
+		Study the DMA theory.
+		
+	
+	Low P
+		Do tests with the system clock of the processor, to further test the first code
+
+**************************
+****		DONE
+**************************
+	Set the periphereals taking into consideration the lirbaries already existing
+	Remote assistance setup correctly but it might be unsecure -can be seen-
+		Team viewer is at the end the solution since it can be shared with an external monitor.
+	
+
+********************************
+****		Learned leasons
+********************************
+
+	Nucleo layout has two names for each pin, one refering to the number inside the socket
+		the second refers directly to the pin in the MCU pin distribution. Also, in the case of
+		PWM @ Analogue pin, it changes. So keep the distribution of pins on-hand.
+	
+	Even configured automatically through the MX toolm, the peripherals should be initiated with
+		a HAL_ instruction. This related to the PWMs.
+	
+	The PWMs should be connected or wired to a source clock which coincides with the one explained
+		in the datashett, namely APB1 or APB2.
+		
+	The DMA periphereal can be used to update the data from the any other peripheral's register.
+		It does not require any CPU resource and works with a FIFO approach.

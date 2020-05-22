@@ -1,0 +1,24 @@
+2020.04.14
+
+USB feature
+
+USB OTG FS/HS - OTG stands for on-the-go, it is though an optional feature.
+
+If implemented, should the EtherCAT device be a periphereal or a host ? Probably a periphereal since it wuould not control anything but only
+	deliver information
+	Periphereal ----> B device
+	Host ----> A device
+
+If implemented it will be restricted to:
+	B device (Simplicity), FS (due to speed handle), only one bidirectional pipe line needed
+	Less dedicated sram (1.25kB)
+	
+	
+	
+////////////QUESTIONS
+what is the ADP support which apparently is only available in Type A device?
+
+
+/////////// TEMPORARY CONCLUSION
+
+This feature is not needed for the development/debugging phase the project is nowadays in.

@@ -1,0 +1,24 @@
+*************************
+*	RTOS Questions
+*************************
+
+@2020.05.13
+	Dynamic allocation of tasks does not need a name for its buffers, since they're being allocated dynamically
+		Is this Heap1?
+
+
+
+	RTOS is more stable with periphereals timers instead of the systick clock.
+		Why? Apparently some problems with the HAL libraries abstraction
+		
+		Practice>>
+			As developing the first tests of the LED ring, there were two main tasks with normal
+				priorities each, and with the logic analyzer it was possible to see both test signals.
+				There was unfortunetly an overhead almost of 1.5 us. So the RTOS internal clock was changed
+				to the Systick clock @ 180 MHz; nevertheless, it DID NOT work. It even did not schedule
+				the tasks.
+		Is it really processing @ 160 MHz?
+
+
+Backend in rs2_get_option(options:000001F93DF5FD50, option:Backlight Compensation):
+hr returned: HResult 0x800703e3: "The I/O operation has been aborted because of either a thread exit or an application request."

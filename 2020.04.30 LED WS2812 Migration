@@ -1,0 +1,127 @@
+2020.04.30
+2020.05.2
+2020.05.10	Results
+
+
+********************************************************************************************
+****		STATE
+********************************************************************************************
+@2020.05.11	While debugging, to neglect that the RTOS was generating problems while preempting
+				The code was adjusted to be a super loop in another project. It still did not work
+				So, the RTOS and the superloop are achieving the same right functionality.
+				THE RING appears to be damaged, since I moved it and other LEDS turned on --23.
+				The PWM signal is so noisy, that it hardly makes think that it is a 800Khz signal.
+@2020.05.10	Lib changed. Now tested. It compiles, controls the leds but there are some bugs
+			at blinking, this could be either buffer or timing. Most likely is buffer, since 
+			after a while it works again (changing color is incrementing its position).
+@2020.05.2 The DMA and PWM @ TIMER1 is already configured, nevertheless, it has erros after creation.
+
+
+	MODIFICATIONs
+	
+	For Lib2: timer handlers, interruptions, super loop to task, library to hardware config.
+	
+	****************
+	Previous comments about Lib 1, now @2020.05.10 obsolete, check bottom of file
+	
+		DMA Type Handler ->>>> There is no request. So delete it.
+		Request is already given depending on the stream of the channel.
+			From Data Sheet DMA_CHANNEL_6 pp207 Reference Manual
+			Stream? TIM1_TRIG? TIM1_CH1 TIM1_COM ==>> DMA2_StreamX_IRQn
+					Probably the Stream4 which is TIM1_COM ==>> comparison TIM1
+
+		PWM @800kHz is working. DMA built but not tested. There is no conflict with the libraries.
+
+********************************************************************************************
+****		Lernt lessons
+********************************************************************************************
+
+Lernt lesson
+	- When a new project is created with the MX tool, check whether the clock is being recognized
+		by using the HAL_Delay. Since it could happen that is not "linked" and the processor fails
+		to execute the Read Ticks function.
+	- The buffer is correctly updated, the ring might be damaged. So far that is the conclusion.
+		It was tested as superloop and something related to the DMA interruption did not working
+		
+@2020.05.10
+	- Callbacks functions are inside the Int file which is created automatically by the compiler.
+	- Init MSP has also the configurations for some Peripherals, example DMA.
+	- It is possible to declare extern variables << check
+	- The DMA interruptions are not conflicting with the tasks
+	- Apparently there are timers on a scheduled based fashion, something like a task that is 
+		executed in a strict time period. << check
+	
+-Not all the timers have compatibility with the DMA peripheral
+	Time9 to 14 not possible
+	Timer 1 and 8 have DMA and APB2 @80MHz
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+
+*TODO*
+	clean code
+	embed the config functions into the task
+
+	PWM needs to be analized with another Logic Analizer
+	Create a task to switch between the Temperature and the LED Control.
+
+
+
+*Low priority*
+	delete the configurations by MX and set them to user??
+	Is it possible to send messages or signals from the threads to others, such that it can be printed whether something happened or not?
+	Create a main Task to manage the others
+
+
+DONE
+@2020.05.13
+	try with another ring
+
+	check with the library but as a standalone project
+	Check buffer bug and size
+	Change size of buffer to match size of ring
+@2020.05.10
+	Recheck the DMA values configured =, since they could be already mixed up
+		REPETITION COUNTER IS NOT WORKING PROPERLY IN THE TIMER CONFIGURATIONS
+		The pointers might not be working properly
+
+	I could check another library
+	Why the fuck the PWM DMA copies already the values to the Compare?
+	Test the DMA integration.
+
+*Done before*
+	Add the two tasks that will copy and execute the functions of the example
+
+	Read the Migrating code from stm32l4 to stm32f4 (request error)
+		stm32f4 has a dma module distinct to the one from stm32f1 line
+			The latter is equivalent to the stm32l1 line. That was the reason of the request error.
+			
+	Using TIMER 1 to be the PWM @ 800kHz
+
+	
+	
+*******************
+void HAL_TIM_PWM_MspInit <<<---- Initializes the Direct Memory Access 2
+								stm32f4xxx_hal_msp
+void HAL_TIM_MspPostInit <<<---- Initializes the GPIO to match with the PWM configurations
+static void MX_TIM1_Init(void) <<<<----- Configures the PWM but it is not initializing it
+
+This is need
+/*##-3- Start PWM signal generation in DMA mode ############################*/
+	HAL_TIM_PWM_Start_DMA(&TimHandle, TIM_CHANNEL_1, (uint32_t *) LEDbuffer,
+			LED_BUFFER_SIZE);
+			
+			
+***********************			
+	MODIFICATIONs
+	
+	Previous comments about Lib 1, now @2020.05.10 obsolete
+	
+		DMA Type Handler ->>>> There is no request. So delete it.
+		Request is already given depending on the stream of the channel.
+			From Data Sheet DMA_CHANNEL_6 pp207 Reference Manual
+			Stream? TIM1_TRIG? TIM1_CH1 TIM1_COM ==>> DMA2_StreamX_IRQn
+					Probably the Stream4 which is TIM1_COM ==>> comparison TIM1
+
+		PWM @800kHz is working. DMA built but not tested. There is no conflict with the libraries.

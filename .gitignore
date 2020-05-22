@@ -42,6 +42,8 @@ Thumbs.db
 ##**/Admin
 ##**/02_Software
 **/02_Software/Nucleo-F446
+**/to_ignore
+
 
 
 #ignore specific big files from ALTIUM

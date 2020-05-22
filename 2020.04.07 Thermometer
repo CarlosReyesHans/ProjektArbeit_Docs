@@ -1,0 +1,38 @@
+2020.04.07
+FAST STEPS FOR CONFIGURATION OF THE NUCLEO BOARD
+
+NOTES ABOUT THE COMMUNICATION BETWEEN DS18B20 1-WIRE TEMP SENSOR WITH STM32
+
+	UPGRADE all the drivers
+
+	-Open the Cube configuration and select the board
+	-Look that the debugger is selected in the serial port
+	-Check whether the GPIO for the leds ar set correctly
+		-There the option to increase the frequency the LED would switch with (whether it is high frequency or not)
+		-There are labels assigned
+		
+
+///////////////////////////////////////////////////
+////////		TEMPERATURE SENSORs
+///////////////////////////////////////////////////
+
+TO-DO
+	-Finish reading about the RTOS documentation for STM32
+	-Complete the .h and .c files for sensor taking into consideration the DS18B20 tutorial
+	https://controllerstech.com/ds18b20-and-stm32/
+	-Set correctly the timers
+	https://www.youtube.com/watch?v=09C1dyXvSbg
+	Install the Project
+	
+DONE BY 2020.04.08
+	-TALK ABOUT THE PROJECT TIMES
+	-ORGANIZE THE WHOLE PROJECT INTO A TIMETABLE
+	https://www.drawgantt.com
+	
+	
+///////////THESE ARE NOTES ABOUT THE WEBINAR 	
+	Concurrent mode - Usin only one radio Mesh
+	Sequencer Timer server -- The examples - Use of sequencers, COORDINATOR
+	
+		
+		

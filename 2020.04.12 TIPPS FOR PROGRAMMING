@@ -1,0 +1,36 @@
+TIPPS FOR PROGRAMMING IN C
+
+/////// About dividing the programm
+
+All c files should be self contained
+the headers are the only one that have to be included in the main
+If there is a private handler pointer created in the main file, it can be passed over to the c files as a second pointer
+
+For example
+
+main.c
+	#include second_file.h
+	//private pointer
+	a_specific_private_Type private_handler;
+	
+	void main {
+		/*This is code*/
+			initialization_function(&private_handler);
+			while(1){}
+		}
+
+second_file.h
+	#include main.h
+	a_specific_private_Type* this_pointer;
+	void initialization_function(a_specific_private_Type* handler);
+	void a_function();
+	
+second_file.c
+	void initialization_function(a_specific_private_Type* handler){
+		this_pointer = handler;
+	}
+	void a_function(){
+			a=other_function(this_pointer);
+	}
+
+This means that the new c file works only if initialized with a valid handler, which does not depend on the main file unless the pointer is passed over.

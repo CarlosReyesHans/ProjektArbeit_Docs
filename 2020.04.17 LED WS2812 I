@@ -1,0 +1,142 @@
+2020.04.17
+2020.04.20
+2020.04.22
+
+LED DEVELOPMENT
+
+Led strip or ring
+Red		+
+Orange	Data In
+Black	-
+
+
+
+Hendrick - Technology manager
+NIck - glasses heavy work / electrical
+Philipp - behind Jannick
+Shrik - indian guy mechanical stuff
+Kevin?
+
+
+The Indian guy - 
+
+
+TODO
+	
+	Configurate the PWM periphereals with different Channels switching.
+	Test the solution
+	Test the solution with the temperature.
+		
+		Is it possible to have two different OSdelays??
+		
+	How is the usage of an interrup within routines which might be called after the scheduler has changed the context?
+	
+	Have some pictures
+		
+DONE
+	Checked some examples (PWM)
+	http://www.martinhubacek.cz/arm/improved-stm32-ws2812b-library !!!
+	https://github.com/rogerclarkmelbourne/WS2812B_STM32_Libmaple
+	https://www.youtube.com/watch?v=gUEqw9De36w
+	
+	
+		Draw a time scheme to see whether the frequency is enough
+	Write the test functions
+	Use the same timer as the thermometer NOT POSSIBLE
+	disable the Thermometer task
+	Watch videos.
+	Solve the problem of getting stucked within the thermometer-while-loop
+	
+	Configure a second timer for it WITH A 100 ns or 50 ns base time
+	
+	2020.04.22
+		NOT NEEDED	COMMUNICATION MIGHT BE DONE WITH SEMAPHORES! SUCH THAT IT IS NOT INTERRUPTED TILL IT IS FINISHED.
+		Would it be better to have to 1 uS the operative system? --->>> This is not needed but possible, depending on the application. 
+		Anyways, this does not solve the problem of the high frequency switching for interfacing the WS2812
+		
+	LESSON LERNT
+		Calculate the frequencies, such that the overhaed of the code can be also avoided.
+			For WS2812 LED the minimum duration of a timer was about 0.35 micro seconds -->> 2.85 MHz
+				The GPIO should be also configured to be within the Working Frequency. Low or Medium
+				THE PORTA needs further configurations to work as a general purpose output
+		Use the Logic Analizer to watch the generated signals.
+			There was a problem with the task priorities and it was not detected until the round robinson scheduling got activated.
+		
+		Timer configuration of timers in APB1 and APB2 Buses correspond to the already multiplied factor of 2. Which obviously got the name already of CLK TIMER
+			
+	!	With all the above mentioned an overhead of 1.5 us was detected in the code, therefore a switching signal below ~2uS is not possible.
+			
+	
+	
+
+New words
+Wrenches
+Stripper pinzas? pelar
+dupont kit with male and female connectors
+haben wir das abgehackt
+innensechskantschraube
+
+	
+	/******************************************************************************
+
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <stdio.h>
+
+int main()
+{
+    unsigned int byte1, byte2;
+    byte1 = 0b10101010101; //1365
+    byte2 = byte1;
+/*    // swap odd and even bits
+byte2 = ((byte2 >> 1) & 0x55555555) | ((byte2 & 0x55555555) << 1);
+// swap consecutive pairs
+byte2 = ((byte2 >> 2) & 0x33333333) | ((byte2 & 0x33333333) << 2);
+// swap nibbles ... 
+byte2 = ((byte2 >> 4) & 0x0F0F0F0F) | ((byte2 & 0x0F0F0F0F) << 4);
+// swap bytes
+byte2 = ((byte2 >> 8) & 0x00FF00FF) | ((byte2 & 0x00FF00FF) << 8);
+// swap 2-byte long pairs
+//byte2 = ( byte2 >> 16             ) | ( byte2               << 16);
+    */
+    
+    unsigned int v = byte1;     // input bits to be reversed
+unsigned int r = v; // r will be reversed bits of v; first get LSB of v
+unsigned int s = 15; // extra shift needed at end
+
+for (v >>= 1; v; v >>= 1)
+{   
+  r <<= 1;
+  r |= v & 1;
+  s--;
+}
+r <<= s;
+
+    for (int i = 15; i >= 0; i--) {
+        /* code */
+        if((byte1>>i) & 1){
+            printf("for i= %d, val is 1\n",i);
+        }
+        else
+            printf("for i= %d, val is 0\n",i);
+    }
+    
+    for (int i = 23; i >= 0; i--) {
+        /* code */
+        if((r>>i) & 1){
+            printf("for i= %d, val is 1\n",i);
+        }
+        else
+            printf("for i= %d, val is 0\n",i);
+    }
+
+
+
+
+
+    return 0;
+}

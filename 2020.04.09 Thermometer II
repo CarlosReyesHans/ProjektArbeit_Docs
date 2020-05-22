@@ -1,0 +1,33 @@
+2020.04.09	
+2020.04.12	2hrs
+
+RTOS and the Thermometer
+
+///////////////////////////////////////////////////
+////////		TEMPERATURE SENSORs II
+///////////////////////////////////////////////////
+
+TO-DO
+	-Finish reading about the RTOS documentation for STM32
+
+
+	Install the Project
+	
+DONE
+	-Complete the .h and .c files for sensor taking into consideration the DS18B20 tutorial
+	https://controllerstech.com/ds18b20-and-stm32/
+	-Reading the Communication features about threads (signals/message/Mails) There are also Memory Pools
+	-Set correctly the timers and tested
+	https://www.youtube.com/watch?v=09C1dyXvSbg
+	
+	
+CONCLUSIONS
+
+	Timers can be adjusted to be slower counting if the preescaler is set to a greater number. This parameter
+		needs to be specified in the MX Cube IDE. T6 and T7 are general purpose base time counters. They work with the
+		APB1 source clock bus.
+	
+	The USB base clock feature affects the automatic setting of other peripherals, for instance, the TIMERS.
+	
+
+	
