@@ -1,0 +1,53 @@
+2020.06.03 
+Starting the general SMs
+
+First to note: The last changes of SPI are in the SPI_TEST branch
+	
+TODO
+
+Define the SM for ECAT
+Define the functions for SM for LED
+	osWaitUntil << Can be used for signals comming from interrupts?
+	startLedDMA(&pwm) << needs to be updated
+
+Create SM for Notification/event handler
+	notifyEvent(EV_ECAT_VERIFIED);
+
+Create the SM for Error Handling:
+	void reportError(uint8_t errDef);	update the buffer that is being written over uart and ethercat
+	void reportChError(chsetupOK,i); 	special error function that maps to report error depending on the channel
+	void reportPWMError(chsetupOK,i); 	NOT NEEDED
+Link functions to OS functions
+	startTimeOut(2000);
+
+This structure should be possible to use at least for 1PWM, Temperature and UART
+
+Within the SM for notification:
+				updateTemp2eCAT();		// High Priority
+				updateTemp2Print();		// Low Priority TODO this might represent a possible race condition
+
+
+
+
+SPI_TEST should be merged with the SPI_DEV
+Start with the general SMs in the dev branch, since the changes should be available for all branches
+Config the UART as in the examples.
+Consider the BISS-C connector in the files
+
+
+DONE
+	Structure of EventHandler SM
+	Structure of ECAT SM
+	Structure of TEMP SM
+	Structure of LED SM 
+
+NOTES:
+I think that the SM are gonna be tasks for the OS
+
+Configurations
+	Timer for system is TIM10 @ APB2 @160 MHz
+	Debugger is Serial Wire
+	No UART is selected 
+
+Questions is, MPU or FPU activated in the CMSIS?
+Maximal Tick_Rate is 1000 Herz?
