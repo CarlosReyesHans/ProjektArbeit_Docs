@@ -1,0 +1,138 @@
+2020.05.28-29
+SPI Starting the communications
+
+TODO
+Start with the integration of SOES
+
+Set back the brightness and other stuff to Till's Display
+Export in a correct way the pdfs of the schematics
+
+
+DONE
+@2020.05.29
+	Try to write two register readings only with no dummy inside to force the restart of communication
+		This does not apply that easy since it is necessary to wait between fast-read instructions
+			The dummy readouts can be though used as delay between write instructions
+			
+	Incrementing or decrementing header on the instruction
+		First attempt did not work, nevertheless it does not affect the reception. There was though an 8 but could be an error.
+	Set manually by software the ChipSelect Pin 
+		This was not necessary, since the NSS by Hardware is also set to 1 before sending data. 
+			The minimum problem is that the initial IDLE state is not working with the Logic Analizer
+	Check whether the SPI is having an error or the interruption is just not being called.
+		The error was in the NSS line that should not have been set as Hardware controlled
+	The user signal 2 and 3 now are used in the spi function
+	Run the Polling of the data from the SPI regular instruction
+		Change to regular SPI
+			This did not work since the SCS was not working properly due to some spikes
+			Mainly also for the logic of the LAN9252 that need the dummy bytes to be 1 at each clock over MOSI.
+
+22020.05.28	
+	First tests
+	REgister Map found
+	Need to fin the set of steps to start the initialization of the Eval Board
+	Change the clock source for SPI4 to 20Mhz since read instructions are limited to 30Mhz
+		! THIS WAS NOT NEEDED, t
+
+
+External
+This will affect the PWM in the LED section
+	The precaler should be adjusted to the desired period
+	
+The callbacks of the IRQ Handler should be set with a HAL function, not overwritten.
+
+
+
+LERNT LESSONS:
+	THE NSS HArdware Signal is literally that the Hardware takes care of the toggling of the NSS output
+		Therefore it is needed to disable it such that the NSS wire is managed by software
+	The HalfCompleted transmission callback for SPI is only available when the DMA is selected
+	The directives for extraconfigurations are enabled by definitions USE_HAL_SPI_REGISTER_CALLBACKS == 1U
+	While communicating with SPI the dummy bytes should be 0xff, so the Chip Select is not having spikes and the transmission is not interrupted
+	The Transmit/Receive SPI+DMA function needs its own callback function TXRXCpltCallback();
+	There are some functions in the spi that might be impolemented manually. For example, the SCS that should be 1 once something has been written over the SPI Bus
+
+Software TODO
+****************************************************************************************
+	Read the technical information about the bus comming from the lan9252
+		Dynamic Endianness control << It could be changed, probably
+	In a given moment the Contnuos reading out of register will be needed!!
+	Init function will be a task but it should be likely only a function.
+?R	When should be set back to high the SCS# port??
+		Once The interrupt from SPI-DMA finished has been called. Since the SPI READ/WRTITE 
+			cycles finish until the data from SPI Device has been received
+			
+	Implement only the FAST READ Function
+	
+	
+
+
+Important Hardware Notes
+****************************************************************************************
+SCS# is NSS, Communicate when Low >>> Inverse Logic
+SPI Mode - The instructions are 8-bit
+
+	READ/WRITE Adressess >> requires 3 bytes, since Addresses are 2-byte long
+	14-bit long address, 15 and 14 field specify whether the action is auto-decrementing or incrementing 10b or 01b
+		Instructions-Addresses-Data always as MSB (From master to device)
+	!	Data is transfered LSB (comming from Device) Litle endian
+	Dummy bytes need to be added sometimes
+There are a set of instructions for SPI Mode and another for SQI
+Only Fast Read will be used
+
+
+List of instructions for LAN9252
+EQIO	Enable the Quad IO
+RSTQIO	Disable the QUAD IO
+
+BN	>> SCS	0
+RD	>> SCK	1
+ON	>> SI	2
+YW	>> SO	3
+
+Initialization
+***************************************************************************************
+BYTE_TEST should be polled Only Single register reads (one per SCSlow)
+READY bit should be polled from HW_CFG<< Only when the configuration is done
+	As mentioned in 6.3.5 Power Management Registers PMT_CTRL, Ready is the bit 0
+	Addresses
+	050h Chip ID and Revision (ID_REV)
+	064h Byte Order Test Register (BYTE_TEST) DEFAULT VALUE!! 87654321h
+	074h Hardware Configuration Register (HW_CFG)
+
+Questions
+	How is the high-speed read enable?
+	MCU is master
+	Hardware NSS Output signal or input?? >> should be output since the MCU is the master
+R	What about the prescaler? 
+		It should match the maximum transfer rate of the Slave: 80MHz
+		Which one is the clock source for the spi? It is APB2, altogether with the SPI1		
+	!	APB2 should be 80 due to the SPI communication
+			APB2 maximum clock is 80 MHz
+	!		The current confi is 40Mbit/s
+			The current Full Duplex Master SPI configuration only supports Prescaler =2
+				This might be related to the fact that while writing it could use both of the ports to expect 2 bits per clock.
+			If the the MCU were a slave device then it could handle at full speed without prescaler
+?				Why?
+R	Do I need both interruptions the SPI and the DMA?
+		The SPI global interruption is for sure needed. The DMAs are alway active as soon as the DMA peripheral is activated for RX and TX
+R	How width shhould be the access to the registers in the LAN9252??
+		All instructions are 1  byte long, addresses are 14-bit long, info could be 32 bit long.
+		
+?R	What about the different commands of the SPI? What is the difference betwen the DUAL, serial, Fast, address and other shit?
+		Apparently it is possible to be in the SPI mode and still having a connection of 4 wires. Which makes sense, since it could be
+			before entering to the SQI mode.
+R	What would be the difference SPI/SQI? 	
+		SQI is the Quad mode for SPI where 4 bits are sent parallely. The connection needs 2 new wires.
+		
+		
+	Further questions:
+	Right know is it needed to make the DMA Buffers Circular/Rounded?
+	What about the priorities of the DMA Streams??
+		First Streams, then Channels ==>> 8 Channels per Stream
+	Difference between the half duplex and full duplex 
+		half go an back not at the same time? full both concurrent?
+	How different masters can access the same slave??
+	
+	RTOS questions:
+	How to determine the size of the buffer in the tasks?

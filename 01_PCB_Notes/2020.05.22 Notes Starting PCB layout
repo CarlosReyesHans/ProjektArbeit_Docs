@@ -50,6 +50,18 @@ WHILE ROUTING
 
 	Check the design rules << There is a packet with the rules from the manufacturer!!
 
+	Snap guides can be deleted by going to properties and at the bootom Guide Manager
+	
+POLYGONS
+	Place a polygon pour -- place tab
+	View Configurations Panel -->> Component Properties
+	
+	
+AFTER ROUTING
+
+
+PCB -AB
+
 
 KEYBOARDS SHORTCUTS
 Ctrl+M ---->>> Measure from point to point
