@@ -1,0 +1,61 @@
+2020.05.25
+SPI DEVELOPMENT
+
+
+********************************************************************************************
+****		STATE (Starting from scratch)
+********************************************************************************************
+@2020.05.25		SPI Theory reviewed and basics for programming.
+	****************
+	MODIFICATIONS
+	
+
+	****************
+	Previous comments 
+	
+********************************************************************************************
+****		Lernt lessons
+********************************************************************************************
+
+Lernt lesson
+	
+@2020.05.25		Functions are not mapping the rgisters but only Reading and Wrriting at the same time
+					This can be though used for mapping the registers to a buffer that would be accessed
+					as the image of the memory in the Device, ant it will be only be dependant of the SPI speed
+					
+				Theory questions, the speed is not the SPI speed but the speed after which the  whole buffer finishes transmitting
+					There could be implemented a way to measure the time through the Logic Analyzer
+					Then, how can we consider the Real Time? What are our time constraints?
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+
+Download SOES and start playing around
+Ask Jannick for a sensor that communicates over SPI
+
+
+
+*Low priority*
+
+
+****************
+*DONE*
+
+@2020.05.10
+
+*Done before*
+
+*******************
+
+********************************************************************************************
+****		NOTES
+********************************************************************************************
+THIS SECTION MAY BE CONVERTED TO ANOTHER FILE DEPENDING ON THE TOPIC.
+
+
+
+			
+			
+***********************			
+	MODIFICATIONs
