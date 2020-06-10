@@ -4,10 +4,17 @@ Configuration of the GUI environments within personal and Hans laptop
 ***************************
 ****		TODO
 ***************************
+
+
+**************************
+****		DONE
+**************************
+@2020.06.10
+
+DONE
 Check messages from REnner
 Finish really the last presentation as kickoff
 	practice it
-
 SETUP a Copy of the repository in GIT LAB from Hans
 
 Continue Working
@@ -16,14 +23,9 @@ Continue Working
 			Clean up the PWM code. Add a task to configure it. A master TASK
 		https://github.com/MaJerle/stm32-ws2812b-tim-pwm-dma
 		Study the DMA theory.
-		
 	
 	Low P
 		Do tests with the system clock of the processor, to further test the first code
-
-**************************
-****		DONE
-**************************
 	Set the periphereals taking into consideration the lirbaries already existing
 	Remote assistance setup correctly but it might be unsecure -can be seen-
 		Team viewer is at the end the solution since it can be shared with an external monitor.

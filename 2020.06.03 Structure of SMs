@@ -6,18 +6,20 @@ First to note: The last changes of SPI are in the SPI_TEST branch
 This structure should be possible to use at least for 1PWM, Temperature and UART
 	
 TODO
-@2020.06.05
+@2020.06.10
 (high priority)
-Work with the new library of 1wire over uart
-Implement it on the SM of temperature sensor
 Adjust the library for PWM to the SM, such that it could work with 2 channels
-there should be a function that suspends again the signal comming out from ecattestpin whenever the ecat has a problem
-
-
 
 
 (low priority)
 the error flags must use either semaphore or mutex!!
+Work with the new library of 1wire over uart
+Implement it on the SM of temperature sensor
+
+there should be a function that suspends again the signal comming out from ecattestpin whenever the ecat has a problem
+
+/*--------------------------------------------------------*/
+@2020.06.05
 
 DONE
 there should be a way to not let all the threads start at once, or start them as blocked

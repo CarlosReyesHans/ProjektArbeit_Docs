@@ -1,0 +1,62 @@
+2020.06.10
+LED WS2812 two channels adaptation into RTOS
+
+
+********************************************************************************************
+****		STATE
+********************************************************************************************
+This document starts where 2020.04.30 LED WS2812 Migration left
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+
+@2020.06.10
+(High priority)
+	Continue debugging the multichannel code and run it, so far there is a file which is still calling for the previous WS2812 lib
+	Change the PWM Channels to match the final distribution of pins
+		for all PWM channels, once the a DMA data sending has finished, its callback turns on 
+			a flag and then call a function to check whether all of the PWMS have triggered, 
+			if yes, then create signal to continue with LED Rings SM
+			
+	Export the BOM to make the purchases of the devices/elemenst/components
+	Start adapting
+
+(High priority for overall system)
+	Check wheter the pins are available in the small version
+	Check what jannick said about the report
+
+(Low priority)
+	Rework the main structure of the GIT
+		One GIT for each Project instead of a root directory
+		
+DONE
+Write the colors of the pinout from the LED Strip
+	Test the previous code running as a superloop
+	Copy the last state machine with the libraries to the LED branch
+
+
+********************************************************************************************
+****		Lernt lessons
+********************************************************************************************
+
+Constraints
+The pointers are sent through a function in library configurate lib()
+
+There can be updated only 255 LEDS within a strip
+
+In function startDMA(void), the TIM_CHANNEL should be provided from defines, so the ones that 
+are gonna be available will need to be hardcoded: Timer 2 ch1 ch3 and timer 3 chx chx <<< Depending on PCB
+
+
+
+
+
+For Branch LED_dev, LEdv1 project
+PWM working in Timer1
+CH1 -> PE9
+
+LED STRIP 
+WH --> GND
+GN --> SIGNAL
+RD --> VDD

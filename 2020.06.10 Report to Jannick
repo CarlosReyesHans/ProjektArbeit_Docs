@@ -1,0 +1,45 @@
+Talk with Jannick
+
+-Advancements within the State Machines
+-Timing of tasks (RTOS approach)
+	Is it ok the 1ms >> timing constraint for refresh cycles
+	
+-Altium new design (draft of the 3d model)
+	- version 1 and 2 -->> 2nd is the interesting one
+
+
+port rx and tx and also the led for status
+
+
+- Affected timing within the schedule 
+	Change the priorities
+		Real Time Constraints (this week)
+		Multiple channel +DMA for 2-4 LED Rings as tasks (this week)
+		Soldering of PCB -> LEDs (next week)
+		Configuration of SOES Library to be implemented for basic config of device (in 2 weeks)
+		Multiple CH of 1-wire interface using UART+DMA as tasks
+
+
+
+
+- Altium design for the capacitive sensor
+	- Mosfet design -- Is there any model to base on?
+		(Lack of experience)
+		-Most of the examples are for high current so it exceed the sizes within the board
+		
+		
+
+
+
+
+
+
+NOTES ABOUT THE TEMPERATURE LIBRARY
+
+Temperature sensor
+	Data through 1wire worked for 1 sensor, nevertheless, since it was based on timers and polling
+		it (protocol in software) does not match the TASK approach
+		New Library will be implemented to address 10 Temperature sensors
+			using 1-Wire protocol over uart, timing and interrupts will be handled by HW
+Overall result:
+
