@@ -1,0 +1,19 @@
+Notes about ECLIPSE and C in general
+
+NEW TAGS
+
+IMPRVME
+CHKME
+PENDING
+/*-------------------------------------commands----------------------------------------*/
+alt + left/right // it sends you back to previous locations of your files
+
+/*-------------------------------------typedefs----------------------------------------*/
+typedef cannot be extern nor static
+
+//EXAMPLE
+
+typedef int int_t; // declares int_t to be an alias for the type int
+typedef char char_t, *char_p, (*fp)(void); // declares char_t to be an alias for char
+                                           // char_p to be an alias for char*
+                                           // fp to be an alias for char(*)(void)

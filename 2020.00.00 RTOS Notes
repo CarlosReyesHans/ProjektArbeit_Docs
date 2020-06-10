@@ -1,0 +1,207 @@
+****************************************
+*	CMSIS/RTOS Interesting facts
+****************************************
+
+The following is a link where the libraries are explained
+https://www.keil.com/pack/doc/CMSIS/RTOS2/html/group__CMSIS__RTOS__Wait.html#ga3c807924c2d6d43bc2ffb49da3f7f3a1
+
+
+Within the configurations files of the RTOS there is the possibility to increase the OS Ticks up to 1KHz
+	TICKRATEHZ <= 1000
+	Any increment beyond that will create erros in portTICK_RATE_MS (bunch of divide by ZEROs)
+		This port is used during scheduling. It could be though modified but this is outside the scope of stm32cubemx,
+			furthermore apparently the faster is this configuration the larger is the overhead*?
+		However, apparently this is fast enough and here comes the importance of preemption and priorities.
+	PRIORITIES:
+	/* PRIORITIES
+	osPriorityLow 	
+	Priority: low.
+
+	osPriorityLow1 	
+	Priority: low + 1.
+
+	osPriorityLow2 	
+	Priority: low + 2.
+
+	osPriorityLow3 	
+	Priority: low + 3.
+
+	osPriorityLow4 	
+	Priority: low + 4.
+
+	osPriorityLow5 	
+	Priority: low + 5.
+
+	osPriorityLow6 	
+	Priority: low + 6.
+
+	osPriorityLow7 	
+	Priority: low + 7.		>> HIGHER PRIORITY THAN LOW, STILL LOWER THAN NORMAL
+
+	osPriorityBelowNormal 	
+	Priority: below normal.
+
+	osPriorityBelowNormal1 	
+	Priority: below normal + 1.
+
+	osPriorityBelowNormal2 	
+	Priority: below normal + 2.
+
+	osPriorityBelowNormal3 	
+	Priority: below normal + 3.
+
+	osPriorityBelowNormal4 	
+	Priority: below normal + 4.
+
+	osPriorityBelowNormal5 	
+	Priority: below normal + 5.
+
+	osPriorityBelowNormal6 	
+	Priority: below normal + 6.
+
+	osPriorityBelowNormal7 	
+	Priority: below normal + 7.
+
+	osPriorityNormal 	
+	Priority: normal.
+
+	osPriorityNormal1 	
+	Priority: normal + 1.
+
+	osPriorityNormal2 	
+	Priority: normal + 2.
+
+	osPriorityNormal3 	
+	Priority: normal + 3.
+
+	osPriorityNormal4 	
+	Priority: normal + 4.
+
+	osPriorityNormal5 	
+	Priority: normal + 5.
+
+	osPriorityNormal6 	
+	Priority: normal + 6.
+
+	osPriorityNormal7 	
+	Priority: normal + 7.
+
+	osPriorityAboveNormal 	
+	Priority: above normal.
+
+	osPriorityAboveNormal1 	
+	Priority: above normal + 1.
+
+	osPriorityAboveNormal2 	
+	Priority: above normal + 2.
+
+	osPriorityAboveNormal3 	
+	Priority: above normal + 3.
+
+	osPriorityAboveNormal4 	
+	Priority: above normal + 4.
+
+	osPriorityAboveNormal5 	
+	Priority: above normal + 5.
+
+	osPriorityAboveNormal6 	
+	Priority: above normal + 6.
+
+	osPriorityAboveNormal7 	
+	Priority: above normal + 7.
+
+	osPriorityHigh 	
+	Priority: high.
+
+	osPriorityHigh1 	
+	Priority: high + 1.
+
+	osPriorityHigh2 	
+	Priority: high + 2.
+
+	osPriorityHigh3 	
+	Priority: high + 3.
+
+	osPriorityHigh4 	
+	Priority: high + 4.
+
+	osPriorityHigh5 	
+	Priority: high + 5.
+
+	osPriorityHigh6 	
+	Priority: high + 6.
+
+	osPriorityHigh7 	
+	Priority: high + 7.
+
+	osPriorityRealtime 	
+	Priority: realtime.
+
+	osPriorityRealtime1 	
+	Priority: realtime + 1.
+
+	osPriorityRealtime2 	
+	Priority: realtime + 2.
+
+	osPriorityRealtime3 	
+	Priority: realtime + 3.
+
+	osPriorityRealtime4 	
+	Priority: realtime + 4.
+
+	osPriorityRealtime5 	
+	Priority: realtime + 5.
+
+	osPriorityRealtime6 	
+	Priority: realtime + 6.
+
+	osPriorityRealtime7 	
+	Priority: realtime + 7.
+	*/
+
+/*-----------------------------------------------------------*/
+Thread Management
+
+osThreadSuspend();	<< This will block a thread and take it out of any execution list.
+	Threads that are already BLOCKED are removed from any wait list and become ready when they are resumed. Thus it is not recommended to suspend an already blocked thread.
+!	This function cannot be called from Interrupt Service Routines.
+
+Thread Flags << First we use the global ones
+
+	Thread Flags are a more specialized version of the Event Flags. See Event Flags. 
+		While Event Flags can be used to globally signal a number of threads, thread flags are only send to 
+		a single specific thread. Every thread instance can receive thread flags without any additional 
+		allocation of a thread flags object.
+
+MUTEX Management
+https://www.keil.com/pack/doc/CMSIS/RTOS2/html/group__CMSIS__RTOS__MutexMgmt.html
+
+
+EVENTS 
+	Events are inside a signal, up to 31 events per signal
+
+
+*************************
+*	RTOS Questions
+*************************
+
+@2020.05.13
+	Dynamic allocation of tasks does not need a name for its buffers, since they're being allocated dynamically
+		Is this Heap1?
+
+
+
+	RTOS is more stable with periphereals timers instead of the systick clock.
+		Why? Apparently some problems with the HAL libraries abstraction
+		
+		Practice>>
+			As developing the first tests of the LED ring, there were two main tasks with normal
+				priorities each, and with the logic analyzer it was possible to see both test signals.
+				There was unfortunetly an overhead almost of 1.5 us. So the RTOS internal clock was changed
+				to the Systick clock @ 180 MHz; nevertheless, it DID NOT work. It even did not schedule
+				the tasks.
+		Is it really processing @ 160 MHz?
+
+
+Backend in rs2_get_option(options:000001F93DF5FD50, option:Backlight Compensation):
+hr returned: HResult 0x800703e3: "The I/O operation has been aborted because of either a thread exit or an application request."
