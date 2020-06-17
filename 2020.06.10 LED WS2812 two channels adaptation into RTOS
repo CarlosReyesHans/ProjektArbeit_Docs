@@ -10,17 +10,89 @@ This document starts where 2020.04.30 LED WS2812 Migration left
 ********************************************************************************************
 ****		TODO
 ********************************************************************************************
+@2020.06.17
+//LESONS
+!!	The output compare preload prevents the signal from bein overlapped or that the following cycle seems shorter everytime a new comparing value is change by the dma
 
-@2020.06.10
-(High priority)
-	Continue debugging the multichannel code and run it, so far there is a file which is still calling for the previous WS2812 lib
-	Change the PWM Channels to match the final distribution of pins
-		for all PWM channels, once the a DMA data sending has finished, its callback turns on 
-			a flag and then call a function to check whether all of the PWMS have triggered, 
-			if yes, then create signal to continue with LED Rings SM
+	The PA3 for CH2 was not intended to be so, but the nucleo board does not count with a physical gpio to PA2
+	Unfortunately the TIMER2 Channel 1 is not working when stating it in DMA mode.
+		After changing to other Timers it does work, but not simultaneously (DMA over different channels even when theyre independent)
+		There are also problems with the callbacks that are not bein recognized.
+		
+	Even though I have already met the solution, the quick solution, I invested though time in trying to run the multichannel alternative
+//TODO
+	Start with the SOES
+	Expand the event handler to handle the errors and events
+	Match or elaborate plan to port the timers to the ones that are gonna be in the physical version
+		Update the channels of timer 2 for it to coincide correctly with the pcb design
 			
+	
+	(low priority)
+	change the PwM_REfresh_period to os evenFlag
+
+	
+	
+	DONE
+		See the pwm generated. >> Ch1 stucks at one whenever 2 dma streams are set.
+		Problem could be de pwm mode, apparently it would let the the different channels to change independently.
+		It could be also the DMA configuration, but I have set already the DMA with different priorities and they are in different
+			Streams. Nevertheless, it could be that  one dma is handling 2 different events  since it is a shared channel. TMER CH4 and UP.
+			
+			>>Quick solution, use only one dma per timer >> test the SM so
+				
+			
+			Long term solution: work with these two channels per timer.
+	Code the two different callbacks depending on the active channel of the DMA
+	
+
+@2020.06.11
+//NOTES
+Variables for event handler will remain with the SM since everything is defined there
+
+
+(High priority)
+
+
+	Apparently something is missing with the DMA interruption 2
+		NOPE, it is a different callback, apparently there is one callback once it has started
+		the callback is set within the DMA handler
+
+	Link and debug the dma callbacks for LED1 and LED2, not only the callbacks but the values
+	Check why the second buffer to be transmitted appears to be shifted by a byte
+
+	Debugging of update state in LED SM can be emulated with a function that creates a LED EVENT and sets a loose boolean!!
+	The update step in LED SM should be called by an error or a notification event, not only notify();
+
+	for all PWM channels, once the a DMA data sending has finished, its callback turns on 
+		a flag and then call a function to check whether all of the PWMS have triggered, 
+		if yes, then create signal to continue with LED Rings SM
+
+	Change the PWM Channels to match the final distribution of pins
+
+			
+
+(Low priority)
+
+	Lern how to link the callbacks using the HAL library, for example for PWM and DMA
+		For now the callback functions can be called from the general interruption callback in HAL_STM32_IT file
+		          (+) At the end of data transfer HAL_DMA_IRQHandler() function is executed and user can 
+              add his own function by customization of function pointer XferCpltCallback and 
+              XferErrorCallback (i.e a member of DMA handle structure).
+		      htim->hdma[TIM_DMA_ID_CC3]->XferCpltCallback = TIM_DMADelayPulseCplt;
+      htim->hdma[TIM_DMA_ID_CC3]->XferHalfCpltCallback = TIM_DMADelayPulseHalfCplt;??
+
+DONE
 	Export the BOM to make the purchases of the devices/elemenst/components
 	Start adapting
+	Create the function to initialize the PWM handlers of the system and link them to the ones from MX
+	We need to set the initial colors before starting the update
+	Define the osTimerCallback for LED	
+There could be a race condition writting the DMA and TIMEOUT Event FLAG
+	NOT because the timeout embedded in the wait for event OS feature is being used. It is not writting any notification flag
+Continue debugging the multichannel code and run it, so far there is a file which is still calling for the previous WS2812 lib
+
+@2020.06.10
+
 
 (High priority for overall system)
 	Check wheter the pins are available in the small version
@@ -40,6 +112,13 @@ Write the colors of the pinout from the LED Strip
 ****		Lernt lessons
 ********************************************************************************************
 
+The callback function after the pulse stored in a buffer has been completely sent using the DMA, needs to
+	be copied from the HAL library. 
+	So it will be called always using an argument as the timer handler. Identification of the channel must be done here
+
+By using the dma with timer, the callback that is used is the one of the timer not the one of the dma.
+	!!! Otherwise, the dma is rewritten constantly by the send functions in the timer library
+
 Constraints
 The pointers are sent through a function in library configurate lib()
 
@@ -50,11 +129,29 @@ are gonna be available will need to be hardcoded: Timer 2 ch1 ch3 and timer 3 ch
 
 
 
+MAPPING OF THE LED CHANNELS TO HARDWARE CHANNELS
+(this is not updated after the streams failed to work within the same Timer)
+LED1 ---> TIM2 CH1 -> DMA stream 5
+LED2 ---> TIM2 CH3 -> DMA stream 1
 
 
-For Branch LED_dev, LEdv1 project
+OUTPUT OF PWM SIGNALS
+
+FOR SMS PROJECT:
+
+	LEDRING1 CH1 ->	PA0
+CH2 ->	PA2 <<<< This is not available in the Nucleo board
+CH2 ->	PA3 <<<< This is available and momentary
+	LEDRING2 - TIM3 - CH1 >> PA6
+
+
+
+FOR BRANCH: LED_dev, LEdv1 project
 PWM working in Timer1
 CH1 -> PE9
+CH2?????
+
+PINOUT OF LED STRIP
 
 LED STRIP 
 WH --> GND

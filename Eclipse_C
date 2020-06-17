@@ -8,6 +8,10 @@ PENDING
 /*-------------------------------------commands----------------------------------------*/
 alt + left/right // it sends you back to previous locations of your files
 
+/*--------------------------------structures-----------------------------------------------*/
+	tempRGB = (WS2812_RGB_t){0,255,255};		<<= a cast to the defined type of structure is needed to assign the values
+				otherwise the error expected type before  {} is missing
+
 /*-------------------------------------typedefs----------------------------------------*/
 typedef cannot be extern nor static
 
@@ -17,3 +21,7 @@ typedef int int_t; // declares int_t to be an alias for the type int
 typedef char char_t, *char_p, (*fp)(void); // declares char_t to be an alias for char
                                            // char_p to be an alias for char*
                                            // fp to be an alias for char(*)(void)
+
+/*------------------------------------some specifier------------------------------------*/
+1000U or 100L U and L suffix. is the way to specify constants as unsigned or Long, so the preprocessor will 
+now even how to store the constant.
