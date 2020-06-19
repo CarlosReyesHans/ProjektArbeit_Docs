@@ -1,0 +1,11 @@
+#Thu Jun 18 15:47:34 UTC 2020
+CustomerEmail=carlos.reyes@hansrobot.de
+CustomerName=Carlos Reyes
+ExpirationDate=2020-06-25
+Issuer=rt-labs
+OriginatingIP=90.187.87.229
+ProductId=3f82fe5c-4d1b-4c5c-9d43-692a8bb9ee59
+ProductName=EtherCAT Explorer
+Scope=Node 3e6a5a4a2d86342441d40b843e6a5a463873ab233e6a5a47
+Signature=MCwCFDf+ppKsa54sOk/S/PyaRFxZZ6v0AhQ/WqSCuhyZGsR8MElhHCH69BicRQ\=\=
+Type=Evaluation

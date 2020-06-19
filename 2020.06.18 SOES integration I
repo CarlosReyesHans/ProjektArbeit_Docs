@@ -1,0 +1,168 @@
+2020.05.29
+
+Starting the SOES Integration
+
+
+********************************************************************************************
+****		STATE
+********************************************************************************************
+@2020.06.18 >> State is not current
+This document starts where 2020.04.30 LED WS2812 Migration left
+
+Current issues can be followed here: https://github.com/OpenEtherCATsociety/SOES/issues?q=is%3Aissue+is%3Aclosed
+//Assumptions
+	-No error handling
+
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+(Long term)
+!	TEST the main interactions with EtherCAT MASTER Monitor (milestone)
+		EEPROM write/read works,
+		ESC register reading works,
+		switching the state machine works (including the OP state),
+
+!		Afterwards:  simple_test example from the SOEM to communicate with EtherCAT master or ECAT Monitor
+			Read out the responses and compare the state of the device
+
+********************************************************************************************
+
+@2020.06.18
+//Lern Lessons
+	What is the ESC? What does ESC stand for? EtherCAT Slave Controller
+	
+	SOES Provides:
+		EtherCAT State Machine
+		Mailbox Interfaces
+		Protocols
+			CoE
+			FoE + bootstrap template
+
+//TODO
+(high priority)
+!	Go through the tutorial OpenEtherCATsociety.github.io
+
+retake the SPI configuration from last exercises
+	-Link the basic functions to the one of the library
+
+Open a Ethercat Slave Information file ESI files with an xml editor
+	Open examples for EtherCAT ESI files
+
+
+	There is a demo version: https://esd.eu/en/products/ethercat-workbench
+			Check the price
+
+Does the CTT work for the SOES that does not support all the features from EtherCAT protocol??
+			
+(medium priority)
+	Look for any trial license for CTT 
+	Look for an example within the Simple Open Ethercat Slave Configurator
+	Check the threads in the beckhoff forum
+	
+
+	Check the library >>> esc_hw.c taken from SOES/soes/hal/rt-kernel-lan9252. 
+		replace the starting functions of spi and others withing the library
+			what about the "cb_get" and "cb_set" functions.?
+	Is the Ethercat Explorer the same as the TwinCAT 3 when adding new devices?
+			Explore the documentation of ethercat explorer 
+	What is CoE?
+	
+!	THEORY: Understanding the mailbox 
+	THEORY: what is EoE as feature of SOES??? 
+		Ethernet over ECAT
+		usage?
+		It is also used within the boot state.
+	THEORY: Object Dictionaries for EtherCAT slaves??
+		
+(low priority)
+	what is  PDI used for such applications is either SPI? Protocol what?
+	Check some examples of wireshark
+	
+
+//DONE
+The XML editor
+	Download a xml editor as a alternative for CTT  https://www.ethercat.org/en/products/D60E3A8E639B44859B2E0F501725703B.htm
+				1403,38 EUR or 700 EURO
+
+Ask Jannick about a credential of the EtherCAT Conformance Test Tool
+Add the xml tools either to stm32MX or Visual Studio
+	https://marketplace.visualstudio.com/items?itemName=DotJoshJohnson.xml
+	
+/*---------------------------------------------------------------------------------------*/
+@2020.06.18
+//Lernt Lessons 
+	The soes can work with Run polling, mixed polling/interrupt or interrupt while communicating
+		with the LAN9252
+	Has libraries for LINUX but not for STM32
+	Support for SM Synchronization
+	
+	About the Slave Designer
+		ESI/EEPROM and Object Dictionaries for EtherCAT slaves using the SOES stack (Simple Open EtherCAT Slave).
+		ESI (Ethercat slave information file) files can be exporter by EtherCAT Workbench
+	
+	As soon as the Slave Editor project is created:
+		And a SOEM slaveinfo Wireshark can be sent to support[at]rt-labs.com
+		The old SlaveEditor was not compatible with LAN9252 due to SPI is configured differently and in conflict with ET1100. 
+	
+/*----------------------------------ETHERCAT--------------------------------------------*/
+	EtherCAT devices have different modes (as IOLINK ones also do) BOOT-operation?-fault?
+
+	
+//TODO
+Moved to the following day
+//DONE
+	Check the plugin for eclipse >>> This is not needed since there is a standalone version for the 
+		ethercat slave designer and the ethercat device monitor/explorer
+	How are we going to work with the SM32?
+		read the documentation for starting points
+	Download the  EtherCAT Slave Editor
+	!	which version of soes should we be using?? The upcoming 3.x will be. the esc_hw driver was updated.
+	Install the wireshark to trace the traffic on Ethernet
+	start right away with soes
+	Check the information within the official information from ecat
+	Still look for an example of a Ecat device using the SOES
+	Download the EtherCAT Explorer (as soon it is necesary and a EtherCAT slave editor has been created)
+		This needs a license with a price about 5k
+	check FoE with LAN9252 in issue web page of github
+	what is the Foe implementation? Part of the official library of components that a ECAT slave has.
+		Apparently is a sort of communication service, similar to the asynchronous comm channel of IO Link.
+			Apparently to communicate the errors
+			FILE OVER ETHERCAT >>> Write files to ethercat slaves
+
+********************************************************************************************
+****		Lernt lessons
+********************************************************************************************
+
+********************************************************************************************
+****		Information of system: Updated: 2020.06.18
+********************************************************************************************
+
+MAPPING OF THE LED CHANNELS TO HARDWARE CHANNELS
+(this is updated after the streams failed to work within the same Timer)
+LED1 ---> TIM8 CH1 -> DMA stream X PC6
+LED2 ---> TIM3 CH1 -> DMA stream X PB5
+
+
+OUTPUT OF PWM SIGNALS
+
+FOR SMS PROJECT:
+
+	LEDRING1 CH1 ->	PC6	Available in PCB and Nucle
+CH2 ->	PA2 <<<< This is not available in the Nucleo board
+CH2 ->	PA3 <<<< This is available and momentary
+	LEDRING2 CH2 -> PB5 PC6	Available in PCB and Nucle
+
+
+
+FOR BRANCH: LED_dev, LEdv1 project
+PWM working in Timer1
+CH1 -> PE9
+CH2?????
+
+PINOUT OF LED STRIP
+
+LED STRIP 
+WH --> GND
+GN --> SIGNAL
+RD --> VDD

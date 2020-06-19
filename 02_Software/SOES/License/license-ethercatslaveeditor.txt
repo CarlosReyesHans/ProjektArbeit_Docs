@@ -1,0 +1,11 @@
+#Thu Jun 18 15:44:02 UTC 2020
+CustomerEmail=carlos.reyes@hansrobot.de
+CustomerName=Carlos Reyes
+ExpirationDate=2020-06-25
+Issuer=rt-labs
+OriginatingIP=90.187.87.229
+ProductId=69353383-5704-414c-98c9-cb09ca0f9b3b
+ProductName=EtherCAT Slave Editor
+Scope=Node 3e6a5a4a2d86342441d40b843e6a5a463873ab233e6a5a47
+Signature=MCwCFDme7guNbo+1yDNI1XFP+9/PSXa1AhQPpU7AAkHMdzB29RA/bdYBaVEt1Q\=\=
+Type=Evaluation

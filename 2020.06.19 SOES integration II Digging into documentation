@@ -1,0 +1,131 @@
+2020.06.19
+THE SOES Example Implementation
+
+
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+This document contains information about the implementation of the SOES v.1.0.0 as shown in 
+	the example tutorial8_txt. 
+	It is also related to the file Starting the SOES Integration I 2020.06.18
+
+@2020.06.19	
+Starting
+
+
+********************************************************************************************
+****		NOTES
+********************************************************************************************
+The System
+	Inputs 40bit
+		One button 8bit
+		One encoder value 32bit
+	Outputs 8bit
+		LED 8bit
+	Parameters
+		Encoder settings
+	Slave commands
+		Reset counter
+
+Words to have in mind: 
+	OBJECT DICITIONARY - Based on CANopen, it is the distribution of the data that the ECAT 
+			device is working with. Namely, inputs, outputs, configuration, diagnosis areas, etc.
+	PROCESS DATA AND MAILBOX - Communication channels for the device to communicate with the master
+		
+	SERINGERS ==>  To inject grease
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+//Lernt Lessons
+The object dictionary used to describe the data I/O of the EtherCAT Device is based on CANopen.
+
+SyncManager has 4 types, depending on what the Device is communicating to the master (Mailbox or Process Data)
+	Divided into 2 types again depending the communication direction (master-slve or slave-master).
+	Whihc SyncManager is working is linked ot OD indexes. !!
+		standard settings SM0 = 1, SM1 = 2, SM2 = 3, SM3 = 4 from ETG 1000.6, 5.6.7.4.
+		SyncManagers channels 0-31 are listed in SDO1C10-SDO1C2F (Registers?)
+
+A process data output, which is the Type3 of SyncManager, is stored within an objectlist.h. This file
+	contains matrixes where the data is mapped depending on its type and characteristics.
+		FLASHSTORE _objd SDO1C12[] => one PDO 0x01 and its index 0x1600 (index to next array)
+		FLASHSTORE _objd SDO1600[] => one PDO 0x01 of length 1 byte =  0x70000108, 
+			means: 0x7000 - 0x7FFF, Output area, index 1, length 8 bits.
+
+At PDO Levels (Process data output) the local variables are linked to the specified matrixes.
+	Directly to the address space of outputs (0x7000) ==>> FLASHSTORE _objd SDO7000[] = {THE INDEX 1,
+										{0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, &acName7000_01[0], 0, &(Wb.LED)}}
+	And the local variables has been already declared:
+	!!	utypes.h
+								typedef struct
+								{
+								   uint8 LED;
+								} _Wbuffer;
+
+	Other mandatory fields 0x1000 Device Type 0x1018 Object Identity 0x10C0 SyncManager Communication Type
+		For a complete description of the object dictionary you can get guidance by the ETG1000.6 EcatAlProtocols
+
+
+objectlist.h <<< Object dictionary for data 
+utypes.h <<< Definition of local variables to be linked to the objectlist
+soes.c <<< The main code of the EtherCAT device
+		ESC_objectHandler (index, subindex); << Handling of one specific object, probably within an infinite loop
+												that will update the objectlist
+		void ESC_objecthandler (uint16 index, uint8 subindex)
+			{
+			   switch (index)
+			   {
+			...
+				  case 0x7100:
+				  {
+					 switch (subindex)
+					 {
+						case 0x01:
+						{
+						   encoder_scale_mirror = encoder_scale;
+						   break;
+						}
+					 }
+					 break;
+				  }
+			...
+				}
+			}
+/*-----------------------------------------------------------------------------------------*/
+//TODO
+(High priority)
+Use the rtl_slavedemo as example
+	copy the ecat_options and other files to the main project
+!	Look for the ESI file for the example.
+	
+Write an skeleton for the soes implementation in code, using own functions
+	Then the object dictionary will be flashed into the EEPROM of the LAN9252?
+		That may be the reason why the EEPROM needs an HEX file to be flashed, the one that contains the objectlist/object dictionary
+
+Create a ESI file from an example
+Define the SII-EEPROM Memory map
+
+How large is the expected data comming out from the Ecat slave?
+
+*What is the PDO and OD data types?
+	*The OD indexes 
+	How are they related to the SDO1C10-SDO1C2F (are these stored in the MCU or the EEPROM from LAN?)
+		R= This registers keep the indexes to PDOs (Process Data Otput)
+
+What is CANopen DS301 ranges?
+
+(medium priority)
+	THEORY: What is the SDO?? They are kinda asynchronous data.
+			It is related to the object dictionary index (the one that divides the EEPROM depending on the use of the data)
+				Apparently each object, independently of whether it is process out/input data or service, it is SDOXXXX
+	Download the Ethercat official docummentaion ETG1000.X Ecat description, so the abreviations are avaukabke
+
+	THEORY: EEPROM, it is a rewritable memory, non-volatile and slow access that is mapped to the 
+		same address space than the internal memories of the microcontroller
+		
+		
+//DONE
+	Copying the libraries needed to the SOES project except for ecat_options.
+	Checked information about the SOEM to hav ea picture of the structure
+	How familiar is Jannick with EEPROM writing/reading
+		Regular experience by using it not developing

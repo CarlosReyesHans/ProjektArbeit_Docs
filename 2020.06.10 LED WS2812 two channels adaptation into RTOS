@@ -7,9 +7,60 @@ LED WS2812 two channels adaptation into RTOS
 ********************************************************************************************
 This document starts where 2020.04.30 LED WS2812 Migration left
 
+@2020.06.18	
+The events are basically handled by a concurrent task.
+Multichannel of pwm+dma is stable for different timers with different cycles. The outputs coincide
+	with the channels seleted for the pcb. NO EFFECTS only solid colors.
+
 ********************************************************************************************
 ****		TODO
 ********************************************************************************************
+@2020.06.18
+//Lessons lernt
+	Use some physical fuses to bridge different timers to a different pinouts.
+	The value that is stored corresponding to the value of the high state of the pwm, which is the effective 
+		percentage of pulse is hardcoded in the library, and it is not adjustable to different frequencies.
+		The to-compare value is actually in terms of the timer counter not a percentage. 
+			this means: If timer counts till 250, then 50% should be 125
+			Quick solution -> Change both APBX clock buses to be the same for different timers
+	!!		Better solution --> Use prescaler for only one timer such that the APBX correspondent bus can remain 
+				with a high frequency.
+			>>> This also helps the spi peripheral to work at high speed
+			>>>	TIMER connected to APB2 should have a prescaler value of 2
+		!!		>>> The prescalers values on the MX configuration wizard are always starting counting from 0, 
+					this means, values should be always X-1, where X is the value we want. 
+					For example, Count 4 cpu clock tick before having a timer tick, then prescaler = 4-1
+						period counter to count 100 times, then  period counter = 100-1
+	
+//TODO
+(high priority)
+	Start with the SOES
+	Expand the event handler to handle the errors and events
+	Check wheter the pins are available in the small version
+	Check what jannick said about the report
+
+(medium priority)
+	add effects and other colours to the state machine
+	check which other features need to be implemented and make a list on the technical specification.
+
+(low priority)
+	Plan how would work 4 different channels
+	Change the PwM_REfresh_period to os evenFlag
+	
+	Lern how to link the callbacks using the HAL library, for example for PWM and DMA
+		For now the callback functions can be called from the general interruption callback in HAL_STM32_IT file
+		          (+) At the end of data transfer HAL_DMA_IRQHandler() function is executed and user can 
+              add his own function by customization of function pointer XferCpltCallback and 
+              XferErrorCallback (i.e a member of DMA handle structure).
+		      htim->hdma[TIM_DMA_ID_CC3]->XferCpltCallback = TIM_DMADelayPulseCplt;
+      htim->hdma[TIM_DMA_ID_CC3]->XferHalfCpltCallback = TIM_DMADelayPulseHalfCplt;??
+	
+//DONE
+	Change different colors for different channels (right now is only one color)
+	Match or elaborate plan to port the timers to the ones that are gonna be in the physical version
+	Update the channels of timer 2 for it to coincide correctly with the pcb design
+		LED_RING1 -> Works with timer 8 channel 1 at 160Mhz
+		LED_RING2 -> Works with timer 3 channel 2 at 80 Mhz
 @2020.06.17
 //LESONS
 !!	The output compare preload prevents the signal from bein overlapped or that the following cycle seems shorter everytime a new comparing value is change by the dma
@@ -21,18 +72,10 @@ This document starts where 2020.04.30 LED WS2812 Migration left
 		
 	Even though I have already met the solution, the quick solution, I invested though time in trying to run the multichannel alternative
 //TODO
-	Start with the SOES
-	Expand the event handler to handle the errors and events
-	Match or elaborate plan to port the timers to the ones that are gonna be in the physical version
-		Update the channels of timer 2 for it to coincide correctly with the pcb design
-			
 	
 	(low priority)
-	change the PwM_REfresh_period to os evenFlag
-
 	
-	
-	DONE
+//DONE
 		See the pwm generated. >> Ch1 stucks at one whenever 2 dma streams are set.
 		Problem could be de pwm mode, apparently it would let the the different channels to change independently.
 		It could be also the DMA configuration, but I have set already the DMA with different priorities and they are in different
@@ -46,12 +89,18 @@ This document starts where 2020.04.30 LED WS2812 Migration left
 	
 
 @2020.06.11
-//NOTES
+//Lernt lessons
 Variables for event handler will remain with the SM since everything is defined there
 
-
+//TODO
 (High priority)
 
+		
+
+(Low priority)
+
+
+//DONE
 
 	Apparently something is missing with the DMA interruption 2
 		NOPE, it is a different callback, apparently there is one callback once it has started
@@ -68,35 +117,21 @@ Variables for event handler will remain with the SM since everything is defined 
 		if yes, then create signal to continue with LED Rings SM
 
 	Change the PWM Channels to match the final distribution of pins
-
-			
-
-(Low priority)
-
-	Lern how to link the callbacks using the HAL library, for example for PWM and DMA
-		For now the callback functions can be called from the general interruption callback in HAL_STM32_IT file
-		          (+) At the end of data transfer HAL_DMA_IRQHandler() function is executed and user can 
-              add his own function by customization of function pointer XferCpltCallback and 
-              XferErrorCallback (i.e a member of DMA handle structure).
-		      htim->hdma[TIM_DMA_ID_CC3]->XferCpltCallback = TIM_DMADelayPulseCplt;
-      htim->hdma[TIM_DMA_ID_CC3]->XferHalfCpltCallback = TIM_DMADelayPulseHalfCplt;??
-
-DONE
+	
 	Export the BOM to make the purchases of the devices/elemenst/components
 	Start adapting
 	Create the function to initialize the PWM handlers of the system and link them to the ones from MX
 	We need to set the initial colors before starting the update
 	Define the osTimerCallback for LED	
-There could be a race condition writting the DMA and TIMEOUT Event FLAG
+	There could be a race condition writting the DMA and TIMEOUT Event FLAG
 	NOT because the timeout embedded in the wait for event OS feature is being used. It is not writting any notification flag
-Continue debugging the multichannel code and run it, so far there is a file which is still calling for the previous WS2812 lib
+	Continue debugging the multichannel code and run it, so far there is a file which is still calling for the previous WS2812 lib
 
 @2020.06.10
 
 
 (High priority for overall system)
-	Check wheter the pins are available in the small version
-	Check what jannick said about the report
+
 
 (Low priority)
 	Rework the main structure of the GIT
@@ -127,22 +162,24 @@ There can be updated only 255 LEDS within a strip
 In function startDMA(void), the TIM_CHANNEL should be provided from defines, so the ones that 
 are gonna be available will need to be hardcoded: Timer 2 ch1 ch3 and timer 3 chx chx <<< Depending on PCB
 
-
+********************************************************************************************
+****		Information of system: Updated: 2020.06.18
+********************************************************************************************
 
 MAPPING OF THE LED CHANNELS TO HARDWARE CHANNELS
-(this is not updated after the streams failed to work within the same Timer)
-LED1 ---> TIM2 CH1 -> DMA stream 5
-LED2 ---> TIM2 CH3 -> DMA stream 1
+(this is updated after the streams failed to work within the same Timer)
+LED1 ---> TIM8 CH1 -> DMA stream X PC6
+LED2 ---> TIM3 CH1 -> DMA stream X PB5
 
 
 OUTPUT OF PWM SIGNALS
 
 FOR SMS PROJECT:
 
-	LEDRING1 CH1 ->	PA0
+	LEDRING1 CH1 ->	PC6	Available in PCB and Nucle
 CH2 ->	PA2 <<<< This is not available in the Nucleo board
 CH2 ->	PA3 <<<< This is available and momentary
-	LEDRING2 - TIM3 - CH1 >> PA6
+	LEDRING2 CH2 -> PB5 PC6	Available in PCB and Nucle
 
 
 
