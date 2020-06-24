@@ -1,13 +1,19 @@
 2020.05.22
-This notepad contains shortcuts for ALTIUM
+Starting PCB Layout
+
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+@2020.06.19
+	This note contains general information about the process of working in a new design in 
+		Altium.
+		
+	Everything completed.
 
 
-DONE
-@2020.05.20 - No problem with Plugin
-Check introduction to PCB transport
-Then Keys
-
-NOTES About Altium
+********************************************************************************************
+****		NOTES about ALTIUM
+********************************************************************************************
 
 NEtlabels only provide connection within the same sheet and cables
 Ports provide connections between different sheets.
@@ -61,6 +67,12 @@ AFTER ROUTING
 
 
 PCB -AB
+
+
+//DONE
+@2020.05.20 - No problem with Plugin
+Check introduction to PCB transport
+Then Keys
 
 
 KEYBOARDS SHORTCUTS

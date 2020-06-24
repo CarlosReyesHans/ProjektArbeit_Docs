@@ -1,0 +1,88 @@
+@2020.06.19
+Manufacturing of the PCB
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+
+This continues where the 2020.05.22 Notes starting PCB Layout left
+
+@2020.06.20
+Mounted and soldered by first time
+
+
+********************************************************************************************
+****		NOTES
+********************************************************************************************
+
+Word references
+SOLDER PASTE - what needs to be put on the usrface of the pcb, on the right amount and position
+					Literally this will be soldered.
+STENCIL	- stainless steel sheet 
+		Could be WITH FRAMEWORK OR WITHOUT IT. 
+		
+FIDUCIAL MARKER - it is a reference point on pcbs to be proven by a vision system
+		Could be half-lasered, lasered or non. Fiducials are inserted during design
+
+Reflow Oven	- One of the methods to solder
+
+BLURRS - manchas, spots
+
+NEEDLE - to fix the clothes/to apply the solder paste
+
+TWEEZERS/PLIERS - To hold the chip
+
+HOT AIR GUN NOZZLE - is the pointy end of a hot air gun, from which the hot air comes out 6mm across
+
+MARKER TYPE FLUX DISPENSER
+
+SOLDERING IRON TIP - now can be used at the end to clean (bridge from two different ) from bad soldering, when it gets between two pins
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+
+@2020.06.20
+
+
+(High priority)
+
+ Use the soldering iron to clean any bridge created through the soldering process
+ Test
+	Make cable from external power source
+	Make 2 cables for pwms
+	Power supply test
+	Check how to program with jtag
+	Test a blinking led program
+	test pwm
+	test spi with send receive
+	
+(External and high priority)
+
+	Continue the second PCB design.
+ //DONE
+  Paste or hold the pcb onto the stencil with tape or something/glue
+ hold it strongly and ppur the soldering paste throughout all thestencil
+	to have the right quantity at the right place
+ With the tweeyers/pliers, locate the components carefully in the center of their pads
+ use the hot air gun tip to heat the pins with the soldering paste till it melts and
+	gets exactily between the pad and the pin
+	
+@2020.06.19
+//TODO
+
+//DONE
+	Introduction to lab
+
+ 
+ /*----------------------------------------------------------------------------------------*/
+ Material to be used
+ 
+ soldering iron
+ microscope
+ solder paste with its tool to spread it over the stencil
+ tape for holding the pcb on to the stencil
+ hot air gun with different tips/ different temperatures?
+ Using any holder for the pcb
+ Something to pull pins out of the pcbs
+
+

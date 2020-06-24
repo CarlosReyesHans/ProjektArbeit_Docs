@@ -1,12 +1,103 @@
 2020.05.28-29
 SPI Starting the communications
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+@2020.06.24	The adaptation to the manufactured board will be done
+			To test the SPI channel within the AXIS COMM BOARD, the branch spi_board_dev should be used!!
+********************************************************************************************
+****		TODO
+********************************************************************************************
+@2020.06.24
 
-TODO
-Start with the integration of SOES
+//TODO
 
-Set back the brightness and other stuff to Till's Display
+Increase the Transmission speed till 40 MBits/80 Mbits ()
+	Adjust the SPI4 at least to 40 Mbit/s
+	Is it possible to work with 80 Mbits in normal SPI or does it only work with SQI??
+
+Connect the spi4 to the logic of the SM, such that it handles an event to change colors when connected and disconnected.
+Continuing the SOES implementation
+
+External
 Export in a correct way the pdfs of the schematics
 
+
+//QUESTIONS 
+	(From questions at bottom) The current Full Duplex Master SPI configuration only supports Prescaler =2
+		This might be related to the fact that while writing it could use both of the ports to expect 2 bits per clock.
+	If the the MCU were a slave device then it could handle at full speed without prescaler
+?				Why?
+//DONE
+See the signals with the digital analyzer // This was not necessary
+Backup the main configuration for the implementation at NUCLEO Board
+For next Version the fastest APB bus should be used for SPI communication
+	SPI4 is using the fastest one
+
+
+/*----------------------------------------------------------------------------------------*/
+Configuration for NUCLEO:
+Full-Duplex Master on SPI4
+Hardware NSS Output Signal
+
+SPI4
+PE2		-->	SCK			NO			@All Very high frequency	Labels ECAT_SCK/SCS/MISO/MOSI
+PE4		-->	NSS			PULL-UP
+PE5		-->	MISO		NO
+PE6		-->	MOSI		NO
+
+DMAs at Low Priority
+Byte-Byte
+Incremental only in Memory, normal and directions depending on transmission
+All interruptions
+
+
+SPI General configuration
+Motorola
+8 Bits
+MSB First
+4
+Clock polarity Low
+Clock Phase	1 Edge
+NSS Signal Type	Output by Hardware
+/*----------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------*/
+Configuration for AXIS COMM BOARD:
+//Learnt lesson
+The SPI2 is related to the APB1 which means that the fastest speed is 20 MHz with prescaler 2, since
+	the APB1 bus can handle only up to 45 Mhz
+
+Full-Duplex Master on SPI2
+Hardware NSS Output Signal
+
+SPI4
+PC7		-->	SCK			NO			@All Very high frequency	Labels ECAT_SCK/SCS/MISO/MOSI
+PD1		-->	NSS			PULL-UP
+PC2		-->	MISO		NO
+PC3		-->	MOSI		NO
+
+DMAs at Low Priority
+Byte-Byte
+Incremental only in Memory, normal and directions depending on transmission
+All interruptions
+
+
+SPI General configuration
+Motorola
+8 Bits
+MSB First
+4
+Clock polarity Low
+Clock Phase	1 Edge
+NSS Signal Type	Output by Hardware
+/*----------------------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------------------------*/
+
+@2020.05.29
+TODO
 
 DONE
 @2020.05.29

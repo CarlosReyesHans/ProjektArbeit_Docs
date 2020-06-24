@@ -10,6 +10,8 @@ Starting the SOES Integration
 This document starts where 2020.04.30 LED WS2812 Migration left
 
 Current issues can be followed here: https://github.com/OpenEtherCATsociety/SOES/issues?q=is%3Aissue+is%3Aclosed
+
+
 //Assumptions
 	-No error handling
 
@@ -31,6 +33,7 @@ Current issues can be followed here: https://github.com/OpenEtherCATsociety/SOES
 @2020.06.18
 //Lern Lessons
 	What is the ESC? What does ESC stand for? EtherCAT Slave Controller
+	What is CoE? Can over Ethercat
 	
 	SOES Provides:
 		EtherCAT State Machine
@@ -66,7 +69,7 @@ Does the CTT work for the SOES that does not support all the features from Ether
 			what about the "cb_get" and "cb_set" functions.?
 	Is the Ethercat Explorer the same as the TwinCAT 3 when adding new devices?
 			Explore the documentation of ethercat explorer 
-	What is CoE?
+
 	
 !	THEORY: Understanding the mailbox 
 	THEORY: what is EoE as feature of SOES??? 

@@ -91,16 +91,41 @@ soes.c <<< The main code of the EtherCAT device
 			...
 				}
 			}
+
+6-8 weeks for development time
+
+!!	The device is a stand-alone device with two MII )_ ports
 /*-----------------------------------------------------------------------------------------*/
 //TODO
 (High priority)
+
+Add the following tasks into the planner
+	Device requirements
+	Ethercat feature configuration???
+	Software development
+		esi
+		comm swab
+		local application (example)
+!	Debug with CTT and NW monitor (this is important, it could be that there would not be a free application)
+	No-Conformance TEST
+	
+	
+
+
+Apparently there is a development toolkit available and it does not need the CTT license.
+Continue the documentation of ethercat official pdf (Section II of ETG2200 v3) 
+	Look for and NW Monitor Software from Beckhoff
+
 Use the rtl_slavedemo as example
 	copy the ecat_options and other files to the main project
 !	Look for the ESI file for the example.
 	
+Redesign the structure of the software (it is getting messy)	
+	
 Write an skeleton for the soes implementation in code, using own functions
 	Then the object dictionary will be flashed into the EEPROM of the LAN9252?
 		That may be the reason why the EEPROM needs an HEX file to be flashed, the one that contains the objectlist/object dictionary
+		R = EEPROM configuration is a needed step that should be created to have the device working
 
 Create a ESI file from an example
 Define the SII-EEPROM Memory map
