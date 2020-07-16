@@ -8,7 +8,9 @@ THE SOES Example Implementation
 This document contains information about the implementation of the SOES v.1.0.0 as shown in 
 	the example tutorial8_txt. 
 	It is also related to the file Starting the SOES Integration I 2020.06.18
-
+@2020.06.25
+	Integration of some libraries in the branch ecat_dev lead to compilation errors.
+	This file is still open
 @2020.06.19	
 Starting
 
@@ -99,6 +101,9 @@ soes.c <<< The main code of the EtherCAT device
 //TODO
 (High priority)
 
+What is the difference between sending dma or by interruption?
+
+
 Add the following tasks into the planner
 	Device requirements
 	Ethercat feature configuration???
@@ -106,6 +111,9 @@ Add the following tasks into the planner
 		esi
 		comm swab
 		local application (example)
+		Create a ESI file from an example
+		Define the SII-EEPROM Memory map
+
 !	Debug with CTT and NW monitor (this is important, it could be that there would not be a free application)
 	No-Conformance TEST
 	
@@ -127,8 +135,7 @@ Write an skeleton for the soes implementation in code, using own functions
 		That may be the reason why the EEPROM needs an HEX file to be flashed, the one that contains the objectlist/object dictionary
 		R = EEPROM configuration is a needed step that should be created to have the device working
 
-Create a ESI file from an example
-Define the SII-EEPROM Memory map
+
 
 How large is the expected data comming out from the Ecat slave?
 

@@ -1,0 +1,284 @@
+2020.06.25	Changes in the library
+
+
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+This document contains information about the implementation of the SOES v.1.0.0 as shown in 
+	the example tutorial8_txt. 
+	It is also related to the file Starting the SOES Integration II 2020.06.19
+@2020.07.15
+	Restarting work after spi tests, pcb design + delays
+@2020.07.02
+
+@2020.06.25
+	Integration of some libraries in the branch sm_ecat_dev lead to compilation errors.
+	This file is still open
+	
+
+
+********************************************************************************************
+****		NOTES
+********************************************************************************************
+/*-----------------------Changes within the library of SOES-----------------------------------------*/
+@2020.07.16	cc.h file was modified to use DPRINT(...) macro as defined with printf, taking into account that stdio.h is already included
+@2020.07.03
+	spi_select() and unselect() will be ignored since the spi interface will always active, unless it is necessary to shut off and restart.
+@2020.07.02
+	MAcro #define BIT(nr) (1UL << (nr)) added to axis overall lib
+	The following functions has been properly tested
+	(not finished)The following functions are being tested
+		lan9252_read_32();  <<	changed from esc_hw.c to lan9252_spi.c
+			alltogether with ESC_init_mod
+			escread for addresses less than 0x1000
+@2020.06.26	
+	within ESC_read_param()	the read/write function are changed to raw_read
+
+This sizeof parameter may be a problem afterwards << keep an eye on it
+Keep an eye on the ESC_CMD_FAST_READ_DUMMY
+
+
+LAN9252 Channel was changed, in write and read functions it is not needed, since the AXIS COMM HUB is only working with one ECAT device
+SIZEOF in write and read, are practically ignore in implementation since they always work with 4 bytes-data 8 bytes long needed due to dma
+
+The ESC_CMD_FAST_READ_DUMMY will be changed from1  to 0xff, since this avoid spikes that restart the communication line
+
+/*-----------------------NOTES about LAN9252-----------------------------------------*/
+
+
+It mimics/emulates? the ET1100 always providing AlEvent on every read or write
+Process data ram is mapped after 0x1000 << apparently from function ESC_read
+
+**********************
+
+The EEPROM addresses are defined following the EtherCAT Slave standard.
+
+	The EEPROM Interface is defined in 13.0 EEPROM Interface
+		It uses a I2C interface and the size is determined by eeprom_size_trap
+			Where is defined "eeprom_size_trap"? IT is defined as HARD-STRAP, a kinda default value for EtherCAT functionalities
+				From Table 7-1 of LAN9252
+				//EEPROM Size Strap: Configures the EEPROM size range.
+				//A low selects 1K bits (128 x 8) through 16K bits (2K x 8).
+				//A high selects 32K bits (4K x 8) through 4Mbits (512K x 8)
+				??This means that it is configurable. Where?? Probably given by SOES
+
+	Section 12.8 EEPROM Configurable Registers within the LAN9252 Datasheet
+	
+	The Table 12-15 Has the EtherCAT CORE CSR Registers
+		From it it is explicitly shown that address 0500h matches the starting configuration area for EEPROM
+		There are two 32-bit long REgisters to control the indirect writing of EEPROM
+			0504h-0507h EEPROM Address Register
+			0508h-050Bh EEPROM Data Register
+	What is the full size of the EEPROM Memory?
+	Can it be then written over SPI, sending data to ASIC and let it write through it the EEPROM?
+		YES, therefore the following instructions are defined:
+			#define ESC_CSR_DATA_REG         0x300
+			#define ESC_CSR_CMD_REG          0x304
+
+			#define ESC_CSR_CMD_BUSY         BIT(31)
+			#define ESC_CSR_CMD_READ         (BIT(31) | BIT(30))
+			#define ESC_CSR_CMD_WRITE        BIT(31)
+	What is the detailed information of Address Register and Data Register?
+	Is it Little/Big Endian?
+*************************
+
+	Distributed Clocks - Receive Times are also mapped after the EEPROM in the overall The Table 12-15 Has the EtherCAT CORE CSR Registers
+	Digital Input/Output <<< These are almost the last address within the ESC-LAN9252
+		0F00h-0F01h Digital I/O Output Data Register
+		0F10h-0F11h General Purpose Output Register
+		0F18h-0F19h General Purpose Input Register
+	
+/*-----------------------LERNT LESSONS-----------------------------------------*/
+etohs and etothl are macros defined in CC to identify whether data shou;ld be swapped depending on its procedence, if it is Big Endian or Little Endian
+
+//CHECK in options ecat the length of the buffers are defined
+/* Max number of dynamically mapped objects in SM2. May be 0 to
+   disable dynamic processdata. */
+#ifndef MAX_MAPPINGS_SM2
+#define MAX_MAPPINGS_SM2 16
+#endif
+
+/* Max number of dynamically mapped objects in SM3. May be 0 to
+   disable dynamic processdata. */
+#ifndef MAX_MAPPINGS_SM3
+#define MAX_MAPPINGS_SM3 16
+#endif
+
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+@2020.07.15
+Continue with the porting of the example application after waiting from being busy
+
+	-Copy the sample main function to the project and run it
+		-Cotinue copying the global variables of the sample application (detailed in further section)
+			test/debug open() with modification of string comparison
+			
+		-What part should be a task, what part can be executed and interrupted?
+			Create soes and periodic task, at which period?? >> This depends on ecat_slv(), nevertheless, it could be paused after the ecat_slv_init();
+				What is the APP. variable? where it is defined?
+		-WTF with led_handler
+		//DONE
+			Modify the       .user_arg = "/spi0/et1100" at soes() to comply with LAN9252 adaption of code
+			
+			
+	-Bypass the bootstrap functionalities by disabling FOE 
+		--This may demand to deactivate and modify the ESI file
+		--IT may be needed to include an eeprom library for STM32
+			-There is no EEPROM HAL library
+	-adjust bootstrap.c ~/SOES_APP/
+		what is the flash_drv.h???
+	-How are used the hooks post_state_change_hook() and post_object_download_hook();
+	-Compile and upload to GIT
+	-Adjust the bootstrap to not write any information into the eeprom, while keeping the library such that the ESC does not enter into fail state.
+	-What is the bootstrap? State within the EcatSM that s used for FIRMWARE. IT is optional but recommended. It works mainly with FoE (File Access over EtherCAT)
+		(See the notes of EEPROM)
+		-It could be posssible that this part is not needed cause the eeprom is supposedly to be flashed with the TwinCAT3
+		-Why are there two bin files related to the eeprom??? /SOES/applications/rtl_slavedemo,
+			namely eeprom.bin, and RTL_ATO_SPI_slave.bin
+	-Write in the report that the LED RUN/ERROR may be not implemented. TAble 9, as described in ETG2200_v3i1i0
+		-OS Tasks that would call the LED control functions, so far, are not spawned.
+			~/SOES_APP/led_handler
+(Low priority)
+	-Adjust cb_get_inputs() and cb_set_outputs() to work with temp variables.
+		~/../main.c From SAMPLE
+	-Write the select function >> 	spi_select() << Is it necessary to redefine this function? YES
+	-Add the meeting in the outlook calendar, meeting with MR Renner
+
+
+//CLOSED
+	-Write a directory of new functions
+	-Merge soes_src to soes_app, where soes_app will be directory to be included
+		This is not needed, indeed include directories are not the same to source directories.
+			The compiler add the needed libraries to the source .c files 
+				<< in this case the ones included in soes_libs, and soes_app_libs are included to soes_app source files
+
+
+@2020.07.03
+//TODO
+
+(low priority)
+Check information and understand the Little Endian and Big Endian
+Change within the read ecat read???
+
+//DONE
+	@16:13 I'm trying to run esc_read() within the ecat_sm task to only read the ESC state.
+		test open() self made open by creating a variable that identifies the ESC
+	declare a read functions for lengths 
+	(reopened)It is needed to compile the whole project and define open() O_RDWR ! // (: 
+	
+
+
+The following functions should be tested:
+What is the ESC_read_csr? CSR?
+	!!!	lan9252_write_32()		<< Needs to be tested with the digital analyzer
+
+	esc_read_pram();  <<	esc_hw.c
+	ESC_read_csr ??????????	<<	esc_hw.c
+	esc_read() <<	esc_hw.c
+		test it with the data fromm ecat_slv_init() >>       
+					ESC_read (ESCREG_DLSTATUS, (void *) &ESCvar.DLstatus,
+						sizeof (ESCvar.DLstatus));
+					ESCvar.DLstatus = etohs (ESCvar.DLstatus);
+		
+	esc_write_pram();  <<	esc_hw.c
+	ESC_config()	<< esc.c
+	ESC_init(); when is it been called?
+	Run the whole application example
+	How can I know the ESCREG ?? Where are they stored
+	Go back to original definitions in the files given
+	#define BIT(nr) (1UL << (nr)) to be moved to another common library
+	
+(low priority)
+	What is App_safeoutput() used for?
+	what is AlEvent??? Not sure, it is related to the ESC instance.
+
+
+TEst the ESC_read_param within the library
+	ecat_read_raw() should be only for receiving not for sending, nevertheless, it shouldkeep the clock << could be changed to a while or sending a big file.
+	Test a continuing read of the registers
+	
+/*-------------------------Variable Instances from SOES application--------------------------------------*/	
+	/* From application */
+	//Defined in SampleApp.c
+	extern _ESCvar ESCvar;
+	
+	//Not reviewed
+	extern void APP_safeoutput ();
+	extern _MBXcontrol MBXcontrol[];
+	extern uint8_t MBX[];
+	extern _SMmap SMmap2[];
+	extern _SMmap SMmap3[];	
+	
+	//Not yet defined
+/*-------------------------From SOES libraries --------------------------------------*/	
+-----------
+	what is etohs()? <<	esc_hw.c << 
+		It is a Macro that checks whether a received data should be rearranged depending on ENDianess
+-----------
+	task_spawn(); is a linux function that normally would have more parameters. Within the SOES library, 
+		it will be assumed, "name", function pointer, priority, stack size, and parameter.
+	https://docs.windriver.com/bundle/vxworks_7_application_core_os_sr0630-enus/page/CORE/taskLib.html#taskSpawn
+
+	
+   task_spawn ("led_error", led_error, 15, 512, NULL);
+   task_spawn ("t_StatsPrint", my_cyclic_callback, 20, 1024, (void *)NULL);
+   task_spawn ("soes", soes, 8, 1024, NULL);
+
+----------
+	utypes.h <<< ~/SOES_APP/ << Contains the declaration of the variables we want to share to succesfully mapping them
+
+/*---------------------------About open() from Linux--------------------------------------*/
+The argument flags must include one of the following access modes:
+       O_RDONLY, O_WRONLY, or O_RDWR.
+	   The mode argument specifies the file mode bits be applied when
+       S_IRWXU  00700 user (file owner) has read, write, and execute
+                permission
+	   https://man7.org/linux/man-pages/man2/open.2.html
+/*---------------------------Responses from the device--------------------------------------*/
+
+ESC_PRAM_RD_ADDR_LEN_REG		value	uint32_t	0x43218765 (Hex)
+ESC_PRAM_RD_CMD_REG
+ESC_PRAM_WR_ADDR_LEN_REG
+ESC_PRAM_WR_CMD_REG
+
+ESC_CSR_CMD_REG
+
+********************************************************************************************
+****		Functions directory
+********************************************************************************************
+//NOT YET IMPLEMENTED
+select(spi)	<< should call the hal function
+	~/SOES_src/esc_hw.c
+	~/SOES_Libs/esc_hw.h
+//IMPLEMENTED
+open() << basic emulator of linux function
+	~/SOES_src/esc_hw.c
+	~/SOES_Libs/esc_hw.h
+
+//DECLARED for APP
+void soes (void *arg);	//<< Defined in sampleApp.c
+void post_object_download_hook (uint16_t index, uint8_t subindex, uint16_t flags); //<< Defined in sampleApp.c
+void post_state_change_hook (uint16_t* as, uint16_t*an); //<< Defined in sampleApp.c
+	~/AxisCommHub/SMs.h
+	
+
+********************************************************************************************
+****		Variable directory
+********************************************************************************************
+_ESCvar ESCvar << Instance of the whole EtherCAT Slave Controller
+	~/AxisCommHub/smEcat.c
+
+***************************************************************
+****		Vocabulary
+***************************************************************
+
+	Board Support Package (BSP) << A set of libraries (firmware) to make an application code compatible 
+		with a physical layer
+		
+	Bootstrap -- Literraly a copntainer or a tie that would keep fastened something in "the boot"
+					The functional mode of a device that is activating the bootloader, to, e.g, start a firmware update
+
+	
+

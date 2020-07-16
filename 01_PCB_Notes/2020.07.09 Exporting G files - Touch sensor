@@ -1,0 +1,56 @@
+PCB Touch sensor
+
+Castellated Holes (PCB Specifications)
+	The copper layer should have pads,the soldermask layer should have soldermask openings,the drill layer 
+		should have drills and the drills center is on the outline.
+	The half holes diameter should be bigger than 0.6mm and the holes gap should be bigger than 0.55mm.
+	
+	Diameter = 0.8mm
+	Hole Size = 0.65mm
+	
+How to export the data for manufacturing
+
+
+Set the drill configurations
+SEt the gerber file configurations
+https://www.pcbway.com/helpcenter/technical_support/Generate_gerber_file_from_Altium.html
+
+Create an output gerber file in the project
+Create the two different files that are gonna be on the the fabrication outputs
+Link  by dragging into the folder structure
+Folder structure configure in change, to be exported direct within the root folder
+Generate Content
+
+
+
+HINTS for design
+The textbox where the id number is written is inverted box, hrg logo font is needed
+
+
+///// About the offset given by the manufacturer
+Rectangular PAD 01
+Original position with reference to top left corner
+x 36.635 y -15.7 mm
+
+Measured one
+Rectangular PAD 01
+x 33.0	y -11.2
+
+(this offset is not important)offset x -3.635 y +4.5
+
+
+PGM x 21.77	y -20.24
+(Offset from sent version to scanned one is not consisten)
+From scanned version
+PGM x 17.6	y -16.0
+
+
+!!!
+Coordinates:
+Rectangular PAD 01		x 33.0	y -11.2
+PGM 					x 17.6	y -16.0
+S1/2 (3mmx5mm)			x 27	y -21
+
+
+
+

@@ -1,0 +1,145 @@
+2020.07.02
+EtherCAT Master configuration and testing
+
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+@2020.07.01 
+	This contains relevant notes about the commissioning of EtherCAT devices in TwinCAT3.
+	Some hints about the IDE are provided as well.
+	Some info about Flange Tool Device
+	Configuration info of unify wireless ethernet switch
+
+-Local PC acted as a master properly.
+-Tested with the ELMO recognition, LAN9252 and the flange tool device
+-Variables were updated comming from the flange tool device.
+-A chain-like topology was also tested using the LAN9252 and it worked
+
+********************************************************************************************
+****		NOTES
+********************************************************************************************
+
+
+Notes about the material needed for better EtherCAT testing
+/*--------------------------About possible master devices -----------------------------------------*/
+As a DIN rail IPC and in conjunction with the TwinCAT software from Beckhoff, the CX50x0 offers the same functionality 
+	as large Industrial PCs. In terms of PLC, up to four virtual IEC 61131 CPUs can be programmed with up to four tasks 
+	each, with a minimum cycle time of 50 μs. All IEC 61131-3 languages can be used.
+For remote programming of some devices (cheap cost) “Windows CE.NET”. In this case, the system is programmed via a laptop 
+	or a desktop PC, which is connected to the CX via Ethernet (network or crossover cable). The programs are developed 
+	on the laptop with a standard TwinCAT software licence and then loaded into the target device.
+
+
+*Embedded PC CX5000 series
+	yes CX5010 = https://infosys.beckhoff.com/content/1033/cx5000_hw/212956043.html?id=2485056975336372412
+		Difference with CX5020 is only the extendable internal main memory
+		@1. Ghz
+		Twincat 3
+		1 ethernet and two aimed to ethercat
+		
+		Optional interface
+			*CX50x0-B100 = EtherCAT SLAVE, EtherCAT IN and OUT (2 x RJ 45)
+		
+	yes C6905 https://www.beckhoff.de/english/industrial_pc/c6905.htm?id=11792158067647
+		Twincat 3
+		2 Ethernet ports
+		
+	not CX8010	 http://www.beckhoff.de/german/embedded_pc/cx8010.htm?id=68812326820360
+		@400 Mhz
+		Twincat 2 PLC
+		
+	not CX8110 https://www.beckhoff.de/german/embedded_pc/cx8110.htm?id=77619629238348091
+		@800Mhz
+		Twincat 3 
+		Ethercat Slave?
+
+
+/*--------------------------Notes about the Master's features -----------------------------------------*/
+
+The EtherCAT master is a virtual software device
+	It is the one that allocates the ETherCAT Telegrams
+	Can handle up to 2^16 devices
+	Can allocate a second port for cable redundancy ( to have a ring topology)
+	Protocol EtherCAT (Master can act as a tunnel switch for ethernet)
+
+/*--------------------------Notes about TwinCAT3 -----------------------------------------*/
+
+(Mapping inputs and outputs)
+	Don't forget the At %I* / AT %Q* depending of the nature of the variables.
+
+	AT %I* Is needed at the beginning of the PLC oonfiguration to create and map the IO memory area
+		Such that any external device can be linked to the variables.
+		
+	Work always with the instance of the plc created by default, within it the input and outputs will be mapped.
+		NAME_OF_THE_PLC_Instance
+	
+(EtherCAT slave commissioning)
+	Where the ESI are stored
+	C:\TwinCAT\3.1\Config\Io\EtherCAT
+	
+(Software architecture)
+
+What is the ADS?
+	 Automation Device Specification >> fieldbus-independent interface that will synchronize the access to ADS devices
+	 Twincat System architecture allows individual software modules to act as independent devices.
+		Communication between them is done by the ADS interface >> To exchange data
+	
+	-Set of methods to communicate with ADS devices https://infosys.beckhoff.com/content/1031/tcadswcf/html/tcadswcf.tcadsservice.interfaces.itcadsservicesimplex.html?id=3473745601901113910
+
+ADS ERROR 1795 >> After trying to commission a device
+
+	
+/*--------------------------Notes about ROBOT TOOL DEVICE -----------------------------------------*/
+	
+It uses a Texas Instruments C2000 Processors / F2838x/ C28x
+	Has already implemented an EtherCAT interface
+	
+Physical M8 connectors
+
+P1 >> IO LINK B
+P2 >> GPIO PORT (Male)
+P3 >> IO LINK A
+
+
+P2 connection pinout
+
+	1	>>	WH
+	2	>>	BR
+	3	>>	GN		>>	OUTPUT 1
+	4	>>	YE		>>	OUTPUT 0
+	5	>>	GY
+	6	>>	PK
+	7	>>	BU		>>	24V 
+	8	>>	RD	
+
+/*--------------------------Notes about Unify Switch -----------------------------------------*/
+
+The unify wireless modem
+Carlos
+PWD:Carlos
+WPWD:Carlos1414
+	
+********************************************************************************************
+****		LERNT LESSONS
+********************************************************************************************
+(CRITICAL)
+	THE ELMO HAS ONLY ONE WAY TO BE CONNECTED , TAKING INTO ACCOUNT THE PINOUT OF THE CONNECTORS
+		A photo was taken.
+********************************************************************************************
+****		TODO
+********************************************************************************************
+//TODO
+
+
+
+//DONE
+	Debug the problem with the second instance 
+		R= Solution was to delete it and create from zero another plc instance
+		Don't forget the At %I* / AT %Q* depending of the nature of the variables
+
+
+
+
+
+
+

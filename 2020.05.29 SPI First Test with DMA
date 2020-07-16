@@ -3,25 +3,43 @@ SPI Starting the communications
 ********************************************************************************************
 ****		CURRENT STATE
 ********************************************************************************************
-@2020.06.24	The adaptation to the manufactured board will be done
+@2020.06.25	The SPI channel works within the BOARD 
+
 			To test the SPI channel within the AXIS COMM BOARD, the branch spi_board_dev should be used!!
+			
+			!! Information about physical pins is on the bottom!
+			
+			It is recommended that a new file is open to start working on the notes about SPI+soes
+			
 ********************************************************************************************
 ****		TODO
 ********************************************************************************************
-@2020.06.24
+@2020.06.25
+//TODO 
+(high priority)
+Checking of the TEST_BYTE runs Start considering the mutex or atomic blcoks while changing the notifications and the errors
+Work in the Event Handler
+Continuing the SOES implementation
+	Keep copying the files from the library >> solve the problem during compilation
 
-//TODO
 
+(medium priority)
 Increase the Transmission speed till 40 MBits/80 Mbits ()
 	Adjust the SPI4 at least to 40 Mbit/s
 	Is it possible to work with 80 Mbits in normal SPI or does it only work with SQI??
 
-Connect the spi4 to the logic of the SM, such that it handles an event to change colors when connected and disconnected.
-Continuing the SOES implementation
-
+(almost zero priority)
 External
 Export in a correct way the pdfs of the schematics
 
+//DONE
+Rethink again the SM of the ecat, since it only checks once, and it should after some minutes recheck whther there is connection or not. It migh not be needed though.
+	No, it does. it should be probably embedded within the periodic task instead of the SM, the SM should only wait from the periodic task if there are consecutive erros.
+		>> Now it runs in the periodic task
+		
+@2020.06.24
+
+//TODO
 
 //QUESTIONS 
 	(From questions at bottom) The current Full Duplex Master SPI configuration only supports Prescaler =2
@@ -29,69 +47,12 @@ Export in a correct way the pdfs of the schematics
 	If the the MCU were a slave device then it could handle at full speed without prescaler
 ?				Why?
 //DONE
+Connect the spi4 to the logic of the SM, such that it handles an event to change colors when connected and disconnected.
 See the signals with the digital analyzer // This was not necessary
 Backup the main configuration for the implementation at NUCLEO Board
 For next Version the fastest APB bus should be used for SPI communication
 	SPI4 is using the fastest one
 
-
-/*----------------------------------------------------------------------------------------*/
-Configuration for NUCLEO:
-Full-Duplex Master on SPI4
-Hardware NSS Output Signal
-
-SPI4
-PE2		-->	SCK			NO			@All Very high frequency	Labels ECAT_SCK/SCS/MISO/MOSI
-PE4		-->	NSS			PULL-UP
-PE5		-->	MISO		NO
-PE6		-->	MOSI		NO
-
-DMAs at Low Priority
-Byte-Byte
-Incremental only in Memory, normal and directions depending on transmission
-All interruptions
-
-
-SPI General configuration
-Motorola
-8 Bits
-MSB First
-4
-Clock polarity Low
-Clock Phase	1 Edge
-NSS Signal Type	Output by Hardware
-/*----------------------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------------------*/
-Configuration for AXIS COMM BOARD:
-//Learnt lesson
-The SPI2 is related to the APB1 which means that the fastest speed is 20 MHz with prescaler 2, since
-	the APB1 bus can handle only up to 45 Mhz
-
-Full-Duplex Master on SPI2
-Hardware NSS Output Signal
-
-SPI4
-PC7		-->	SCK			NO			@All Very high frequency	Labels ECAT_SCK/SCS/MISO/MOSI
-PD1		-->	NSS			PULL-UP
-PC2		-->	MISO		NO
-PC3		-->	MOSI		NO
-
-DMAs at Low Priority
-Byte-Byte
-Incremental only in Memory, normal and directions depending on transmission
-All interruptions
-
-
-SPI General configuration
-Motorola
-8 Bits
-MSB First
-4
-Clock polarity Low
-Clock Phase	1 Edge
-NSS Signal Type	Output by Hardware
-/*----------------------------------------------------------------------------------------*/
 
 
 /*------------------------------------------------------------------------------------------*/
@@ -159,6 +120,67 @@ Software TODO
 
 
 Important Hardware Notes
+*********************************************************************************************
+
+/*----------------------------------------------------------------------------------------*/
+Configuration for NUCLEO:
+Full-Duplex Master on SPI4
+Hardware NSS Output Signal
+
+SPI4
+PE2		-->	SCK			NO			@All Very high frequency	Labels ECAT_SCK/ECAT_SCS/ECAT_MISO/MOSI
+PE4		-->	NSS			PULL-UP
+PE5		-->	MISO		NO
+PE6		-->	MOSI		NO
+
+DMAs at Low Priority
+Byte-Byte
+Incremental only in Memory, normal and directions depending on transmission
+All interruptions
+
+
+SPI General configuration
+Motorola
+8 Bits
+MSB First
+4
+Clock polarity Low
+Clock Phase	1 Edge
+NSS Signal Type	Output by Hardware
+/*----------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------*/
+Configuration for AXIS COMM BOARD:
+//Learnt lesson
+The SPI2 is related to the APB1 which means that the fastest speed is 20 MHz with prescaler 2, since
+	the APB1 bus can handle only up to 45 Mhz
+
+Full-Duplex Master on SPI2
+Hardware NSS Output Signal
+
+SPI4
+PC7		-->	SCK			NO			@All Very high frequency	Labels ECAT_SCK/ECAT_SCS/ECAT_MISO/ECAT_MOSI
+PD1		-->	NSS			PULL-UP
+PC2		-->	MISO		NO
+PC3		-->	MOSI		NO
+
+DMAs at Low Priority
+Byte-Byte
+Incremental only in Memory, normal and directions depending on transmission
+All interruptions
+
+
+SPI General configuration
+Motorola
+8 Bits
+MSB First
+4
+Clock polarity Low
+Clock Phase	1 Edge
+NSS Signal Type	Output by Hardware
+/*----------------------------------------------------------------------------------------*/
+
+
 ****************************************************************************************
 SCS# is NSS, Communicate when Low >>> Inverse Logic
 SPI Mode - The instructions are 8-bit
