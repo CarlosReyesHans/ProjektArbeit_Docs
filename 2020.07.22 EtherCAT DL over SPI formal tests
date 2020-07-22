@@ -1,0 +1,78 @@
+2020.07.22
+Results of the SPI BUS 
+	Protocol correctly readout over SPI @5Mhz
+	LAN9252 System registers are read correctly
+	read/write instructions now are reliable
+	Endianess is correct, little endian for addresses @system
+	
+	
+	
+	Current Status:
+		Waiting the DL to be ready
+	
+TODO
+		Still the addresses may be incorrect when trying to access the CSR
+		functions for reading the csr may be incorrect while copying the addresses
+			Since even the default RO CSR registers have info 0x00
+	
+
+Checking the values being sent
+
+DATA TO BE SENT FROM AL
+   value = (ESC_CSR_CMD_WRITE | ESC_CSR_CMD_SIZE(len) | address);
+   ESC_CSR_CMD_WRITE		BIT(31)		128		0x8000 0000		
+   ESC_CSR_CMD_SIZE(len)	(x << 16)	2<<16	0x0002 0000
+   address		ESCREG_ALSTATUS					0x0130
+
+	value = 0x8002 0130
+	
+DATA TO BE SENT FROM DL
+   lan9252_write_32(ESC_CSR_CMD_REG, value);
+   ESC_CSR_CMD_REG			0x304
+	data[0]	uint8_t	0x2 (Hex)	
+	data[1]	uint8_t	0x3 (Hex)			Big Endian 8Bit	- MSB first for LAN9252 Addresses
+	data[2]	uint8_t	0x4 (Hex)			
+	data[3]	uint8_t	0x30 (Hex)			Little Endian 8bit - LSB first for ESC_CSR
+	data[4]	uint8_t	0x1 (Hex)	
+	data[5]	uint8_t	0x2 (Hex)	
+	data[6]	uint8_t	0x80 (Hex)	
+	This means that it sends the 
+
+   ESC_CMD_SERIAL_WRITE	0x02
+   "LITTLE AND BIG ENDIANESS"
+
+LITTLE ENDIANESS: Least significant byte FIRST SENT
+									0x40 0x00 0x00 0x00 << Data string once sent
+									LSB1 LSB2 MSB1 MSB2
+BIG ENDIANESS: Most significant byte FIRST SENT
+									0x00 0x00 0x00 0x40 << Data string once sent
+	
+  
+
+  
+  IT is a LAN9252 System CSR 
+  Within FIRST INIT
+  "TO RESET THE ESC"		
+  ESC_RESET_CTRL_REG	0x1F8 RESET_CTL >> Resets the EtherCAT core by writing at bit 6 = 0x40 
+											VAL2WRITE = 0x00 0x00 0x00 0x40 << 32bit long data
+  
+		IT sentds 0x02 0x01 0xf8 	0x40 0x00 0x00 0x00
+									LSB1 LSB2 MSB1 MSB2
+
+	THIS is a ETHERCAT core CSR Register
+	Within Initialization
+	"Reading ESCREG_DLSTATUS"
+	ESC_read (ESCREG_DLSTATUS,...)
+		This is a LAN9252 System CSR for ECAT Registers
+	ECAT_CSR_CMD_REG	0x304  (ETHERCAT CSR INTERFACE COMMAND REGISTER)
+		
+		First ESC_CSR_CMD_READ + SIZE + address	(ESCREG_DLSTATUS	0x0110) = 0xC002 0110
+		It sends 0x02 0x03 0x04 	0x10 0x01 0x02 0xC0
+									LSB1 LSB2 MSB1 MSB2
+									
+		LAN Responds (already ordered)
+			0x40 0x02 0x01 0x10		<< Only to know whether it is busy or not
+			
+		ESC_CSR_DATA_REG 0x300<< (EtherCAT CSR INterface data register) The data from DL will be stored here
+		LAN Responds (already ordered)
+			0x00 0x00 0x00 0x00		<< Default value

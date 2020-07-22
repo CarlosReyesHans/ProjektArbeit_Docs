@@ -1,0 +1,35 @@
+@2020.06.19
+
+FOR PCB Second Layout
+ 
+ slimstack of 8mm mated height 30 wires 525883075
+ slimstack of 8 mm mated height 20 wires 525882075
+ 702-0253 852-80-006-10-001101 
+ 702-3088 853-87-006-10-001101
+ 
+/*------------------------------------------------------------------------------------------*/
+
+FP-STM32F446ZET6-MFG
+	Space between pads 0.15mm x 1.35mm width
+FP-STM32F446ZET6-IPC_A
+	Space between pads 0.188mm x 1.955mm width
+
+FP-STM32F446ZET6-IPC_B
+	Space between pads 0.248mm
+FP-STM32F446ZET6-IPC_C
+	Space between pads 0.288mm
+
+
+
+To update the Files it is needed to create a outputjob file.
+	If it is already created then enter to it >> regenerate the gerber files.
+	
+	
+PCB things
+
+No PICOCLASP Connector
+The RJ45 Socket wont be able, but a PICO Clasp Connector
+
+
+
+

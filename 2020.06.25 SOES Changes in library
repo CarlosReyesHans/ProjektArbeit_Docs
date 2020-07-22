@@ -21,9 +21,19 @@ This document contains information about the implementation of the SOES v.1.0.0 
 ****		NOTES
 ********************************************************************************************
 /*-----------------------Changes within the library of SOES-----------------------------------------*/
+@2020.07.17 
+	FLASH_WRITE_BLOCK_SIZE, FTFL_USER_MARGIN,NUM_OF_FILES added in bootstrap.h << this is a configuration relative to STM32, it should be though in other library.
+		~/SOES_App/bootstrap.h
+		The FoE fuinctions are gonna be commented out for testing.
+		~/SOES_Libs/esc_foe.c
+		.n_files     = NUM_OF_FILES,//NELEMENTS (files), << Converted into a constant
+		~/SOES_App/bootstrap.c @ "bootstrap_foe_init  (void)"
+		commented out: boot_started = tick_2_ms(); << needs functions from OS
+								@ "void bootstrap_state (void);"
+		
 @2020.07.16	cc.h file was modified to use DPRINT(...) macro as defined with printf, taking into account that stdio.h is already included
 @2020.07.03
-	spi_select() and unselect() will be ignored since the spi interface will always active, unless it is necessary to shut off and restart.
+	(overriden) spi_select() and unselect() will be ignored since the spi interface will always active, unless it is necessary to shut off and restart.
 @2020.07.02
 	MAcro #define BIT(nr) (1UL << (nr)) added to axis overall lib
 	The following functions has been properly tested
@@ -108,9 +118,15 @@ etohs and etothl are macros defined in CC to identify whether data shou;ld be sw
 ********************************************************************************************
 ****		TODO
 ********************************************************************************************
-@2020.07.15
-Continue with the porting of the example application after waiting from being busy
+@2020.07.17
+//TODO
+Test ecat_slv_init() as scheduled task.
+	-passed ESC_config
+	-kinda passedESC_init 
+	-hanging ESC_ALstatus (ESCinit); << "~/SOES_App/ecat_slv.c"
 
+Continue with the porting of the example application after waiting from being busy
+	-Write the select function >> 	spi_select() << Is it necessary to redefine this function? YES
 	-Copy the sample main function to the project and run it
 		-Cotinue copying the global variables of the sample application (detailed in further section)
 			test/debug open() with modification of string comparison
@@ -122,37 +138,50 @@ Continue with the porting of the example application after waiting from being bu
 		//DONE
 			Modify the       .user_arg = "/spi0/et1100" at soes() to comply with LAN9252 adaption of code
 			
-			
-	-Bypass the bootstrap functionalities by disabling FOE 
-		--This may demand to deactivate and modify the ESI file
-		--IT may be needed to include an eeprom library for STM32
-			-There is no EEPROM HAL library
-	-adjust bootstrap.c ~/SOES_APP/
-		what is the flash_drv.h???
+		
 	-How are used the hooks post_state_change_hook() and post_object_download_hook();
 	-Compile and upload to GIT
-	-Adjust the bootstrap to not write any information into the eeprom, while keeping the library such that the ESC does not enter into fail state.
-	-What is the bootstrap? State within the EcatSM that s used for FIRMWARE. IT is optional but recommended. It works mainly with FoE (File Access over EtherCAT)
-		(See the notes of EEPROM)
-		-It could be posssible that this part is not needed cause the eeprom is supposedly to be flashed with the TwinCAT3
-		-Why are there two bin files related to the eeprom??? /SOES/applications/rtl_slavedemo,
-			namely eeprom.bin, and RTL_ATO_SPI_slave.bin
+
 	-Write in the report that the LED RUN/ERROR may be not implemented. TAble 9, as described in ETG2200_v3i1i0
 		-OS Tasks that would call the LED control functions, so far, are not spawned.
 			~/SOES_APP/led_handler
+	
+//CLOSED
+	-Adjust the ecat_slv_init and ecat_slv functions to app
+
+//THE FRIDGE
+	-Bypass the bootstrap functionalities by disabling FOE 
+		--This may demand to deactivate and modify the ESI file
+		-adjust bootstrap.c ~/SOES_APP/
+	-Adjust the bootstrap to not write any information into the eeprom, while keeping the library such that the ESC does not enter into fail state.
+		-Why are there two bin files related to the eeprom??? /SOES/applications/rtl_slavedemo,
+			namely eeprom.bin, and RTL_ATO_SPI_slave.bin
+			<< These are the files that would be send through the EcatMaster to update the firmware on the Host MCU, this done through the FoE service of ESC (LAN9252)
+		
+
+
+@2020.07.15
+//TODO
+
 (Low priority)
-	-Adjust cb_get_inputs() and cb_set_outputs() to work with temp variables.
-		~/../main.c From SAMPLE
-	-Write the select function >> 	spi_select() << Is it necessary to redefine this function? YES
+	-(bootstrap and FoE) Look for the a library to write onto the EEPROM of the STM32446ze
+			-There is no EEPROM HAL library, so it need to be implemented in flash_drv.h
+
+
 	-Add the meeting in the outlook calendar, meeting with MR Renner
+	-(Docu)	Update information about the restriction of not using FoE>>No-Bootloader
 
 
 //CLOSED
+	-Adjust cb_get_inputs() and cb_set_outputs() to work with temp variables.
+		~/../main.c From SAMPLE
+	-Temporary bypass of Bootstrap state
 	-Write a directory of new functions
 	-Merge soes_src to soes_app, where soes_app will be directory to be included
 		This is not needed, indeed include directories are not the same to source directories.
 			The compiler add the needed libraries to the source .c files 
 				<< in this case the ones included in soes_libs, and soes_app_libs are included to soes_app source files
+
 
 
 @2020.07.03
@@ -177,10 +206,6 @@ What is the ESC_read_csr? CSR?
 	esc_read_pram();  <<	esc_hw.c
 	ESC_read_csr ??????????	<<	esc_hw.c
 	esc_read() <<	esc_hw.c
-		test it with the data fromm ecat_slv_init() >>       
-					ESC_read (ESCREG_DLSTATUS, (void *) &ESCvar.DLstatus,
-						sizeof (ESCvar.DLstatus));
-					ESCvar.DLstatus = etohs (ESCvar.DLstatus);
 		
 	esc_write_pram();  <<	esc_hw.c
 	ESC_config()	<< esc.c
