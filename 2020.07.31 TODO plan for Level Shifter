@@ -1,0 +1,30 @@
+2020.07.31
+
+TODO
+
+
+Check MOSFET example from a shield board opensource with mosfets
+	https://www.electronics-tutorials.ws/transistor/tran_7.html
+	
+
+Compare with the proposed solution provided
+	Difference was the characteristic curve for Gate charge vs Gate to source Voltage
+	
+Do the tests with LDO and only one MOSFET (Check 2 )
+	Proposal for second version: using either P-Channel MOSFETS
+	or N-CHANNEL with pull-down resistors and LOAD resistors to have the signal provided only and not as switching it over the source.
+	
+	
+
+1 wire pico clasp connector
+
+New plan for Level Shifter
+		Level shifter needs another approach (Update using another project as reference)
+			Tests: 	Only the Voltage regulator,without MOSFETS (Friday)
+					Only one MOSFET, to check whether the MOSFET configuration is working
+			
+			Changes:	Depending on results, MOSFETs could be changed (Friday-Monday 07.03)
+						Connector will be changed to PICO-Clasp
+						Board2Board connector as well. 
+						Solder Jumper Pads to  bypass elemenst (voltage regulator)
+	

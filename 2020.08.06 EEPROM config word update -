@@ -1,0 +1,247 @@
+"Brainstorming for continue "
+
+The ESC is not updating the EtherCAT Core Registers
+
+	Possible reasons:
+		Reading incorrectly from MCU
+			"Run a test to read the ESC Core Registers with the TwinCAT"
+			"Read the data though another function/reg (FIFO one)"
+				The SOES functions are still incorrectly
+					Core rading/writting functions are OK (reading out system registers + CSR CTRL CMD + CSR DATA are ok)
+						"TAking a look to another library for the Microchip PIC32"
+						"Recheck the tests now taking into account that not all the addresses are data from 103pp lan9252 datasheet"
+		The ESC is not updating or allowing access since reboots due to internal errors
+			Bad EEPROM Configuration due to faulty ESI
+			ESI expects FoE and it is not enable by software
+			The DL logic is not workign on the device
+				"Modify or creates a minimalistic ESI" <<<
+			
+		The Speed of reading out is too slow?
+			"Look for the specifications in Datasheet"
+		Are all of them not accesible or only some of them?
+			DL and AL and the info ones as well
+				"SOES recommends to try reading the PDI area that skips the SOES"
+TESTS:
+
+Check whether the Configured Station Alias has been updated over the master. After the boot up and having read out the SII.
+
+
+
+
+
+This is actually not working
+From the Examples I cab match a configuration word for the LAN9252
+
+!! First 16 bytes EEPROM match with LAN9252 Straps
+
+				<Name LcId="1033">LAN9252-DIGIO</Name>
+					<ConfigData>040F00441027F0FF</ConfigData>
+				SPI-withGPIO-2PortMode
+					<ConfigData>800E00CC8813f000000000800000</ConfigData>
+				linux_lan9252demo
+					<ConfigData>8002000000000000</ConfigData>
+
+														LAN9252-DIGIO		SPI-withGPIO-2PortMode		linux_lan9252demo	HANS
+0140h	PDI Control Register								040F				800E					8002				8002		2 //SPI mode, no AL emulation and Enhance link detection
+0141h	ESC Configuration Register			
+	
+0150h	PDI Configuration Register (only DGIO)				0044				00CC					0000				0000			2
+0151h	Sync/Latch PDI Configuration Register	
+		(If DC is supported)
+(0982h-0983h)	Pulse Length of SyncSignals Register 		1027				8813					0000				0000		2
+				(if DC compatible)
+(0152h-0153h)	Extended PDI Configuration Register 		F0FF				f000					0000				EAEA		2	
+				(DGIOs also used in SPI)
+				D9--SCK << Input
+				D5--SCS << Input
+				D1--SO << Output
+				D0--SI << Input
+				  Open Drains 1110 1010 Input 1110 1010
+								= EAEA
+				
+(0012h-0013h)	Configured Station Alias Registe								0000										CACA		2						
+				(optional feature/needed for test if non ID Selector)
+
+(0510h-0511h)	MII Management Control/Status Register	
+(0142h-0143h)	ASIC Configuration Register 									0080		0000							0080			2											2
+				MII_LINK detection (8th bit) = 1
+
+									
+
+(0144h-0145h)	RESERVED Register 																										2
+
+/*--------------------FROM current Axis Board-----------------------*/
+
+				<Eeprom>	
+					<ByteSize>512</ByteSize>
+					<ConfigData>800200000000EAEACACA0080</ConfigData>
+					<!--Bootstrap is disabled since FoE is not present-->
+					<!--<BootStrap>0010800080108000</BootStrap>-->
+				</Eeprom>
+
+
+/*--------------------FROM Configuration files-----------------------*/
+				<Eeprom>
+					<ByteSize>2048</ByteSize>
+					<!--PDI=DIGIO(04);Enable enhanced link detection and DC - dont care - 
+						device emulation -on(03);
+						Bidirectional mode , outvalid polarity - active low ,output updated when watchdog triggers,output reset after watchdog expires(0f); 
+						sync out enabled - push pull active low(44);
+						pulse length (1027);
+						Direction -output(ffff)
+					-->
+					<ConfigData>04030f441027ffff</ConfigData> 
+				</Eeprom>
+				
+Question: device emulation?
+what is exactly the 2 ports mode?
+	This is the normal mode, the extended mode works only with SPI and would enable a third ETHERNET interface that can be used upstream/downstream to chain the slave to another LAN9252 module, enabling more topologies or a device with 4 ports.
+
+
+
+
+How many bootstraps are within the LAN9252? 5
+
+	Apparently they're shared with the GPIOS.
+	CHIPMODE0 (GPI0) ACTLED0-> 0
+	CHIPMODE0 (GPI1) ACTLED1-> 0 >> 2 PORT MODE "OK"
+	E2PSIZE   (GPI2) RUN LED -> 1  "OK" (In EVB SPI & 512 Bytes for the eeprom) If EEPROM is 24c04 then is low if it is 24FC512 then it is high
+			There is also an addres for ecah EEPROM
+	MII_LINK_POL	(lose in LAN_EVB_SPI) =>> N/A 
+	tx_shift_strap[1:0]  (lose in LAN_EVB_SPI) =>> N/A
+	fx_mode_strap_1/2 -> 0 in LAN_EVB_SPI FXLOSEN and FXDEN
+
+
+	fx_modestrap 1 AND 2
+	fx_los_strap 1 and 2
+	
+	How is it related the bootstrap?? Is it maybe a value that is only checked whether it matches?
+
+Which features can be set out?
+	Enhanced Link Detection is support fro an auto-negotiation that needs to comply with Beckhoff Phy section. This is not needed in the first run.
+	FROM AN1920 3.0 EEPROM Configuration
+	Enhance link detection – Both normal and Enhance link detection detects the link establishment. However, if enhance
+	link detection bit set then EtherCAT Core will disconnect a link if at least 32 RX errors (RX_ER) occur in a fixed interval
+	of time (~10 us) and the link partner is informed by restarting the Auto-Negotiation mechanism via the MII Management.
+	So, the link partner can close that particular port. Register 0x0110:0x0111 shows the status of MII_LINK and
+	0x0518:0x051B shows the link detection status updated via MII management interface.
+
+
+	Distributed Clocks are not available.
+"Station Alis"
+	Station Alias is not supported, it is optional from ETG2000 5.3.6.7 Identification
+	Nevertheless in ETG1020 18.4.3 It is expressed that the configuration alias is unique and loaded from SII
+
+Pins related to functions
+
+	IRQ to DNP --> Test Point 4
+	SYNC to DNP --> TP 5 and 6
+	RST to DNP --> TP 1
+
+Is it then not possible to not use the GPIOS, for example, only SPI MODE without GPIOS?
+
+Interrupts???:
+		Slave Stack Code (Generated bt the app) access the CSR Registers in two modes, polling and within interrupt scope.
+			Therefore, atomic reads/writes should be taken into account while accessing the CSRs.
+			I don't have any access to the IRQ Pin, so  SOES	 only works with polling.
+Question:  Is it possible that IRQ configuration is misconfiguring the LAN9252
+
+Configured Statuoin Alias Address,m Byte 8 and 9 of EEPROM
+This field contains the alias address used for node
+addressing (FPxx commands). More details about
+different addressing are available at ETG1000 and
+ETG1020 specifications.
+
+What about the ID-Selector according to ETG1020 pp54
+
+
+For linux_lan9252demo
+0141h	ESC Configuration Register =8002 SPI with all the ports
+Bit 1 Enhanced Link Detection All Ports
+0: Disabled (if bits [7:4] = 0)
+1: Enabled all ports
+
+From linux_lan9252demo 256 is the eeprom size
+
+
+
+
+Can the synchronization Manager watchdog be disabled
+what is the enhanced link detection all ports? Seen as the second configuration byte within EEPROM
+It could that physically there is already one configuration and it does not match the one in the eeprom
+
+From ETHERCAT ET1100 ASIC 
+pp78 There is outputs from the ESC that act as a flag to know when the EEPROM has been already loaded
+
+/*---------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------*/
+Only LAN9252 Information
+
+
+HBI controls something related to the PDI
+
+PDI !!! Process Data Interface
+Chip Mode chip_mode_strap[1:0] (CHIP_MODE1/CHIP_MODE0)  ->> 0x00 2 Port mode
+Once the mode of the chip is selected, the Process Data Interface (PDI) in use is selected by the PDI Control Register
+(0x0140). >>>> 0x80 SPI
+
+HBI (Host Bus Interface) is an interface for board-to-board and another set of channels to transmit on higher SQI
+High bandwidth chip-to-chip interface using HBM physical interface
+
+
+big endianess and little endianess
+
+All instructions, addresses and data are transferred with the most-significant bit (msb) or di-bit (msd) or nibble (msn)
+first. Addresses are transferred with the most-significant byte (MSB) first. Data is transferred with the least-significant
+byte (LSB) first (little endian).
+
+
+//Interesting to know
+
+EtherCAT IP Core uses an FPGA where ESC+EEPROM+uC are integrated
+
+ESC >> ECAT and PDI Communication 4Kbyte
+		Mailbox and process data distributed over 60Kbytes next to the first configuration address memory
+
+From pp28 of Workshop
+	At least the ET1000 can be monitored physically over 1 pin that communicates the current EEPROM_Loaded, if yes, then the ESC can be accessed
+
+To acknowledge the Events written by the MASTER on the register 0x120 >> SPI Host should  read out 0x120, but host only knows that by constantly reading out 0x220 << Al EVENT
+				Here it is possible to know whether the SM has an event as well
+				
+				
+"About flashing procedure"
+
+No communication from the MCU while flashing
+Rebuild ESI cache in the  TWINCAT>Ethercat devices>> Reload Device descriptions
+Now start the communication
+
+
+// ESI FILE
+SPI Should be activated since it is needed for PDI (Process data Interface)
+
+Should have 1 SM for each input/output data and their asynchronous and synchronous versions == 4 SMS (Standard)
+
+DPRAM size is calculated through SMs (Consults SM0..3) in LAN9252 is 4Kbyte, 4 sync Managers, 3 FMMUs entities 2 ports
+
+
+What does DPRAM stands for?? It is usser memory
+
+
+DC Supported and AL_event_Enabled should be disabled for testing
+	 The following are the purposes of the files generated
+	 ecatslv ->>> Controls the ESM
+	 ecatcoe, coeappl, sdoserv ->>> Controls the CoE
+	 mailbox -->> mailbox0
+	 ecatappl -->> controls the process data
+
+
+"TODO"
+Continue from 37 in seminar about the evaluation kit
+
+
+*-----------SSC TOOL-----------------------------------------------------------------------------*
+Where is a tutorial for ssc tool???
+
+Tool - Create  -- New application then the description is given

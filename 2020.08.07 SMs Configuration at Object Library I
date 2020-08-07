@@ -1,0 +1,101 @@
+2020.08.07
+
+***********************************************
+TO HAVE IN MIND FROM ETHERCAT
+*********************************************
+Usually SM 2 for outputs.
+	Outputs means, "outouts from MASTER", which are then normally output actions from SLAVE driven by Master outputs. 
+	ACTUATORS
+		Handled by RXPDO  << Refers that THE RX HANDLER from Device receives the commands.
+
+
+
+	Inputs means, "inputs for MASTER", which are then normally output data from SLAVE to MASTER. 
+	SENSOR DATA. INTERNAL STATUS OF DEVICE
+		Handled by TXPDO << Refers that the TX Handler sends the data to the MASTER.
+
+
+
+The Object Dictionary used as example follow the CANopen DS301 ranges.
+
+0x0000 - 0x0FFF, Data Type Area
+0x1000 - 0x1FFF, Communication Area
+0x2000 - 0x5FFF, Manufacture specific area
+0x6000 - 0x6FFF, Input area
+0x7000 - 0x7FFF, Output area
+0x8000 - 0x8FFF, Configuration area
+0x9000 - 0x9FFF, Information area
+0xA000 - 0xAFFF, Diagnosis Area
+0xB000 - 0xBFFF, Service Transfer Area
+0xC000 - 0xEFFF, Reserved Area
+0xF000 - 0xFFFF, Device Area
+
+
+
+Tracing back the Application Layer Error no "0x01d"
+	"Invalid Outout Synchronization Manager"
+	
+Originated in ESC_State function <<< State Manager
+
+While comparing the size of Sm2mapping
+         if (ESCvar.sm2mappings < 0)
+         {
+            an = ESCpreop | ESCerror;
+            ESC_ALerror (ALERR_INVALIDOUTPUTSM);
+            break;
+         }
+		 
+Variable ESCvar:
+         ESCvar.ESC_SM2_sml = sizeOfPDO (RX_PDO_OBJIDX, &ESCvar.sm2mappings,
+                                         SMmap2, MAX_MAPPINGS_SM2);
+		sizeOfPDO()?? @ecat_coe
+		
+Problem Returning error from the definition of the PDO space
+		const _objd SDO1600[] =
+		{
+		  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1600_00, 2, NULL},
+		  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_01, 0x70000108, NULL},
+		  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_02, 0x70000208, NULL},
+		};
+		const _objd SDO1A00[] =
+		{
+		  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A00_00, 1, NULL},
+		  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_01, 0x60000108, NULL},
+		};
+
+Rechecking whole definition of PDO
+Defined:
+1. OK
+const _objd SDO1C00[] Sync Manager Communication Type --->> 4 SM are used
+2. OK
+SMs are defined from 0x01c10-0x01c2f (32 in total)
+const _objd SDO1C12[] SM2 Linked to Object RXPDO <<< There couldbe up to 256 RXPDO	
+PROBLEM: Cannot be added another Object since its synchronization would need another syncrhonization Manager
+const _objd SDO1C13[] SM3 Linked to Object TXPDO << There could be up to 256 TXPDO
+3. 
+Define the 1600 Receive PDO Mapping object << From here comes the PDO Mapping 0x21 
+Link the Output objects to the RXPDO  
+const _objd SDO1600[] =
+{ {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, &acNameNOE[0], 0x01, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, &acNameMO[0], 0x70000108, NULL}
+};
+
+
+
+
+
+Something related to it in the SOES example		
+		
+Where can I find the Data Objects in the Object Library???
+
+	
+
+0K Question, is it SM2 to outputs?? Object Dictionary: Yes
+				<RxPdo Fixed="true" Mandatory="true" Sm="2"> Read first notes. RXPDO handler in device matches to Outputs from Master.
+
+	Question, are the initial addresses ok in ESI file? 
+	Question, are the maximum sizes in SOES matching to configuration -->> Now yes
+		Export the application with ssc
+		MAX_MAPPINGS_SM2 == one???? <<< This is defined in ecat_options.h
+				This might be 0 to disable dynamic processdata, default value is 16. "Same for SM3"
+			Changed to 0

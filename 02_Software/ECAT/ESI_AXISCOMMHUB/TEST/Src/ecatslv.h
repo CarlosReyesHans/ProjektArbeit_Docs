@@ -373,29 +373,6 @@ PROTO    INT16                          EsmTimeoutCounter; /**< \brief Counter u
 
 #define MAX_SM_EVENT_MISSED             4 /**< \brief threshold of max missed counter value (0x1C32.11 / 0x1C33.11)*/
 
-PROTO BOOL                              bDcRunning; /**< \brief Indicates if Sync0 events are received*/
-
-PROTO UINT16                            u16SmSync0Counter; /**< /brief Incremented by one on every Sync0 event and reset to 0 on every SM event. It is used to check the SM/Sync0 sequence */
-PROTO UINT16                            u16SmSync0Value; /**< /brief Allowed Sync0 events within one SM cycle. If 0 the Sequence check is disabled */
-
-PROTO BOOL                              bSmSyncSequenceValid; /**< \brief Set to true if SM/Sync0 sequence is valid*/
-
-PROTO INT16                             i16WaitForPllRunningTimeout; /**< \brief The time bPllRunnig shall be true while state change from SafeOp to Op*/
-
-PROTO INT16                             i16WaitForPllRunningCnt; /**< \brief Incremented with every valid Sync-SyncManger cycle */
-
-PROTO UINT16                            Sync0WdCounter; /**< \brief Sync0 watchdog counter*/
-PROTO UINT16                            Sync0WdValue; /**< \brief Sync0 watchdog value*/
-
-PROTO UINT16                            Sync1WdCounter; /**< \brief Sync1 watchdog counter*/
-PROTO UINT16                            Sync1WdValue; /**< \brief Sync1 watchdog value*/
-
-PROTO UINT16                            LatchInputSync0Value; /**< \brief Sync0 event on which the inputs shall be latched and copied to the ESC buffer. If the inputs shall be latched base don Sync1 the value is set to 0.*/
-PROTO UINT16                            LatchInputSync0Counter; /**< \brief Sync0 counter used to get the Sync0 event to latch the Inputs. */
-
-/*ECATCHANGE_START(V5.12) COE4*/
-PROTO BOOL b32BitDc;
-/*ECATCHANGE_END(V5.12) COE4*/
 
 
 
@@ -440,7 +417,6 @@ PROTO void DisableSyncManChannel(UINT8 channel);
 PROTO TSYNCMAN ESCMEM *GetSyncMan(UINT8 channel);
 PROTO void SetALStatus(UINT8 alStatus, UINT16 alStatusCode);
 PROTO void AL_ControlInd(UINT8 alControl, UINT16 alStatusCode);
-PROTO void DC_CheckWatchdog(void);
 PROTO    void CheckIfEcatError(void);
 PROTO void ECAT_Init(void);
 

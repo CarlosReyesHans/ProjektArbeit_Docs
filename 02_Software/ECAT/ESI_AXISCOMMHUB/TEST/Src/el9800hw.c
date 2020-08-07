@@ -158,27 +158,6 @@ UALEVENT;
 ------
 -----------------------------------------------------------------------------------------*/
 
-#define    INIT_SYNC0_INT                   {(_INT3EP) = 1;(_INT3IP) = 1;}//_INT3EP = 1:  negative edge ; _INT3IP = 1; //highest priority
-#define    SYNC0_INT_REQ                    (_INT3IF) //Sync0 Interrupt (INT3) state
-#define    INT_SYNC0                        (_RD10) //Sync1 Interrupt input port
-#define    Sync0Isr                        (_INT3Interrupt) // primary interrupt vector name
-#define    DISABLE_SYNC0_INT                {(_INT3IE)=0;}//disable interrupt source INT3
-#define    ENABLE_SYNC0_INT                {(_INT3IE) = 1;} //enable interrupt source INT3
-#define    ACK_SYNC0_INT                    {(SYNC0_INT_REQ) = 0;}
-#define    SET_SYNC0_INT                    {(SYNC0_INT_REQ) = 1;}
-#define    SYNC0_INT_PORT_IS_ACTIVE        {(INT_EL) == 0;}
-
-
-#define    INIT_SYNC1_INT                   {(_INT4EP) = 1;(_INT4IP) = 1;}//_INT4EP = 1:  negative edge ; _INT4IP = 1; //highest priority
-#define    SYNC1_INT_REQ                    (_INT4IF) //Sync1 Interrupt (INT4) state
-#define    INT_SYNC1                        (_RD11) //Sync1 Interrupt input port
-#define    Sync1Isr                        (_INT4Interrupt) // primary interrupt vector name
-#define    DISABLE_SYNC1_INT                {(_INT4IE)=0;}//disable interrupt source INT4
-#define    ENABLE_SYNC1_INT                {(_INT4IE) = 1;} //enable interrupt source INT4
-#define    ACK_SYNC1_INT                    {(SYNC1_INT_REQ) = 0;}
-#define    SET_SYNC1_INT                    {(SYNC1_INT_REQ) = 1;}
-#define    SYNC1_INT_PORT_IS_ACTIVE        {(INT_EL) == 0;}
-
 
 /*-----------------------------------------------------------------------------------------
 ------
@@ -381,11 +360,6 @@ UINT8 HW_Init(void)
     INIT_ESC_INT
     (_INT1IE)=1;
 
-    INIT_SYNC0_INT
-    INIT_SYNC1_INT
-
-    ENABLE_SYNC0_INT;
-    ENABLE_SYNC1_INT;
 
     INIT_ECAT_TIMER;
     START_ECAT_TIMER;
@@ -689,28 +663,6 @@ void __attribute__ ((__interrupt__, no_auto_psv)) EscIsr(void)
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
- \brief    Interrupt service routine for the interrupts from SYNC0
-*////////////////////////////////////////////////////////////////////////////////////////
-void __attribute__((__interrupt__, no_auto_psv)) Sync0Isr(void)
-{
-    Sync0_Isr();
-
-    /* reset the interrupt flag */
-    ACK_SYNC0_INT;
-}
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
- \brief    Interrupt service routine for the interrupts from SYNC1
-*////////////////////////////////////////////////////////////////////////////////////////
-void __attribute__((__interrupt__, no_auto_psv)) Sync1Isr(void)
-{
-    Sync1_Isr();
-
-    /* reset the interrupt flag */
-    ACK_SYNC1_INT;
-}
 
 
 /** @} */

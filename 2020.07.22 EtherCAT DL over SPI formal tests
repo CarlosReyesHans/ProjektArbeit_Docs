@@ -1,23 +1,43 @@
 2020.07.22
-Results of the SPI BUS 
+EtherCAT Data over SPI Bus formal Test
+(Writing to System Registers)
+*-----------------------------------------------------------------------------------------------*
+"CONTENTS"
+	-Results
+	-TODO List
+	-Data sent over bus (TESTS)
+	-Configuration for Tests
+	-EtherCAT error codes
+
+/*------------------------------------------------------*/ 	
+Results of the SPI BUS TESTS
 	Protocol correctly readout over SPI @5Mhz
 	LAN9252 System registers are read correctly
 	read/write instructions now are reliable
 	Endianess is correct, little endian for addresses @system
 	
-	
-	
+	"VERY IMPORTANT" The address incrementer was not set automatically >> I reacts the same with or without it
+/*------------------------------------------------------*/ 	
 	Current Status:
 		Waiting the DL to be ready
-	
-TODO
-		Still the addresses may be incorrect when trying to access the CSR
-		functions for reading the csr may be incorrect while copying the addresses
-			Since even the default RO CSR registers have info 0x00
-	
+		Writing and Reading from ESC_ETHERCAT_CORE Memory is not responding.
+			Nevertheless the ESC_CSR_CMD_REG is acting properly (Updates the BUSY_BIT but no data available)
+			The Addresses are correctly written since, as soon as they are changed, the ESC_CSR_CMD_REG stops responding.
+	@Check the parameters:
+	@Check EtherCAT Error Codes
+
+@2020.07.23	
+"TODO"
+
+//Done
+	CSR Writing and Reading functions are ok
+	Writting to a LAN9252 System register and reading from it is "OK"
+		Register: CSR_DATA_REGISTER << Where the responds and the requests to the ESC are stored.
+		
+*-----------------------------------------------------------------------------------------------*
 
 Checking the values being sent
-
+/*---------------BIG/LITTLE ENDIANESS OF MSGS---------------------------------------*/ 
 DATA TO BE SENT FROM AL
    value = (ESC_CSR_CMD_WRITE | ESC_CSR_CMD_SIZE(len) | address);
    ESC_CSR_CMD_WRITE		BIT(31)		128		0x8000 0000		
@@ -47,7 +67,7 @@ LITTLE ENDIANESS: Least significant byte FIRST SENT
 BIG ENDIANESS: Most significant byte FIRST SENT
 									0x00 0x00 0x00 0x40 << Data string once sent
 	
-  
+ /*----------ACCESS TO REGISTERS--------------------------------------------*/  
 
   
   IT is a LAN9252 System CSR 
@@ -61,11 +81,15 @@ BIG ENDIANESS: Most significant byte FIRST SENT
 
 	THIS is a ETHERCAT core CSR Register
 	Within Initialization
-	"Reading ESCREG_DLSTATUS"
-	ESC_read (ESCREG_DLSTATUS,...)
+	"Reading ESCREG_DLSTATUS" << This is not process data (starting at 0x1000)
+	ESC_read (ESCREG_DLSTATUS,...) << This is for two different address spaces
+		ESC_read_csr(address, temp_buf, size);
+		or 
+		ESC_read_pram(address, buf, len); << Function from SOES 
+		
 		This is a LAN9252 System CSR for ECAT Registers
 	ECAT_CSR_CMD_REG	0x304  (ETHERCAT CSR INTERFACE COMMAND REGISTER)
-		
+	ESCREG_DLSTATUS		0x0110	
 		First ESC_CSR_CMD_READ + SIZE + address	(ESCREG_DLSTATUS	0x0110) = 0xC002 0110
 		It sends 0x02 0x03 0x04 	0x10 0x01 0x02 0xC0
 									LSB1 LSB2 MSB1 MSB2
@@ -76,3 +100,79 @@ BIG ENDIANESS: Most significant byte FIRST SENT
 		ESC_CSR_DATA_REG 0x300<< (EtherCAT CSR INterface data register) The data from DL will be stored here
 		LAN Responds (already ordered)
 			0x00 0x00 0x00 0x00		<< Default value
+	"Reading X Process Data" << After 0x1000 at ETHERCAT Core Memory
+	ESC_read_pram(address, buf, len); << Function from SOES 
+	
+
+
+
+*------------------CONFIGURATIONS FOR TESTS-----------------------------------------------------------------------------*
+2020.07.22
+
+DEBUG SPI
+WORK
+@ Full duplex 5 MB
+NSS by software
+	NSS no pull up nor down
+	Medium speed
+
+@ Full duplex 5 MB
+NSS by hardware
+	NSS no pull up nor down
+	Medium speed
+
+TESTING 
+@ Full duplex 10 MB
+NSS by hardware
+	NSS no pull up nor down
+	Medium speed
+
+ONLY NOISE
+@ Full duplex 10 MB
+NSS by hardware
+	NSS no pull down
+	medium speed
+
+NOPE
+@ Full duplex 10 MB
+NSS by hardware
+	NSS no pull down
+	low speed
+
+@ Half duplex 5 MB <<< Cause it switches to only one physical line
+NSS by hardware
+	NSS no pull up nor down
+	Medium speed
+	
+*------------------ETHERCAT ERROR CODES-----------------------------------------------------------------------------*
+
+
+BOOT: AL Control = 0x03
+
+INIT: AL Control = 0x01
+
+PREOP: AL Control = 0x02
+
+SAFEOP: AL Control = 0x04
+
+OP: AL Control = 0x08
+
+The fifth bit of the AL Control (left nibble is 1) is the “Error Acknowledge Bit”. If the slave is in AL STATUS = 0x14, i.e. ERROR SAFEOP the master acknowledges this by setting the Acknowledge bit.
+
+Error Code 0x0011
+Meaning
+Invalid requested state change
+
+Description
+The EtherCAT State Machine (ESM) defines which state changes are allowed. All other state changes are not allowed
+
+Example: If the master requests the slave to go from OP (AL Control = 0x08) directly to BOOT (AL Control = 0x03).
+
+Current State (or state change)
+P→S, I→O, P→O, O→B, S→B, P→B
+
+Resulting state
+Current State + E  >>>>> 0x11, 12 13 14
+
+Solution
+Go step-by-step from the original state to the desired state.

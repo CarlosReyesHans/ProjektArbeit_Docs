@@ -1,0 +1,117 @@
+2020.07.29
+
+Status of manufacturing process by PCBway
+	Delivery Date
+	USB + LEvel shifter
+	
+	New plan for Level Shifter
+		Level shifter needs another approach (Update using another project as reference)
+			Tests: 	Only the Voltage regulator,without MOSFETS (Friday)
+					Only one MOSFET, to check whether the MOSFET configuration is working
+			
+			Changes:	Depending on results, MOSFETs could be changed (Friday-Monday 07.03)
+						Connector will be changed to PICO-Clasp
+						Board2Board connector as well. 
+						Solder Jumper Pads to  bypass elemenst (voltage regulator)
+	
+	Status of USB Hub
+		Show the final design
+		Tests by 17-19 August
+		
+	
+
+Status Projektarbeit
+	-Renner last feedback was 1 month ago (Feedback about OS)
+	-Writting an email report (this week)
+	-Current problems with the LAN9252
+		ESI examples tested SOES and LAN9252
+		DL Events are not updated, ESC core registers return 0x00
+		Confusion about Object Dictionary vs Physical Addresses 
+			(Datasheet where it is said, that the physycal addresses should match, from soes as well)
+		Confusion about the EEPROM, FoE >> EEPROM Library should emulate the EEPROM access
+		ESI file finished also within SOES
+	Short term Plan
+		This week - EEPROM update with ESI and comm 
+		Comparing properly the addresses among the LAN9252 ESI example (no spi)
+	
+	-Probable new plan:
+		1wire temperature over UART (1 week)
+		2nd PCB design (2weeks)
+		Tests with the LEDs and the 1wire devices (1 week)
+		Consider to buy the software from SOES
+		
+
+
+Current questions 
+	-As writting the EEPROM, what does the 309867606/1 number stand for? It is copied from the SOES?
+		PRODUCT number and revision number
+	-Is it possible to disable the FoE/EEPROM configuration within the Application layer? Apparently yes, since the FoE is optional.
+	
+	
+So intermediate results regarding the projektarbeit.
+SOES Libraries are ported to STM32F avoiding the FoE feature.
+
+
+Dear Prof. Dr.-Ing. Renner,
+
+This is a summary of the Project Thesis' current status.
+
+The following lines give a general understanding of the LAN9252/ESC structure:
+	The chip counts with a configurable interface to the Host MCU called PDI (Process Data Interface). This was configured to be SPI.
+	
+	Has a directly addressable memory space which contains the System and Status Registers of the ESC. Test and general ID data are located here.
+	
+	Has three indirectly addressable memory spaces:
+		PHY Registers
+		EtherCAT Core CSR Registers, roughly, it is diveded into ESC information, Data Link related registers, Application Layer related registers, PDI related registers, ESC's EEPROM interface, among other EtherCAT's protocol features related registers.
+		ESC's EEPROM Memory Space
+
+Once been described, the next paragraphs summarize the current advancements since the last time.
+
+Manufacturing of the PCB: 
+	The PCB prototype was soldered and tested, it did work. 
+	Some relevant points about the functionalities that were tested are listed below:	
+		Overall power-on and SWD-Programming of the STM32 MCU via SWD/JTAG connector on-board -> OK
+		SPI connections/communication with LAN9252 Evaluation Board 
+			(Readout of directly addressed memory space, specificaly test and ID register) -> OK
+	PWM Outputs over the two channels for WS2812 LED control, 1 per physical connector -> OK
+	1-wire connection physycally tested (pads and connectors on-board), software feature not yet -> Not completed.
+
+Since this first PCB version worked ok, the second is not longer needed and the time will be allocated to further software development plus tests.
+
+
+Software functionalities:
+	LED Ring control over PWM+DMA extended for two independent channels with configurable number LEDs by ring. -> OK
+	1-Wire implementation still to be extended to 10 or more devices over 1 channel -> Delayed
+	Overall porting of SOES library to STM32F4xx, some relevant points are the next onnes: 
+		SPI-related functions changed from DMA/Interruption to timeouts approach, with this the set of functions for reading/writing were able to avoid infinite waiting loops if communication failed -> OK
+		Only one service explicetely was left aside (File over EtherCAT feature), since it is related to up/downloading of firmware via a Master Device by using the host MCU's EEPROM 
+	
+	New Challenges:
+	Read/write functions for indirectly addressable memory returns valid data onnly for ESC information and PDI related subdivision.
+	Within the SOES Library scope, the Application-Layer's services cannot be checked if lower-level requests are not acknowledged correctly between both parties (MCU and LAN9252).
+
+
+EtherCAT's Protocol related activities:
+The so far mentioned avancements provided already a platform to deepen into the EtherCAT Protocol itself, this has been demanding a bit longer times but it is providing valuable experience and information required to a further configuration of the required Data/Application Layer, the first provided by ESC and the second partially provided by the open-source SOES Library.
+Some of the relevant activities to report are in the next list:
+	First version of ESI description file that includes Object Dictionary (OD also integrated within SOES) -> OK
+	ESI recognized/loaded by EtherCAT Master Device -> OK
+	ESI data written into LAN9252 Controller's EEPROM -> OK
+	AL Services of SOES running over LAN9252 -> Current work
+	
+	New Challenges:
+	Configuration words within ESI file need to be ported from BECKHOFF's original standard to LAN9252 Hardware, Data Link Layer cannot start completely.
+	Further investigation about specific Data Link Layer conforming the protocol and this specific hardware.
+	Further investigation about DL/AL services (mandatory and optional) and their effects in the configuration of ESC (EtherCAT Slave Controller), moreover the FoE service.
+	
+	
+	Overall status: Board and basic SOES features ready for further EtherCAT development.
+	
+	Eventhough, there have been delays due to the libraries being ported, channels being noisy before having the PCB working, we're in a stage where we can ensure that the PCB manufactured and ported libraries allow to further develop an EtherCAT compatible application.
+		Therefore, in the following calendar days the following tasks will be priorized to complete the main tasks:
+		Further testing of EtherCAT's Data Link Protocol in ESC.
+		Report
+		Final tests with LED Rings in both channels with colors changing depending on the internal events.
+		
+	

@@ -74,7 +74,6 @@ typedef struct OBJ_STRUCT_PACKED_START {
 } OBJ_STRUCT_PACKED_END
 TOBJ1C00;
 
-#define CHECK_DC_OVERRUN_IN_MS      4000 /**<\brief cycle time in ms to check the DC system time for overrun*/
 
 #endif //_COEAPPL_H_
 
@@ -98,8 +97,6 @@ PROTO UINT64 u64Timestamp
 ;
 /*ECATCHANGE_END(V5.12) COE4*/
 
-PROTO UINT32 u32LastDc32Value;
-PROTO UINT32 u32CheckForDcOverrunCnt;
 /*-----------------------------------------------------------------------------------------
 ------
 ------    Global functions
@@ -111,14 +108,7 @@ PROTO void COE_UpdateSyncErrorStatus(void);
 
 PROTO void COE_ObjInit(void);
 PROTO void COE_Main(void);
-PROTO UINT16 COE_ObjDictionaryInit(void);
-PROTO UINT16 COE_AddObjectToDic(TOBJECT OBJMEM * pNewObjEntry);
-PROTO void COE_RemoveDicEntry(UINT16 index);
-PROTO void COE_ClearObjDictionary(void);
 PROTO OBJCONST TOBJECT OBJMEM * COE_GetObjectDictionary(void);
-/*ECATCHANGE_START(V5.12) COE4*/
-PROTO void COE_SyncTimeStamp(void);
-/*ECATCHANGE_END(V5.12) COE4*/
 
 #undef PROTO
 /** @}*/

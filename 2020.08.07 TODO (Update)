@@ -1,0 +1,36 @@
+2020.08.07
+Activities of today
+
+	Modify the outputs object to be only at index 6000 instead of 6000-6001 nope
+	Check then the pdo mapping to the RXPDO object 0x21 within the ESI file
+	Check the Object dictionary in the Output area.
+
+	The 1 wire communication
+	Contact then Microchip
+		Asses the specific questions for Microchip in a better way
+		Contact only available for microchip by telephone
+
+	
+
+
+
+
+
+DONE
+	Adapt the SSC tool to LAN9252
+	Check the values of the ESC only with beckhoff, poll the AL status with own functions
+	Buy the elements for PCB Level shifter
+	Drill the table
+
+2020.08.06
+
+DONE
+
+	Possibly problem, there is an offset in the read function of SOES.
+	Configuration word was updated and now it is reliable
+	Check the straps // Defer depending on the hardware
+	Check PCB data
+
+
+Other Day:
+PICO CLASP Connectors for usb testing

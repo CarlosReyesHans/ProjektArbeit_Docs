@@ -182,14 +182,14 @@ OBJCONST TOBJECT OBJMEM *  OBJ_GetObjectHandle( UINT16 index )
 {
     OBJCONST TOBJECT OBJMEM * pObjEntry = (OBJCONST TOBJECT OBJMEM *) COE_GetObjectDictionary();
 
-    while (pObjEntry!= NULL)
+    while (pObjEntry->Index != 0xFFFF)
     {
         
         if (pObjEntry->Index == index)
         {
             return pObjEntry;
         }
-        pObjEntry = (TOBJECT OBJMEM *) pObjEntry->pNext;
+        pObjEntry++;
     }
     return 0;
 }
@@ -349,7 +349,7 @@ UINT16    OBJ_GetNoOfObjects(UINT8 listType)
     UINT16 n = 0;
 
 
-    while (pObjEntry != NULL)
+    while (pObjEntry->Index != 0xFFFF)
     {
         /* count the objects of the requested list type */
         if ( pObjEntry->Index >= 0x1000 )
@@ -376,7 +376,7 @@ UINT16    OBJ_GetNoOfObjects(UINT8 listType)
             }
         }
         /* next object in object dictionary */
-        pObjEntry = (TOBJECT OBJMEM *) pObjEntry->pNext;
+        pObjEntry++;
     }
 
     return n;
@@ -424,7 +424,7 @@ UINT16    OBJ_GetObjectList(UINT16 listType, UINT16 *pIndex, UINT16 size, UINT16
 
     if ( pObjEntry != NULL )
     {
-        while (pObjEntry != NULL && size > 1 )
+        while ( pObjEntry->Index != 0xFFFF && size > 1 )
         {
             /* get the next index of the requested object list if there is enough space in the mailbox buffer */
             if ( pObjEntry->Index >= 0x1000 )
@@ -453,7 +453,7 @@ UINT16    OBJ_GetObjectList(UINT16 listType, UINT16 *pIndex, UINT16 size, UINT16
                     size -= 2;
                 }
             }
-        pObjEntry = (TOBJECT OBJMEM *) pObjEntry->pNext;
+        pObjEntry++;
         }
     }
 
@@ -798,29 +798,6 @@ UINT8 CheckSyncTypeValue(UINT16 index, UINT16 NewSyncType)
             }
         break;
 
-    case SYNCTYPE_DCSYNC0:
-        if ((index == 0x1C32) && ((sSyncManOutPar.u16SyncTypesSupported & SYNCTYPE_DCSYNC0SUPP) > 0))
-        {
-            return 0;
-        }
-        else
-        if ((index == 0x1C33) && ((sSyncManInPar.u16SyncTypesSupported & SYNCTYPE_DCSYNC0SUPP) > 0))
-        {
-            return 0;
-        }
-        break;
-
-    case SYNCTYPE_DCSYNC1:
-        if ((index == 0x1C32) && ((sSyncManOutPar.u16SyncTypesSupported & SYNCTYPE_DCSYNC1SUPP) > 0))
-        {
-            return 0;
-        }
-        else
-        if ((index == 0x1C33) && ((sSyncManInPar.u16SyncTypesSupported & SYNCTYPE_DCSYNC1SUPP) > 0))
-        {
-            return 0;
-        }
-        break;
     } //switch 
     return ABORTIDX_VALUE_EXCEEDED;
 

@@ -1,0 +1,194 @@
+2020.07.22
+EtherCAT Data over SPI Bus formal Test II 
+(Writing to FPRD and reading it with TWINCAT3)
+
+-EtherCAT Protocol Important Notes: Slave devices
+
+********************************************************************************************
+****		CURRENT STATE
+********************************************************************************************
+@2020.07.22
+	-Adding the new tasks for a new test writting the ESC Core Memory
+	-Added the previous notes about the ESI development
+
+@2020.07.17 
+	Starting the notes
+	This contains relevant notes about the EtherCAT protocol and technical things that should
+		be taken into account in the Slave device design.
+	It will have additional and complementary information for "2020.07.02 EtherCAT master-tool device-unify switch"
+	
+"CONTENTS"	
+	-Notes about EtherCAT Slave Protocol
+	-TODO List
+	-Wireshark Notes (Tapping ECAT bus)
+	-Notes about ESI Files (Not updated)
+	
+********************************************************************************************
+****		Notes about the SOES's features
+********************************************************************************************
+/*--------------------------Notes about the Mailbox service -----------------------------------------*/
+
+Slaves are never sending Mailbox messages, they're only receiving them from the MASTER!
+	This implies that there is no message trigger function within SOES
+	'SOES' embedded in the device, 'only sets a flag whenever a response is ready to be read on Master's side.
+	This data should be seen in Wireshark.
+		>Check the wireshark @ >256kHz 
+
+
+/*--------------------------Notes about the CoE -----------------------------------------*/
+	In order to enter to OP is needed the CoE to be functioning?
+
+/*--------------------------Notes about Testing the SPI/LAN9252 communication between host and ESC -----------------------------------------*/
+	('This is a very important future test')
+	
+	This is a test provided by nakarlsson
+	Seems that CoE have the same problem, it seems you can read CoE,FoE frames. So, the trouble must be when writing data. Since, you seem to be able to write ESC registers, ALStatus did update to BOOT for example, look at the write PDRAM, starting at 0x1000.
+
+	Try to write a know value to an unused PDRAM address, outside SM0-3. Use the very same functions used by mailbox write.
+	Use , SOEM to read that address using FPRD. This would bypass SOES and verify the SPI/LAN9252 in some way.
+/*--------------------------(Future, if in a given moment a Firmware update is needed) -----------------------------------------*/
+
+	-What is the bootstrap? 
+	It is the EtherCAT State at which the SM allows update of FIRMWARE. IT is optional but recommended. It works with FoE (File Access over EtherCAT)
+		(See the notes of EEPROM @2020.07.02 EtherCAT master-tool ... doc)
+
+The example application is the following:
+	A bootloader which can load other applications onto the STM32 host MCU via the LAN9252 after a reset using FoE.
+
+The EtherCAT Semiconductor Device Profile describe one way, ETG5003_2_V1i0i0_S_D_FwUpdate.pdf.
+
+
+	
+********************************************************************************************
+****		LERNT LESSONS
+********************************************************************************************
+
+********************************************************************************************
+****		TODO
+********************************************************************************************
+//TODO
+@2020.07.24
+TODO
+Use SSC to create the ESI file for the AXIS COMM HUB
+	look for a tutorial
+	Start the Excel file with the specifications of the data that will be transmitted
+	
+Test the SOES functions
+check the LAN9252Ethercat application documentation with a beckhoff
+(Theory)
+what is actually mnodbbus?
+Check the features of the C2000 F2838x processor
+
+//DONE
+@2020.07.22
+	Check the ESI File example from soes, try to open it in SSC "SPI Comm, error with EEPROM and ESC Core Registers"
+		MIcrochip ESI Files "PREOP achieved, no SPI configuration, SPI hangs"
+	Is the EEPROM being emulated in the example of SOES? 
+		R: |No, EEPROM is always present in the ESC and it is written by the MASTER (It can be though written by MCU but not necessarily)
+		R: |Still, MCU's EEPROM can be accessed to update firmware over FoE EtherCATs service, nevertheles, it is optional|
+
+@2020.07.22
+(high priority)
+	On saturday to test all the write functions with the logic analyzer
+		*Inside the ESC_read_pram() within the esc_hw library. There is a variable that is concatenated. and written afterwards with write_32()
+
+(low priority)
+	Understand with details how the offset of memories are compensated in the LAN9252 in comparisson to the ET1100
+
+
+*--------------------WIRESHARK NOTES -- Tapping the EtherCAT Bus-----------------------------------------------------------------------*
+
+Wireshark
+
+
+Master EtherCAT
+Network adapter : Ethernet (Realtek PCIe GbE Family Controller)
+Device Name: 	\DEVICE\{842DBD76-B748-406C-AAA9-601296297130}
+MAC Address:	f8 75 a4 f3 14 6b
+169.254.245.161 (255.255.0.0)
+
+
+??
+NetId EtherCAT
+169.254.169.63.3.1	<<Set by TwinCAT default
+255.255.169.63.3.1 << This would be the mask, Is this Ipv6?
+
+
+EtherCAT Slave Device
+Device Name:	F2832x CPU1
+MAC Address:	
+IP	Address:	 169.254.169.63.3.1:1001
+Device/ObjectID:	0x03020001
+
+EtherCAT port 1001 << The address to the EtherCAT Device
+
+CoE >> CAN over EtherCAT >> Allows access to all the data from the ESC
+	Device ID
+	SMS
+	PDOs	
+
+
+Questions:
+38 Bytes-In	vs	30 Bytes-Out
+
+
+PDO >> Process Data Objects >>> Has 4 members on its list 28/10/20/10 Bytes Long >> Inputs and outpus
+
+
+SM2 >> Outputs
+SM3 >> Inputs
+
+
+Words/Vocabulary
+DC -- Distributed Clock
+SM -->> Synchronization Managers
+
+
+Wireshark
+Netmon/Wireshark receives the packets/frames as a copy
+
+
+FPWR -->> Services from DATA LINK LAYER
+
+
+*--------------------NOTES about ESI-----------------------------------------------------------------------*
+
+ABout EEPROM and SII in EtherCAT
+
+
+What is <IdentificationReg134>true</IdentificationReg134> ?? Within the ESI/DEVICE/Info
+
+What us <CoE SdoInfo="true" SegmentedSdo="true" CompleteAccess="true" /> ?? Within ESI/DEVICE/Mailbox
+
+
+
+
+objectlist.c in SOES Library
+	There are some objects acName1C00 << that are not matching with the XML
+	There may be a problem within the specification for inputs/outputs, since pos 6001 is not aligned: 8+16+16+16 elements
+	const _objd SDO7100[] Is not defined in xml, it is the part related to parameters in the device.
+TODO
+@2020.7.28
+const _objd SDO6000[] = <<< Definining this object in the objectlist
+
+
+
+BOTH are necessary
+	SII - Slave Information Interface >>> uC
+	ESI - Masters in the Network
+
+EEPROM and SII are equivalent (Slave Information Interface)
+EEPROM can be accessed by the master.
+EEPROM contains the information of the slave device
+	If it can be simulated, then it is not needed. As long as the same access logic is followed.
+	(Emulation of EEPROM transactions)
+	
+
+
+2020.06.24
+
+00480004C3038...	STLINK-V3	SET
+0670FF31373650...	ST-LINK/V2-1	Nucleo
+
+
+

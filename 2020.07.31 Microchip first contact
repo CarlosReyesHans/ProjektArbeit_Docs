@@ -1,0 +1,72 @@
+2020.07.31 	Microchip contact
+First Approach:
+Data of purchase.
+Invoice No. 56258102, ship date  March 31 2020 and customer number was 5A11FC2.
+
+This consult is continuing the topic discussed in this chat with my personal account linked to this email.
+: 
+Info
+ at 10:36, Jul 31:
+You are now chatting with Mahesh.
+Info
+ at 10:40, Jul 31:
+You are now chatting with Tech Mirko.
+
+
+The following is a brief description of our consult:
+
+As a rough summary, we're doing tests to run an EtherCAT Slave Stack with the LAN9252 and a STM32F446 as host MCU.
+The LAN9252's PDI has been already configured to be SPI.
+The host MCU is currently able to read data from the directly addressable memory space which contains the System and Status Registers of the ESC.
+Whereas the indirectly addressable, namely the EtherCAT core CSR Registers, are also readable by the MCU but the registers corresponding to the DataLink are returning 0x00s.
+From Datasheet we have learned that it might be related to a misconfiguration of the configuration words within the EEPROM.
+
+We have designed our own ESI file by following the official Beckhoff's documentation and one of the tools.
+So we learnt that the configuration registers are clearly different, e.g, when describing the type of PDI from the ET1100 ASIC.
+
+The following is the simplest configuration word that currently we're using in our ESI file.
+                                                                <Eeprom>           
+                                                                                <ByteSize>1024</ByteSize>
+                                                                                <ConfigData>8000000000000000</ConfigData>
+                                                                                <!--Configuration word for all ports enabled, as in SOES example running over linux-->
+                                                                                <!--<ConfigData>8002000000000000</ConfigData>-->
+                                                                                <!--Bootstrap is disabled since FoE is not present-->
+                                                                                <!--<BootStrap>0010800080108000</BootStrap>-->
+                                                                </Eeprom>
+
+We're using the simplest possible configuration, only allowing the PDI to work via SPI, all PHY Ports enabled and no DC.
+Still we're not able to reach values different than 0x00s from the 0110h-0111h ESC DL Status Register.
+
+We're still on the stage of getting to know the LAN9252 chip, therefore we got motivated to reach you to start a technical communication channel.
+
+Thanks.
+
+Best Regards / Mit freundlichen Grüßen
+
+Carlos Reyes
+Embedded Software
+
+
+*****************************************************************************************************************
+***************** Second Approach *******************************************************************************
+*****************************************************************************************************************
+
+First contact with Microchip could be for testing the factory configuration.
+
+Configuration needed based on EVB-LAN9252-PICTAIL Add on (All pins available)
+	SPI as PDI (LAN9252_EVB_SPI available) -> By default selected
+	IRQ (Interrupt Request) Selection -> Disabled. Is it possible?
+	HBI High Bandwidth access to CSR Registers -> Disabled
+
+	Configures LAN9252 in SPI with GPIO - 2 port mode.
+
+
+Test the new configuration word and see whether the DL is changing.
+Is AL changing?
+What would happen when the AL Flag changes?
+--Match the physical connectors with the configuration word.
+
+
+Note: HBI interface is independent from SQI
+
+

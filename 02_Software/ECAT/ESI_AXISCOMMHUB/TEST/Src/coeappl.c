@@ -346,48 +346,11 @@ UINT8 Read0x10F8(UINT16 index, UINT8 subindex, UINT32 dataSize, UINT16 MBXMEM * 
     }
 
 
-    COE_SyncTimeStamp();
 
     MEMCPY(pData, &u64Timestamp, dataSize);
     return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
-\brief    This function updates the local timestamp object (0x10F8) and has to be called at least every 4.2sec to detect an 32Bit DC unit overrun.
-          Called from the Timer handler 
-*////////////////////////////////////////////////////////////////////////////////////////
-void COE_SyncTimeStamp(void)
-{
-
-    if (b32BitDc)
-    {
-        UINT32 DcTime = (UINT32)(u64Timestamp & (UINT64)0x00000000FFFFFFFF);
-
-
-        HW_EscReadDWord(DcTime, ESC_SYSTEMTIME_OFFSET);
-
-        /*update the lower 32Bit*/
-        u64Timestamp = ((u64Timestamp & ((UINT64)0xFFFFFFFF00000000)) | (UINT64)DcTime);
-
-        if (DcTime < u32LastDc32Value)
-        {
-            /*32Bit overrun*/
-            u64Timestamp = u64Timestamp + ((UINT64)0x0000000100000000);
-        }
-        
-        u32LastDc32Value = DcTime;
-    }
-    else
-    {
-        /*The DC unit supports 64Bit => update the complete object*/
-        
-        HW_EscRead((MEM_ADDR *)&u64Timestamp, ESC_SYSTEMTIME_OFFSET, 8);
-    }
-
-    u32CheckForDcOverrunCnt = 0;
-
-}
 /*ECATCHANGE_END(V5.12) COE4*/
 
 
@@ -483,42 +446,27 @@ OBJCONST UCHAR OBJMEM aName0x1C33[] = "SM input parameter\000Synchronization Typ
 ** Object Dictionary
 ******************************************************************************/
 /**
- * \brief Object dictionary pointer
+ * \brief Complete object dictionary
  */
-TOBJECT    OBJMEM * ObjDicList = NULL;
-
-/**
- * \brief List of generic application independent objects
- */
-TOBJECT    OBJMEM GenObjDic[] = {
+const TOBJECT OBJMEM ObjDicList[] = {
     /* Object 0x1000 */
-   {NULL,NULL,  0x1000, {DEFTYPE_UNSIGNED32, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1000, aName0x1000, &u32Devicetype, NULL, NULL, 0x0000 },
+   {0x1000, {DEFTYPE_UNSIGNED32, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1000, aName0x1000, &u32Devicetype, NULL, NULL, 0x0000 },
    /* Object 0x1001 */
-   {NULL,NULL,  0x1001, {DEFTYPE_UNSIGNED8, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1001, aName0x1001, &u16ErrorRegister, NULL, NULL, 0x0000 },
-/* Object 0x1008 */
-   {NULL,NULL,  0x1008, {DEFTYPE_VISIBLESTRING, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1008, aName0x1008, acDevicename, NULL, NULL, 0x0000 },
+   {0x1001, {DEFTYPE_UNSIGNED8, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1001, aName0x1001, &u16ErrorRegister, NULL, NULL, 0x0000 },
+   /* Object 0x1008 */
+   {0x1008, {DEFTYPE_VISIBLESTRING, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1008, aName0x1008, acDevicename, NULL, NULL, 0x0000 },
    /* Object 0x1009 */
-   {NULL,NULL,  0x1009, {DEFTYPE_VISIBLESTRING, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1009, aName0x1009, acHardwareversion, NULL, NULL, 0x0000 },
+   {0x1009, {DEFTYPE_VISIBLESTRING, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x1009, aName0x1009, acHardwareversion, NULL, NULL, 0x0000 },
    /* Object 0x100A */
-   {NULL,NULL,  0x100A, {DEFTYPE_VISIBLESTRING, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x100A, aName0x100A, acSoftwareversion, NULL, NULL, 0x0000 },
+   {0x100A, {DEFTYPE_VISIBLESTRING, 0 | (OBJCODE_VAR << 8)}, &sEntryDesc0x100A, aName0x100A, acSoftwareversion, NULL, NULL, 0x0000 },
    /* Object 0x1018 */
-   {NULL,NULL,  0x1018, {DEFTYPE_IDENTITY, 4 | (OBJCODE_REC << 8)}, asEntryDesc0x1018, aName0x1018, &sIdentity, NULL, NULL, 0x0000 },
-    /* Object 0x10F1 */
-   {NULL,NULL,  0x10F1, {DEFTYPE_RECORD, 2 | (OBJCODE_REC << 8)}, asEntryDesc0x10F1, aName0x10F1, &sErrorSettings, NULL, NULL, 0x0000 },
-/*ECATCHANGE_START(V5.12) COE4*/
-    /* Object 0x10F8 */
-   { NULL,NULL,  0x10F8,{ DEFTYPE_UNSIGNED64, 0 | (OBJCODE_VAR << 8) }, &sEntryDesc0x10F8, aName0x10F8, &u64Timestamp, Read0x10F8, NULL , 0x0000 },
-/*ECATCHANGE_END(V5.12) COE4*/
-   /* Object 0x1C00 */
-   {NULL,NULL, 0x1C00, {DEFTYPE_UNSIGNED8, 4 | (OBJCODE_ARR << 8)}, asEntryDesc0x1C00, aName0x1C00, &sSyncmanagertype, NULL, NULL, 0x0000 },
+   {0x1018, {DEFTYPE_IDENTITY, 4 | (OBJCODE_REC << 8)}, asEntryDesc0x1018, aName0x1018, &sIdentity, NULL, NULL, 0x0000 },
    /* Object 0x1C32 */
-   {NULL,NULL, 0x1C32, {DEFTYPE_SMPAR, 32 | (OBJCODE_REC << 8)}, asEntryDesc0x1C3x, aName0x1C32, &sSyncManOutPar, NULL, NULL, 0x0000 },
+   {0x1C32, {DEFTYPE_SMPAR, 32 | (OBJCODE_REC << 8)}, asEntryDesc0x1C3x, aName0x1C32, &sSyncManOutPar, NULL, NULL, 0x0000 },
    /* Object 0x1C33 */
-   {NULL,NULL, 0x1C33, {DEFTYPE_SMPAR, 32 | (OBJCODE_REC << 8)}, asEntryDesc0x1C3x, aName0x1C33, &sSyncManInPar, NULL, NULL, 0x0000 },
-   
-  /*end of entries*/
-  {NULL,NULL, 0xFFFF, {0, 0}, NULL, NULL, NULL, NULL, NULL, 0x000}};
-
+   {0x1C33, {DEFTYPE_SMPAR, 32 | (OBJCODE_REC << 8)}, asEntryDesc0x1C3x, aName0x1C33, &sSyncManInPar, NULL, NULL, 0x0000 },
+   /*end of entries*/
+   {0xFFFF, {0, 0}, NULL, NULL, NULL, NULL, NULL, 0x000}};
 
 /*-----------------------------------------------------------------------------------------
 ------
@@ -602,9 +550,6 @@ void COE_ObjInit(void)
 /*ECATCHANGE_END(V5.12) ECAT1*/
 #endif
                                               | SYNCTYPE_SYNCHRONSUPP         /* ECAT Synchron Mode is supported */
-                                              | SYNCTYPE_DCSYNC0SUPP          /* DC Sync0 Mode is supported */
-                                              | SYNCTYPE_DCSYNC1SUPP          /* DC Sync1 Mode is supported */
-                                              | SYNCTYPE_SUBCYCLESUPP         /*Subordinated application cycles supported*/
     ;
 
     /* subindex 5 contains the minimum cycle time the slave is able to support,
@@ -670,14 +615,6 @@ void COE_ObjInit(void)
     /*Indicate no user specified Sync mode*/
     bSyncSetByUser = FALSE;
 
-    {
-    UINT16 result = COE_ObjDictionaryInit();
-    if(result != 0)
-    {
-        /*clear already linked objects*/
-        COE_ClearObjDictionary();
-    }
-    }
 
     u8PendingSdo = 0;
     bStoreCompleteAccess = FALSE;
@@ -691,204 +628,9 @@ void COE_ObjInit(void)
 
 
 /*ECATCHANGE_START(V5.12) COE4*/
-    UINT32 EscFeature = 0;
-    HW_EscReadDWord(EscFeature, ESC_FEATURES_OFFSET);
-    EscFeature = SWAPDWORD(EscFeature);
-
-    if ((EscFeature & ESC_DC_32BIT_MASK) > 0)
-    {
-        b32BitDc = FALSE;
-    }
-    else
-    {
-        b32BitDc = TRUE;
-
-        HW_EscReadDWord(u32LastDc32Value, ESC_SYSTEMTIME_OFFSET);
-    }
-
-    u32CheckForDcOverrunCnt = CHECK_DC_OVERRUN_IN_MS;
-
     /*ECATCHANGE_END(V5.12) COE4*/
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
- \return    0               object successful added to object dictionary
-            ALSTATUSCODE_XX add object failed
-
- \brief    This function adds an object to the object dictionary
- *////////////////////////////////////////////////////////////////////////////////////////
-UINT16 COE_AddObjectToDic(TOBJECT OBJMEM * pNewObjEntry)
-{
-    if(pNewObjEntry != NULL)
-    {
-        if(ObjDicList == NULL)
-        {
-            /* Object dictionary is empty */
-            ObjDicList = pNewObjEntry;
-            ObjDicList->pNext = NULL;
-            ObjDicList->pPrev = NULL;
-            return 0;
-        }
-        else if(ObjDicList->Index > pNewObjEntry->Index)
-        {
-            /*insert new object dictionary head*/
-            pNewObjEntry->pPrev = NULL;
-            pNewObjEntry->pNext = ObjDicList;
-            ObjDicList->pPrev = pNewObjEntry;
-            ObjDicList = pNewObjEntry;
-            return 0;
-        }
-        else
-        {
-            TOBJECT    OBJMEM * pDicEntry = ObjDicList;
-            while(pDicEntry != NULL)
-            {
-                if(pDicEntry->Index == pNewObjEntry->Index)
-                {
-                    /*object already exists in object dictionary*/
-                    return ALSTATUSCODE_UNSPECIFIEDERROR;
-                }
-                else if(pDicEntry->Index > pNewObjEntry->Index)
-                {
-                    pNewObjEntry->pPrev = pDicEntry->pPrev;
-                    pNewObjEntry->pNext = pDicEntry;
-
-                    if(pDicEntry->pPrev != NULL)
-                        pDicEntry->pPrev->pNext = pNewObjEntry;
-
-                    pDicEntry->pPrev = pNewObjEntry;
-
-                    return 0;
-                }
-                else if(pDicEntry->pNext == NULL)
-                {
-                    /*Last entry reached => add object to list tail*/
-                    pDicEntry->pNext = pNewObjEntry;
-                    pNewObjEntry->pPrev = pDicEntry;
-                    pNewObjEntry->pNext = NULL;
-                    return 0;
-                }
-                else
-                {
-                    /*The new object index is smaller than the current index. Get next object handle.*/
-                    pDicEntry = pDicEntry->pNext;
-                }
-            }
-        }
-    }
-    return ALSTATUSCODE_UNSPECIFIEDERROR;
-}
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
-
- \brief    This function removes an object to the object dictionary
-*////////////////////////////////////////////////////////////////////////////////////////
-void COE_RemoveDicEntry(UINT16 index)
-{
-    TOBJECT    OBJMEM * pDicEntry = ObjDicList;
-
-    while(pDicEntry != NULL)
-    {
-        if(pDicEntry->Index == index)
-        {
-            TOBJECT OBJMEM *pPrevEntry = pDicEntry->pPrev;
-            TOBJECT OBJMEM *pNextEntry = pDicEntry->pNext;
-
-            if(pPrevEntry != NULL)
-            {
-                pPrevEntry->pNext = pNextEntry;
-            }
-
-            if(pNextEntry != NULL)
-            {
-                pNextEntry->pPrev = pPrevEntry;
-            }
-
-            pDicEntry->pPrev = NULL;
-            pDicEntry->pNext = NULL;
-            /*Update Object dictionary pointer if list head was removed*/
-            if(pDicEntry->Index == ObjDicList->Index)
-            {
-                ObjDicList = pNextEntry;
-            }
-            return;
-        }
-
-        pDicEntry = pDicEntry->pNext;
-    }
-}
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
-
- \brief    This function clear the object dictionary
-*////////////////////////////////////////////////////////////////////////////////////////
-void COE_ClearObjDictionary(void)
-{
-    TOBJECT OBJMEM * pObjEntry = (TOBJECT OBJMEM *) ObjDicList;
-    UINT16 Index = 0;
-
-    while(pObjEntry != NULL)
-    {
-        Index = pObjEntry->Index;
-        pObjEntry = pObjEntry->pNext;
-
-        COE_RemoveDicEntry(Index);
-    }
-    ObjDicList = NULL;
-}
-
-
-UINT16 AddObjectsToObjDictionary(TOBJECT OBJMEM * pObjEntry)
-{
-    UINT16 result = 0;
-    TOBJECT OBJMEM * pEntry = (TOBJECT OBJMEM *)pObjEntry;
-
-    while(pEntry->Index != 0xFFFF)
-    {
-        result = COE_AddObjectToDic(pEntry);
-
-        if(result != 0)
-        {
-            return result;
-        }
-
-        pEntry++;
-    }
-
-    return result;
-
-}
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
- \return    0               object dictionary created successful
-            ALSTATUSCODE_XX create object dictionary failed
-
- \brief    This function initialize the object dictionary
-*////////////////////////////////////////////////////////////////////////////////////////
-UINT16 COE_ObjDictionaryInit(void)
-{
-    UINT16 result = 0;
-
-    /*Reset object dictionary pointer*/
-    ObjDicList = NULL;
-
-    result = AddObjectsToObjDictionary((TOBJECT OBJMEM *) GenObjDic);
-
-    if(result != 0)
-    {
-        return result;
-    }
-    
-    if(ApplicationObjDic != NULL)
-    {
-        result = AddObjectsToObjDictionary((TOBJECT OBJMEM *) ApplicationObjDic);
-    }
-
-
-
-    return result;
-}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -685,9 +685,6 @@ UINT16 StartInputHandler(void)
 
     UINT16     wdiv = 0;
     UINT16     wd = 0;
-    UINT32     cycleTimeSync0 = 0; /* Sync0 cycle time */
-    UINT32     shiftTimeSync1 = 0; /* Delay between the Sync0 and Sycn1 signal. A new Sync1 cycle starts on the next Sync0 signal after Sync1 signal.*/
-    BOOL bSubordinatedCycles = FALSE;
 
     UINT16    nPdInputBuffer = 3;
 
@@ -763,13 +760,6 @@ UINT16 StartInputHandler(void)
     HW_EscReadWord(dcControl, ESC_DC_UNIT_CONTROL_OFFSET);
     dcControl = SWAPWORD(dcControl);
 
-    // Cycle time for Sync0
-        HW_EscReadDWord(cycleTimeSync0, ESC_DC_SYNC0_CYCLETIME_OFFSET);
-        cycleTimeSync0 = SWAPDWORD(cycleTimeSync0);
-
-    // Cycle time for Sync1
-        HW_EscReadDWord(shiftTimeSync1, ESC_DC_SYNC1_CYCLETIME_OFFSET);
-        shiftTimeSync1 = SWAPDWORD(shiftTimeSync1);
 
 
     SyncType0x1C32 = sSyncManOutPar.u16SyncType;
@@ -782,69 +772,18 @@ UINT16 StartInputHandler(void)
        - 0x9A0:0x9A3 Sync0 Cycle
        - 0x9A4:0x9A7 Sync1 Cycle
     */
+    /*DC out unit shall not be active because no DC supported*/
     if((dcControl & (ESC_DC_SYNC_UNIT_ACTIVE_MASK | ESC_DC_SYNC_UNIT_AUTO_ACTIVE_MASK)) != 0)
     {
-        /* DC unit is active at least one Sync signal shall be generated */
-        if((dcControl & (ESC_DC_SYNC0_ACTIVE_MASK | ESC_DC_SYNC1_ACTIVE_MASK)) == 0)
-        {
-            return ALSTATUSCODE_DCINVALIDSYNCCFG;
-        }
 
-        /* If Sync1 shall only be active if also Sync0 will be generated*/
-        if(((dcControl & ESC_DC_SYNC0_ACTIVE_MASK) == 0)
-            && ((dcControl & ESC_DC_SYNC1_ACTIVE_MASK) != 0))
-        {
-            return ALSTATUSCODE_DCINVALIDSYNCCFG;
-        }
-
-        if(u16MinSuppSyncType != 0)
-        {
-            if((((u16MinSuppSyncType & SYNCTYPE_DCSYNC0SUPP) == 0) && ((dcControl & ESC_DC_SYNC0_ACTIVE_MASK) != 0))
-                ||(((u16MinSuppSyncType & SYNCTYPE_DCSYNC1SUPP) == 0) && ((dcControl & ESC_DC_SYNC1_ACTIVE_MASK) != 0)))
-            {
-                /* Sync0 is not supported but will be generated*/
-                return ALSTATUSCODE_DCINVALIDSYNCCFG;                   
+        return ALSTATUSCODE_DCINVALIDSYNCCFG;
     }
-        }
-
-        {
-/*ECATCHANGE_START(V5.12) ECAT1*/
-            UINT32 curMinCycleTime = MIN_PD_CYCLE_TIME;
-            curMinCycleTime = sSyncManOutPar.u32MinCycleTime;
-
-            /*Check if Sync0 cycle time is supported*/
-            if (cycleTimeSync0 != 0 && (cycleTimeSync0 < curMinCycleTime || cycleTimeSync0 > MAX_PD_CYCLE_TIME))
-            {
-                    return ALSTATUSCODE_DCSYNC0CYCLETIME;
-            }
-/*ECATCHANGE_END(V5.12) ECAT1*/
-        }
-
-
-        /* Check if Subordinated cycles are configured */
-        if(((dcControl & ESC_DC_SYNC0_ACTIVE_MASK) != 0) && ((dcControl & ESC_DC_SYNC1_ACTIVE_MASK) != 0))
-        {
-            /* For Subordinated cycles both Sync signals shall be active and Sync0 is not configured in single shot (cycle time == 0)*/
-            if((shiftTimeSync1 > 0) && (shiftTimeSync1 >= cycleTimeSync0))
-            {
-                bSubordinatedCycles = TRUE;
-            }
-        }
-
-        /* Dump an error if subordinated cycles are configured but not supported */
-        if(bSubordinatedCycles && ((u16MinSuppSyncType & SYNCTYPE_SUBCYCLESUPP) == 0))
-        {
-             return ALSTATUSCODE_DCINVALIDSYNCCFG;
-        }
-    }
-
 
     /*
         Check if the user configured Sync Type matches the DC register values (if the Sync Type is supported was already checked in the object write function)
     */
     if(bSyncSetByUser)
     {
-        if((dcControl & (ESC_DC_SYNC_UNIT_ACTIVE_MASK | ESC_DC_SYNC_UNIT_AUTO_ACTIVE_MASK)) == 0)
         {
             /* DC out unit not enabled => no DC mode shall be set */
             if((SyncType0x1C32 == SYNCTYPE_DCSYNC0) || (SyncType0x1C32 == SYNCTYPE_DCSYNC1)
@@ -853,34 +792,13 @@ UINT16 StartInputHandler(void)
                 return ALSTATUSCODE_DCINVALIDSYNCCFG;
             }
         } //if((dcControl & (ESC_DC_SYNC_UNIT_ACTIVE_MASK | ESC_DC_SYNC_UNIT_AUTO_ACTIVE_MASK)) == 0)
-    else
     {
-            if((dcControl & ESC_DC_SYNC1_ACTIVE_MASK) == 0)
-            {
-                /* No Sync 1 is generated => No Sync1 Sync Type shall configured*/
-                if((SyncType0x1C32 == (UINT16)SYNCTYPE_DCSYNC1)
-                    ||(SyncType0x1C33 == (UINT16)SYNCTYPE_DCSYNC1))
-                {
-                    return ALSTATUSCODE_DCINVALIDSYNCCFG;
-                }
-            } //if((dcControl & ESC_DC_SYNC1_ACTIVE_MASK) == 0)
-
-            if((dcControl & ESC_DC_SYNC0_ACTIVE_MASK) == 0)
-            {
-                /* No Sync 0 is generated => No Sync0 Sync Type shall configured*/
-                if((SyncType0x1C32 == (UINT16)SYNCTYPE_DCSYNC0)
-                    ||(SyncType0x1C33 == (UINT16)SYNCTYPE_DCSYNC0))
-                {
-                    return ALSTATUSCODE_DCINVALIDSYNCCFG;
-                }
-            } //if((dcControl & ESC_DC_SYNC0_ACTIVE_MASK) == 0)
 
         }
     } //if(bSyncSetByUser)
     else
     {
         /* No Sync Type selected by user => Configure Sync Type based on DC register values*/
-        if((dcControl & (ESC_DC_SYNC_UNIT_ACTIVE_MASK | ESC_DC_SYNC_UNIT_AUTO_ACTIVE_MASK)) == 0)
         {
             /* Activation or auto activation of the Sync Out Unit is disabled => Free Run or SM Sync is configured*/
 
@@ -910,65 +828,8 @@ UINT16 StartInputHandler(void)
             }
 
         }
-        else
-        {
-            if (nPdOutputSize > 0)
-            {
-                /* Sync Signal generation is active*/
-                if (bSubordinatedCycles)
-                {
-                    SyncType0x1C32 = SYNCTYPE_DCSYNC1;
-                }
-                else
-                {
-                    SyncType0x1C32 = SYNCTYPE_DCSYNC0;
-                }
-            }
-            else
-            {
-                SyncType0x1C32 = SYNCTYPE_FREERUN;
-            }
-
-
-            if (nPdInputSize > 0)
-            {
-                if ((dcControl & ESC_DC_SYNC1_ACTIVE_MASK) != 0)
-                {
-                    /* If Sync1 is available the inputs will always be mapped with Sync1 */
-                    SyncType0x1C33 = SYNCTYPE_DCSYNC1;
-                }
-                else
-                {
-                    /* Map Inputs based on Sync0*/
-                    SyncType0x1C33 = SYNCTYPE_DCSYNC0;
-                }
-            }
-            else
-            {
-                SyncType0x1C33 = SYNCTYPE_FREERUN;
-            }
-        }
     }
 
-    /* Update Cycle time entries if DC Sync Mode enabled */
-    if(SyncType0x1C32 == SYNCTYPE_DCSYNC1)
-    {
-/*ECATCHANGE_START(V5.12) ECAT1*/
-        sSyncManOutPar.u32Sync0CycleTime = (UINT32)cycleTimeSync0;
-        sSyncManOutPar.u32CycleTime = (UINT32)cycleTimeSync0;
-
-        sSyncManInPar.u32Sync0CycleTime = (UINT32)cycleTimeSync0;
-        sSyncManInPar.u32CycleTime = (UINT32)cycleTimeSync0;
-    }
-    else if(SyncType0x1C32 == SYNCTYPE_DCSYNC0)
-    {
-        sSyncManOutPar.u32Sync0CycleTime = (UINT32)cycleTimeSync0;
-        sSyncManOutPar.u32CycleTime = (UINT32)cycleTimeSync0;
-
-        sSyncManInPar.u32Sync0CycleTime = (UINT32)cycleTimeSync0;
-        sSyncManInPar.u32CycleTime = (UINT32)cycleTimeSync0;
-/*ECATCHANGE_END(V5.12) ECAT1*/
-    }
 
     /* Set global flags based on Sync Type */
     if ( !b3BufferMode )
@@ -1018,58 +879,6 @@ UINT16 StartInputHandler(void)
     sSyncManInPar.u16SyncType = SyncType0x1C33;
 
     /* Calculate number of Sync0 events within one SM cycle and the Sync0 events on which the inputs has to be latched*/
-    LatchInputSync0Value = 0;
-    LatchInputSync0Counter = 0;
-    u16SmSync0Value = 0;
-    u16SmSync0Counter = 0;
-
-
-    if(bSubordinatedCycles == TRUE)
-    {
-/*ECATCHANGE_START(V5.12) ECAT4*/
-        UINT32 cycleTimeSync1 = (shiftTimeSync1 + cycleTimeSync0);
-/*ECATCHANGE_END(V5.12) ECAT4*/
-
-        /* get the number of Sync0 event within on SM cycle */
-        if(shiftTimeSync1 >= cycleTimeSync0)
-        {
-
-            u16SmSync0Value = (UINT16)(cycleTimeSync1 / cycleTimeSync0);
-            
-            if((cycleTimeSync1 % cycleTimeSync0) == 0)
-            {
-                /* if the Sync1cycletime/Sync0cycletime ratio is even one additional tick */
-                u16SmSync0Value ++;
-            }
-        }
-        else
-        {
-            u16SmSync0Value = 1;
-        }
-
-        /* Calculate the Sync0 tick on which the inputs shall be latched (last Sync0 before the next Sync1 event)*/
-        LatchInputSync0Value = (UINT16) (cycleTimeSync1 / cycleTimeSync0);
-
-        if ((cycleTimeSync1 % cycleTimeSync0) > 0)
-        {
-            LatchInputSync0Value++;
-        }
-
-    }
-    else 
-    {
-        if(SyncType0x1C32 == SYNCTYPE_DCSYNC0)
-        {
-            /* if SyncType of 0x1C32 is 2 the Sync0 event is trigger once during a SM cycle */
-            u16SmSync0Value = 1;
-        }   
-
-        if(SyncType0x1C33 != SYNCTYPE_DCSYNC1)
-        {
-            LatchInputSync0Value = 1;
-        }
-    }
-
 
 
     /* reset the error counter indicating synchronization problems */
@@ -1131,80 +940,6 @@ UINT16 StartInputHandler(void)
     }
 /*The application ESM function is separated from this function to handle pending transitions*/
 
-    Sync0WdValue = 0;
-    Sync0WdCounter = 0;
-    Sync1WdCounter = 0;
-    Sync1WdValue = 0;
-    bDcRunning = FALSE;
-    bSmSyncSequenceValid = FALSE;
-    i16WaitForPllRunningTimeout = 0;
-
-/*ECATCHANGE_START(V5.12) ECAT5*/
-    sSyncManInPar.u16SmEventMissedCounter = 0;
-    sSyncManInPar.u16CycleExceededCounter = 0;
-    sSyncManInPar.u8SyncError = 0;
-
-
-    sSyncManOutPar.u16SmEventMissedCounter = 0;
-    sSyncManOutPar.u16CycleExceededCounter = 0;
-    sSyncManOutPar.u8SyncError = 0;
-/*ECATCHANGE_END(V5.12) ECAT5*/
-
-    /* calculate the Sync0/Sync1 watchdog timeouts */
-    if ( (dcControl & ESC_DC_SYNC0_ACTIVE_MASK) != 0 )
-    {
-        /*calculate the Sync0 Watchdog counter value the minimum value is 1 ms
-            if the sync0 cycle is greater 500us the Sync0 Wd value is 2*Sycn0 cycle */
-        if(cycleTimeSync0 == 0)
-        {
-            Sync0WdValue = 0;
-        }
-        else
-        {
-            UINT32 Sync0Cycle = cycleTimeSync0/100000;
-
-            if(Sync0Cycle < 5)
-            {
-                /*Sync0 cycle less than 500us*/
-                Sync0WdValue = 1;
-            }
-            else
-            {
-                Sync0WdValue = (UINT16)(Sync0Cycle*2)/10;
-            }
-        }
-
-        /* Calculate also the watchdog time for Sync1*/
-        if ( (dcControl & ESC_DC_SYNC1_ACTIVE_MASK) != 0 )
-        {
-            if(shiftTimeSync1 < cycleTimeSync0)
-        {
-                /* Sync 1 has the same cycle time than Sync0 (maybe with a shift (shiftTimeSync1 > 0))*/
-                Sync1WdValue = Sync0WdValue;
-        }
-        else
-        {
-                /* Sync1 cycle is larger than Sync0 (e.g. subordinated Sync0 cycles) */
-/*ECATCHANGE_START(V5.12) ECAT4*/
-                UINT32 Sync1Cycle = (shiftTimeSync1  + cycleTimeSync0 )/100000;
-/*ECATCHANGE_END(V5.12) ECAT4*/
-                if(Sync1Cycle < 5)
-                {
-                    /*Sync0 cycle less than 500us*/
-                    Sync1WdValue = 1;
-                }
-                else
-                {
-                    /*ECATCHANGE_START(V5.12)*/
-                    Sync1WdValue = (UINT16)((Sync1Cycle*2)/10);
-                    /*ECATCHANGE_END(V5.12)*/
-                }
-
-                /* add one Sync0 cycle because the Sync1 cycle starts on the next Sync0 after the Sync1 signal */
-                Sync1WdValue += Sync0WdValue/2;
-            }
-    }
-    }
 
     if(nPdOutputSize > 0)
     {
@@ -1245,14 +980,6 @@ UINT16 StartOutputHandler(void)
     }
 /*The application ESM function is separated from this function to handle pending transitions*/
 
-
-    /*DC synchronisation is active wait until pll is valid*/
-    if(bDcSyncActive)
-    {
-        i16WaitForPllRunningTimeout = 200;
-
-        i16WaitForPllRunningCnt = 0;
-    }
 
 
 /*ECATCHANGE_START(V5.12) ECAT5*/
@@ -1317,32 +1044,6 @@ void StopInputHandler(void)
     bEscIntEnabled = FALSE;
 /*The application ESM function is separated from this function to handle pending transitions*/
 
-    bDcSyncActive = FALSE;
-    bDcRunning = FALSE;
-    bSmSyncSequenceValid = FALSE;
-    u16SmSync0Value = 0;
-    u16SmSync0Counter = 0;
-
-    Sync0WdValue = 0;
-    Sync0WdCounter = 0;
-    Sync1WdCounter = 0;
-    Sync1WdValue = 0;
-    LatchInputSync0Value = 0;
-    LatchInputSync0Counter = 0;
-
-    /*ECATCHANGE_START(V5.12) ECAT5*/
-
-    sSyncManOutPar.u16SmEventMissedCounter = 0;
-    sSyncManOutPar.u16CycleExceededCounter = 0;
-    sSyncManOutPar.u8SyncError = 0;
-
-
-    sSyncManInPar.u16SmEventMissedCounter = 0;
-    sSyncManInPar.u16CycleExceededCounter = 0;
-    sSyncManInPar.u8SyncError = 0;
-/*ECATCHANGE_END(V5.12) ECAT5*/
-
-    i16WaitForPllRunningTimeout = 0;
 
     bWdTrigger = FALSE;
     bEcatInputUpdateRunning = FALSE;
@@ -1931,26 +1632,6 @@ void AL_ControlRes(void)
                     }
                 break;
                 case SAFEOP_2_OP:
-                    if(bDcSyncActive)
-                    {
-                        /*SafeOP to OP timeout expired check which AL status code need to be written*/
-                        if(!bDcRunning)
-                        {
-                            /*no Sync0 signal received*/
-                            StatusCode = ALSTATUSCODE_NOSYNCERROR;
-                        }
-                        else if(!bEcatFirstOutputsReceived && (nPdOutputSize > 0))
-                        {
-                            /*no process data received*/
-                            StatusCode = ALSTATUSCODE_SMWATCHDOG;
-                        }
-                        else
-                        {
-                            /*SM/Sync Sequence is not valid*/
-                            StatusCode = ALSTATUSCODE_SYNCERROR;
-                        }
-                    }
-                    else
                     {
                         if (nPdOutputSize > 0)
                         {
@@ -2038,38 +1719,6 @@ void AL_ControlRes(void)
                 case SAFEOP_2_OP:
                    if(bApplEsmPending)
                     {
-                        if(bDcSyncActive)
-                        {
-                            if(i16WaitForPllRunningTimeout > 0 && i16WaitForPllRunningTimeout <= i16WaitForPllRunningCnt)
-                            {
-                                /*Pll sequence valid for 200ms (set in APPL_StartOutputHandler() )
-                                acknowledge state transition to OP */
-
-                                i16WaitForPllRunningTimeout = 0;
-                                i16WaitForPllRunningCnt = 0;
-
-/*ECATCHANGE_START(V5.12) ESM4*/
-                                bApplEsmPending = FALSE;
-/*ECATCHANGE_END(V5.12) ESM4*/
-                                result = APPL_StartOutputHandler();
-
-                                if(result == 0)
-                                {
-                                    /* Slave is OPERATIONAL */
-                                    bEcatOutputUpdateRunning = TRUE;
-                                    Status = STATE_OP;
-                                }
-                                else
-                                {
-                                    if(result != NOERROR_INWORK)
-                                    {
-                                        APPL_StopOutputHandler();
-                                        StopOutputHandler();
-                                    }
-                                }
-                            }
-                        }
-                        else
                         {
                             if(nPdOutputSize == 0 || bEcatFirstOutputsReceived)
                             {
@@ -2115,85 +1764,6 @@ void AL_ControlRes(void)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-/**
-
- \brief    This function checks the current Sync state and set the local flags
- The analyse of the local flags is handled in "CheckIfEcatError"
-
-*////////////////////////////////////////////////////////////////////////////////////////
-void DC_CheckWatchdog(void)
-{
-/*ECATCHANGE_START(V5.12) ECAT5*/
-    DISABLE_ESC_INT();
-/*ECATCHANGE_END(V5.12) ECAT5*/
-
-    if(bDcSyncActive && bEcatInputUpdateRunning)
-    {
-        /*If Sync0 watchdog is enabled and expired*/
-        if((Sync0WdValue > 0) && (Sync0WdCounter >= Sync0WdValue))
-        {
-                /*Sync0 watchdog expired*/
-                bDcRunning = FALSE;        
-        }
-        else
-        {
-            if(Sync0WdCounter < Sync0WdValue)
-            {
-                Sync0WdCounter ++;
-            }
-
-            bDcRunning = TRUE;
-        }
-
-        if(bDcRunning)
-        {
-            /*Check the Sync1 cycle if Sync1 Wd is enabled*/
-            if(Sync1WdValue > 0)
-            {
-                if(Sync1WdCounter < Sync1WdValue)
-                {
-                    Sync1WdCounter ++;
-                }
-                else
-                {
-                    /*Sync1 watchdog expired*/
-                    bDcRunning = FALSE;
-                }
-            }
-        }
-        if(bDcRunning)
-        {
-           if(sSyncManOutPar.u16SmEventMissedCounter < sErrorSettings.u16SyncErrorCounterLimit)
-            {
-                bSmSyncSequenceValid = TRUE;
-
-                /*Wait for PLL is active increment the Pll valid counter*/
-                if (i16WaitForPllRunningTimeout > 0)
-                {
-                    i16WaitForPllRunningCnt++;
-                }
-            }
-            else if (bSmSyncSequenceValid)
-            {
-                    bSmSyncSequenceValid = FALSE;
-
-                /*Wait for PLL is active reset the Pll valid counter*/
-                if (i16WaitForPllRunningTimeout > 0)
-                {
-                    i16WaitForPllRunningCnt = 0;
-                }
-            }
-        }
-        else if(bSmSyncSequenceValid)
-        {
-           bSmSyncSequenceValid = FALSE;
-        }
-    }
-    /*ECATCHANGE_START(V5.12) ECAT5*/
-    ENABLE_ESC_INT();
-    /*ECATCHANGE_END(V5.12) ECAT5*/
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -2231,24 +1801,6 @@ void CheckIfEcatError(void)
       }
    }
 
-   if(bDcSyncActive)
-   {
-       if(bEcatOutputUpdateRunning)
-       {
-           /*Slave is in OP state*/
-           if(!bDcRunning)
-           {
-               AL_ControlInd(STATE_SAFEOP, ALSTATUSCODE_FATALSYNCERROR);
-               return;
-           }
-           else if(!bSmSyncSequenceValid)
-           {
-               AL_ControlInd(STATE_SAFEOP, ALSTATUSCODE_SYNCERROR);
-               return;
-           }
-        
-       }
-   }
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -2419,11 +1971,6 @@ void ECAT_Init(void)
      bEcatInputUpdateRunning = FALSE;
     bWdTrigger = FALSE;
     EcatWdValue = 0;
-    Sync0WdCounter = 0;
-    Sync0WdValue = 0;
-    Sync1WdCounter = 0;
-    Sync1WdValue = 0;
-    bDcSyncActive = FALSE;
     bLocalErrorFlag = FALSE;
     u16LocalErrorCode = 0x00;
 

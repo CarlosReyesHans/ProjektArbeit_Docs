@@ -144,8 +144,6 @@ V5.01 : Start file change log
  */
 typedef struct OBJ_ENTRY
 {
-    struct OBJ_ENTRY                      *pPrev; /**< \brief Previous entry(object) in the object dictionary list*/
-    struct OBJ_ENTRY                      *pNext; /**< \brief Next entry(object) in the object dictionary list*/
 
     UINT16                                Index; /**< \brief Object index*/
     TSDOINFOOBJDESC                       ObjDesc; /**< \brief Object access, type and code*/

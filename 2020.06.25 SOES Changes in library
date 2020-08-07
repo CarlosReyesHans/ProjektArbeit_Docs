@@ -7,6 +7,8 @@
 This document contains information about the implementation of the SOES v.1.0.0 as shown in 
 	the example tutorial8_txt. 
 	It is also related to the file Starting the SOES Integration II 2020.06.19
+	
+
 @2020.07.15
 	Restarting work after spi tests, pcb design + delays
 @2020.07.02
@@ -21,7 +23,13 @@ This document contains information about the implementation of the SOES v.1.0.0 
 ****		NOTES
 ********************************************************************************************
 /*-----------------------Changes within the library of SOES-----------------------------------------*/
-@2020.07.17 
+
+@2020.08.07 
+	MAX_TXPDO_SIZE -->> Turned to 0 to avoid the dynamically allocated RX/TXPDO sizes
+
+@2020.07.17 (This should be matched with the latest changes in the github version by 2020.08.07)
+	ESC_read_csr(); and ESC_write_csr   << Integrated a loop to debug over SPI
+		~/SOES_src/esc.c
 	FLASH_WRITE_BLOCK_SIZE, FTFL_USER_MARGIN,NUM_OF_FILES added in bootstrap.h << this is a configuration relative to STM32, it should be though in other library.
 		~/SOES_App/bootstrap.h
 		The FoE fuinctions are gonna be commented out for testing.
@@ -89,7 +97,17 @@ The EEPROM addresses are defined following the EtherCAT Slave standard.
 			#define ESC_CSR_CMD_READ         (BIT(31) | BIT(30))
 			#define ESC_CSR_CMD_WRITE        BIT(31)
 	What is the detailed information of Address Register and Data Register?
+	
+		From 12.13.4 ETHERCAT CSR INTERFACE COMMAND REGISTER (ECAT_CSR_CMD)
+		CSR Busy (CSR_BUSY)
+			When a 1 is written to this bit, the read or write operation (as determined by
+			the R_nW bit) is performed to the specified EtherCAT Core CSR in CSR
+			Address (CSR_ADDR).
+**************************
 	Is it Little/Big Endian?
+	This Byte Test (BYTE_TEST) field reflects the current byte ordering
+	31:0 	RO 87654321h
+
 *************************
 
 	Distributed Clocks - Receive Times are also mapped after the EEPROM in the overall The Table 12-15 Has the EtherCAT CORE CSR Registers
@@ -121,9 +139,24 @@ etohs and etothl are macros defined in CC to identify whether data shou;ld be sw
 @2020.07.17
 //TODO
 Test ecat_slv_init() as scheduled task.
+
+	-ESC_read_csr() Create a loop and watch it over SPI
+	-Use the ECAT API to read directly registers from the ESC!! Did not work
+	
+
 	-passed ESC_config
 	-kinda passedESC_init 
 	-hanging ESC_ALstatus (ESCinit); << "~/SOES_App/ecat_slv.c"
+		What about the htoes() to transform to little endian????
+		The problem is in ESC_CSR_CMD_BUSY:
+		   do
+		   {
+			  value = lan9252_read_32(ESC_CSR_CMD_REG);
+		   } while(value & ESC_CSR_CMD_BUSY);
+		ESC_CSR_CMD_BUSY represents the bit which should be reset by ESC as soon it has the CSR data ready.
+			It could be hanged since the addresses are not matching, the ones given in previous read commands..
+		CHECK WHETHER THE VALUE AND CSR ADDRES ARE OK
+		
 
 Continue with the porting of the example application after waiting from being busy
 	-Write the select function >> 	spi_select() << Is it necessary to redefine this function? YES
@@ -145,7 +178,9 @@ Continue with the porting of the example application after waiting from being bu
 	-Write in the report that the LED RUN/ERROR may be not implemented. TAble 9, as described in ETG2200_v3i1i0
 		-OS Tasks that would call the LED control functions, so far, are not spawned.
 			~/SOES_APP/led_handler
-	
+(Low priority)
+(Optimization)	After asking the ESC for a CSR data, the HOST MCU should wait while polling one bit for the ESC to release it, which would mean that the data is ready to be read out.	
+					It is in this part where an OSWait function could be integrated and change to another task
 //CLOSED
 	-Adjust the ecat_slv_init and ecat_slv functions to app
 

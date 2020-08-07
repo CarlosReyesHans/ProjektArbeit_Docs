@@ -170,7 +170,7 @@ DC_SUPPORTED: If distributed clocks should be supported by the slave, then this 
 If this switch is set, then also AL_EVENT_ENABLED shall be set.<br>
 NOTE: The DC support needs also be set in the "ESC_CONFIG_DATA" settings. */
 #ifndef DC_SUPPORTED
-#define DC_SUPPORTED                              1 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
+#define DC_SUPPORTED                              0 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
 #endif
 
 /** 
@@ -395,7 +395,7 @@ ESC_SM_WD_SUPPORTED: This switch should be set if the SyncManger watchdog provid
 /** 
 STATIC_OBJECT_DIC: If this switch is set, the object dictionary is "build" static (by default only PIC18 objects are added static) */
 #ifndef STATIC_OBJECT_DIC
-#define STATIC_OBJECT_DIC                         0 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
+#define STATIC_OBJECT_DIC                         1 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
 #endif
 
 /** 
@@ -997,7 +997,7 @@ MAX_MBX_WRITE_ADDRESS: Maximum address for the write (receive) mailbox (Sync Man
 /** 
 MAX_PD_INPUT_SIZE: Maximum size of the process input data (Sync Manager 3) for cyclic exchange. */
 #ifndef MAX_PD_INPUT_SIZE
-#define MAX_PD_INPUT_SIZE                         0x8 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
+#define MAX_PD_INPUT_SIZE                         0x24 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
 #endif
 
 /** 
@@ -1015,7 +1015,7 @@ MAX_MBX_READ_ADDRESS: Maximum address for the read (send) mailbox (Sync Manager 
 /** 
 MAX_PD_OUTPUT_SIZE: Maximum size of the process output data (Sync Manager 2) for cyclic exchange. */
 #ifndef MAX_PD_OUTPUT_SIZE
-#define MAX_PD_OUTPUT_SIZE                        0x4 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
+#define MAX_PD_OUTPUT_SIZE                        0x8 //This define was already evaluated by ET9300 Project Handler(V. 1.4.1.0)!
 #endif
 
 /** 
