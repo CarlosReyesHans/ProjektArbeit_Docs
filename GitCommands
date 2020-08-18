@@ -66,13 +66,22 @@ git merge --no-ff master	//master privails as develop has the last changes from 
 git checkout feature
 git merge --no-ff develop	//now feature has incorporated the updated version of develop, hence feature has the master's changes as well
 
-/////	USING STASH
+**************************************************************
+*	USING STASH
+**************************************************************
 Before changing to any other branch when the modifications are not yet ready
 
 git stash
 After having shown what was needed and being again in the initial branch, 
 	to recover what was previously stashed
 git stash pop
+
+Before commiting or discarding some changes
+
+git diff 
+
+git reset --hard is not recommended better use git stash
+
 
 
 **************************************************************

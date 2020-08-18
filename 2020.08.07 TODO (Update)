@@ -1,20 +1,47 @@
+2020.08.17
+2020.08.13
+2020.08.11
 2020.08.07
-Activities of today
 
-	Modify the outputs object to be only at index 6000 instead of 6000-6001 nope
-	Check then the pdo mapping to the RXPDO object 0x21 within the ESI file
-	Check the Object dictionary in the Output area.
+
+Activities of today
+	Start the report for the funcitonal units.
+
 
 	The 1 wire communication
+
+	Write the feedback to PCBway
+
+	(soes) What are the hooks for?
+	(esi) why the data types in the object dictionary are different (32bits) against to those defined in the rxpdo?
+
+2020.08.17
+	Check the bug within the RX and TX Data
+		The bug may be related to mailbox
+			MAilboxes are matching 100% with ESI
+	Check the RXPDO upd
+	Who writes the ESCREG_SM2 in soes?? Depending on the task, MCU host writes the RAM or the MASTER
+
+2020.08.14
+DONE
+	Continuing the tracing back of SM@ mapping
+	Re check deeply the Synchronization managers in SOES und match them with ESI
+	and send feedback to Microchip (about the AL Control Register)+
+	Check the Object dictionary in the Output area.
+	
+2020.08.13
+DONE
+	Continue The RXPDO
+	Defining the TXPDO with two different objects (minor problems within definitions dec instead of hex)
+		Modify the outputs object to be only at index 6000 instead of 6000-6001 not needed
+	Check then the pdo mapping to the RXPDO object 0x21 within the ESI file
+		
+2020.08.11
+DONE
 	Contact then Microchip
 		Asses the specific questions for Microchip in a better way
 		Contact only available for microchip by telephone
-
-	
-
-
-
-
+	Continue from RXPDO 1600 from This has the number of elements of the PDO From Table 74, 5.6.7.4.7 Receive PDO Mapping @ETG1000.6
 
 DONE
 	Adapt the SSC tool to LAN9252
@@ -32,5 +59,15 @@ DONE
 	Check PCB data
 
 
+Take away
+	How is it written the configuration of 0x8000 if there is no sync M to it? : Because in the options file	
+		The virtual addresses are configured.
+	MAilbox is not used in SOES???
+			Is there a Mailbox already implemented in the LAN9252. YES!! At least the buffer.
+
+
 Other Day:
 PICO CLASP Connectors for usb testing
+The cutouts feature in Altium is very practical
+
+Questions to SOES

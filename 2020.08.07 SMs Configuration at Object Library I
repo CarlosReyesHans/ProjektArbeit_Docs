@@ -16,6 +16,24 @@ Usually SM 2 for outputs.
 
 
 
+/*-------------------------------Structures-----------------------------------------------------------------*/
+
+FOR SOES the following is the structure of an object
+
+			typedef struct CC_PACKED
+			{
+			   uint16_t subindex;
+			   uint16_t datatype;
+			   uint16_t bitlength;
+			   uint16_t flags;
+			   const char *name;
+			   uint32_t value;
+			   void *data;
+			} _objd;
+
+
+
+
 The Object Dictionary used as example follow the CANopen DS301 ranges.
 
 0x0000 - 0x0FFF, Data Type Area
@@ -32,8 +50,19 @@ The Object Dictionary used as example follow the CANopen DS301 ranges.
 
 
 
+
+
+
+
+/*------------------------------------Issue to check---------------------------------------------------------*/
+
+
 Tracing back the Application Layer Error no "0x01d"
 	"Invalid Outout Synchronization Manager"
+	
+Severity	Code	Description	Project	File	Line	Suppression State
+Error		8/14/2020 11:46:24 AM 564 ms | 'Box 2 (axcommb)' (1001): 'PREOP to SAFEOP' failed! Error: 'check device state for SAFEOP'. AL Status '0x0012' read and '0x0004' expected. AL Status Code '0x001d - Invalid SM OUT cfg'				
+	
 	
 Originated in ESC_State function <<< State Manager
 
@@ -45,11 +74,156 @@ While comparing the size of Sm2mapping
             break;
          }
 		 
-Variable ESCvar:
+	Tracing back the error
+		 
+Variable  is updated before the comparison: << The Output SM is checked here.
          ESCvar.ESC_SM2_sml = sizeOfPDO (RX_PDO_OBJIDX, &ESCvar.sm2mappings,
                                          SMmap2, MAX_MAPPINGS_SM2);
-		sizeOfPDO()?? @ecat_coe
+Location:		sizeOfPDO() @esc_coe.c
+
+Arguments which were handed over: 	RX_PDO_OBJIDX: 0x1c12 defined in esc_coe.h 
+											#define TX_PDO_OBJIDX           0x1c13
+											#define RX_PDO_OBJIDX           0x1c12
+									&ESCvar.sm2mappings:	This is only allocated memory to be updated
+									SMmap2: declared in ecat_slv.c
+											"_SMmap      SMmap2[MAX_MAPPINGS_SM2];"
+											"_SMmap      SMmap3[MAX_MAPPINGS_SM3];"
+											
+											To point out that the structure of SMap is 
+											typedef struct
+												{
+												   const _objd * obj;
+												   uint16_t offset;
+												} _SMmap; << This may imply that this is only a list of objects, since it has an offset and a pointer
+									MAX_MAPPINGS_SM2: 10 (changed) defined in ecat_options.h
+
+About sizeOfPDO()  this is OK
+	Checks only for RX/TXPDO otherwise -1
+	Looks for definition in object list otherwise 0
+	
+After checking the sizes of pdos, soes ries to starts the interchanging of input with the MASTER (PREOPERATION MODE)
+uint8_t ESC_startinput (uint8_t state);
+	uint8_t ESC_checkSM23 (uint8_t state); << defined in esc.c, checks information from the ESC
+		ESC_read (ESCREG_SM2, (void *) &ESCvar.SM[2], sizeof (ESCvar.SM[2]));
 		
+		Where ESCREG_SM2 is 0x810
+		
+			The following is the structure definition of _ESCsm element. This is what soes will compare
+			typedef struct CC_PACKED
+					{
+					   uint16_t PSA;
+					   uint16_t Length;
+
+					#if defined(EC_LITTLE_ENDIAN)
+					   uint8_t Mode:2;
+					   uint8_t Direction:2;
+					   uint8_t IntECAT:1;
+					   uint8_t IntPDI:1;
+					   uint8_t WTE:1;
+					   uint8_t R1:1;
+
+					   uint8_t IntW:1;
+					   uint8_t IntR:1;
+					   uint8_t R2:1;
+					   uint8_t MBXstat:1;
+					   uint8_t BUFstat:2;
+					   uint8_t R3:2;
+
+					   uint8_t ECsm:1;
+					   uint8_t ECrep:1;
+					   uint8_t ECr4:4;
+					   uint8_t EClatchEC:1;
+					   uint8_t EClatchPDI:1;
+
+					   uint8_t PDIsm:1;
+					   uint8_t PDIrep:1;
+					   uint8_t PDIr5:6;
+					#endif
+					} _ESCsm;
+	
+			What is comapred!! SM->PSA Starting address; SM->Length; SM-> Command ; SM->ActESC
+			
+			Defined in ecat_options (Lengths)
+			#define SM2_sma          0x1100
+			#define SM2_smc          0x64
+			#define SM2_act          1
+			#define SM3_sma          0x1400
+			#define SM3_smc          0x20
+			#define SM3_act          1
+			
+			Needs to match with ESI specification
+			<Sm DefaultSize="8" StartAddress="#x1100" ControlByte="#x64" Enable="1">Outputs</Sm>
+			<Sm DefaultSize="36" StartAddress="#x1400" ControlByte="#x20" Enable="1">Inputs</Sm>
+			
+		It runs into OP mode!!
+/*---------------------------Issue: Only 2 master outputs are being updated------------------------------------------------------------------*/
+
+The function that updates the IO States:
+
+The following function is called continuosly after polling the state of the AL and DL
+void ecat_slv (void)
+
+	/* Function to update local I/O, call read ethercat outputs, call
+	 * write ethercat inputs. Implement watch-dog counter to count-out if we have
+	 * made state change affecting the App.state.
+	 */
+	void DIG_process (uint8_t flags)  << in ecat_slv.c
+
+flags as an argument
+What is this for? To "set" which feature will be updated, therefore the call of DIG_process is activated for all features (flags)
+	#define DIG_PROCESS_OUTPUTS_FLAG    0x02
+   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG 
+   
+   In either cases of an if, the following condition is asserted:
+		ESCvar.ALevent & ESCREG_ALEVENT_SM2
+		and the following function is called
+		         RXPDO_update();
+				 ESCvar.rxpdo_override != NULL <<< The rxpdo update can be overrided with a pointer
+					ESC_read (ESC_SM2_sma, rxpdo, ESCvar.ESC_SM2_sml);
+						"ESC_SM2_sma"	This is the address that was given in the ESI file #define SM2_sma          0x1100
+						"rxpdo" The buffer
+						"ESCvar.ESC_SM2_sml" The length calculated during the preoperation phase
+					
+THE ERROR:
+
+	READ function reads only the first 4 bytes
+					
+			The CURRENT path execution evaluates this as true and updates the watchdog
+			(CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT)
+			Then sets the outputs 
+			         /* Set outputs */
+				cb_set_outputs();
+/*-------------------------------Recheck of the SMS for mailboxes-----------------------------------------------------*/
+
+Mailbox can be approached with different protocols over the same EtherCAT bus.
+
+CANopen over EtherCAT Mailbox (CoE)
+	–
+	CANopen over EtherCAT (CoE)
+	If this checkbox is activated, the EtherCAT slave supports the mailbox protocol CANopen over EtherCAT (CoE).
+	–
+	SDO Info Support
+	If this checkbox is activated, the master can load the object directory of the EtherCAT slave.
+	
+Taking into account the Datagram Example: Mailbox Communication CoE SDO Service/
+	ETG.1000.4 EtherCAT frame structure 
+		This service is processed by the ESC, therefore it should not be implemented within the SOES.
+		
+From LAN 9252 Datasheet 12.14.20
+Note 8: This register behaves like a mailbox if Device Emulation is off (Device Emulation bit of ESC Configuration
+	Register is 0). The PDI must read this register after ECAT has written it. Otherwise, ECAT can not write
+	again to this register. After rest, this register can be written by ECAT. Regarding mailbox functionality, both
+	registers 0120h and 0121h are equivalent, e.g., reading 0121h is sufficient to make this register writable
+	again. If Device Emulation is on, this register can always be written and it contents are copied to the AL
+	Status Register. Reading this register from PDI clears all Event Requests (register 0220h bit 0).
+
+Which might imply that every time SOES reads out the ALCONTROL REGISTER 0120h-0121h is already handling the mailbox.
+
+/*-------------------------------Recheck of the Object Dictionary-----------------------------------------------------*/
+
+Rechecking whole definition of RX/TXPDOs
+
+Problem:
 Problem Returning error from the definition of the PDO space
 		const _objd SDO1600[] =
 		{
@@ -63,31 +237,99 @@ Problem Returning error from the definition of the PDO space
 		  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_01, 0x60000108, NULL},
 		};
 
-Rechecking whole definition of PDO
+
+
 Defined:
 1. OK
-const _objd SDO1C00[] Sync Manager Communication Type --->> 4 SM are used
+const _objd SDO1C00[] Sync Manager Communication Type --->> 4 SM are used (DEFINED AS AN 4-ELEMENT ARRAY)
+		Still the objects for each synchronization manager are also defined as standalone objects
 2. OK
 SMs are defined from 0x01c10-0x01c2f (32 in total)
 const _objd SDO1C12[] SM2 Linked to Object RXPDO <<< There couldbe up to 256 RXPDO	
 PROBLEM: Cannot be added another Object since its synchronization would need another syncrhonization Manager
 const _objd SDO1C13[] SM3 Linked to Object TXPDO << There could be up to 256 TXPDO
-3. 
-Define the 1600 Receive PDO Mapping object << From here comes the PDO Mapping 0x21 
+3. OK 
+Define the 1600 Receive PDO Mapping object << From official documentation comes the PDO Mapping offset 0x21  that is in ESI
 Link the Output objects to the RXPDO  
+const _objd SDO1600[] = //(Remember: 8 and 32 are the sizes of the Data that links to the next object, 0x01 and 0x70000108)
+	{ {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, &acNameNOE[0], 0x01, NULL},
+	  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, &acNameMO[0], 0x70000108, NULL}
+	};
+Important note:
+	Don't confuse the synchronization manager that updates the RX/TXPDOs- it only can update one- 
+		with the RX/TXPDOs that can update more than one out/input PDOs.
+4. OK
+Define the object 7000 according to the standard
+5. OK NOT TESTED
+Define the 1A00 Transmit PDO similar to the way of 1600 and define its output objects.
+
+
+
+
+Resulting structure
+	const _objd SDO1C00[] Not linked but space allocated for SMs
+		const _objd SDO1C10[]
+		const _objd SDO1C11[]
+		const _objd SDO1C12[] >> TO RXPDO
+			const _objd SDO1600[] << RXPDO: This can be related to different items within the output pdoobject
+				const _objd SDO7000[] << Outputs , this access should be rw
+		const _objd SDO1C13[] >> TO TXPDO
+			const _objd SDO1A00[] <<TXPDO is related to two different objects (see example)
+				const _objd SDO6000[] << inputs , this access should be ro (for master)
+				const _objd SDO6001[] << inputs , this access should be ro (for master)
+
+Example of the SD01600 >> 
 const _objd SDO1600[] =
-{ {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, &acNameNOE[0], 0x01, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, &acNameMO[0], 0x70000108, NULL}
+{ {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, &acNameNOE[0], 0x04, NULL}, << This has the number of elements of the PDO From Table 74, 5.6.7.4.7 Receive PDO Mapping @ETG1000.6
+  {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acNameMO[0], 0x70000110, NULL},
+  {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acNameMO[0], 0x70000210, NULL},
+  {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acNameMO[0], 0x70000310, NULL},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acNameMO[0], 0x70000410, NULL}
+  
+  The column 0x70000116 is wrong due to the following:
+for example is based on Bit-0-7lengthof the mappedobjects in bits >> HEX 16 = 0x10
+		Therefore, the column should be 0x70000110
+
+
+Example of the SD07000 << This is declared as an object
+const _objd SDO7000[] =
+{ {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, &acNameNOE[0], 0x04, NULL},
+  {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, &acName7000_01[0], 0, &(Wb.command)},
+  {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, &acName7000_02[0], 0, &(Wb.testVal0)},
+  {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, &acName7000_03[0], 0, &(Wb.testVal1)},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, &acName7000_04[0], 0, &(Wb.testVal2)}
 };
+															VAL, 	*DATA
+  The column 0x70000116 
+for example is based on Bit-0-7lengthof the mappedobjects in bits >> HEX 16 = 0x10
 
 
+
+Example of the SD06000 << This is only one of the objects from TXPDO
+const _objd SDO6000[] =
+{ {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, &acNameNOE[0], !!!0x02, NULL},			<<< !! It should be: 0x0F = 15 elements
+  {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_01[0], 0, &(Rb.temp[0])},
+  {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_02[0], 0, &(Rb.temp[1])},
+  {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_03[0], 0, &(Rb.temp[2])},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_04[0], 0, &(Rb.temp[3])},
+  {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_05[0], 0, &(Rb.temp[4])},
+  {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_06[0], 0, &(Rb.temp[5])},
+  {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_07[0], 0, &(Rb.temp[6])},
+  {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_08[0], 0, &(Rb.temp[7])},
+  {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_09[0], 0, &(Rb.temp[8])},
+  !!{0x10, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_10[0], 0, &(Rb.temp[9])},
+  !!{0x11, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_11[0], 0, &(Rb.temp[10])},
+  !!{0x12, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_12[0], 0, &(Rb.temp[11])},
+  !!{0x13, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_13[0], 0, &(Rb.temp[12])},
+  !!{0x14, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_14[0], 0, &(Rb.temp[13])},
+  !!{0x15, DTYPE_UNSIGNED16, 16, ATYPE_RO, &acName6000_15[0], 0, &(Rb.temp[14])}, << This should be Hex based >> 0x0A, 0x0B
+
+};
 
 
 
 Something related to it in the SOES example		
 		
-Where can I find the Data Objects in the Object Library???
-
 	
 
 0K Question, is it SM2 to outputs?? Object Dictionary: Yes
