@@ -1,0 +1,115 @@
+%%
+%% DOCUMENT TYPE
+%%
+
+% general options:
+% - inputenc        file encoding (should be "utf8" in most cases)
+% - de/en           language of your work (influence pre-defined tokens)
+% - declaration     adds the mandatory statutory declaration for theses
+% - abstract        adds the abstract (from file "prelude_abstract.tex")
+% - acknowledgment  adds an acknowledgment (from file "prelude_acknowledgment.tex")
+%                   it is a nice gesture to personally thank people who
+%                   supported you during your work.
+% - symbollist      adds a list of symbols (from file "prelude_symbols.tex")
+% - figurelist      adds and automatically creates a list of figures 
+% - tablelist       adds and automatically creates a list of tables
+% - index           generates an index based on the package "makeidx", please
+%                   refer to its documentation for usage on index markup
+% - bibbacklinks    adds backlinks from bibliography to the pages, where the
+%                   corresponding entry is used (cited)
+% - gray            make a gray-style version of the thesis report
+%
+% PhD thesis specific options
+% - cv              adds your cv
+% - publishsize     changes the page size from A4 to A5 for print publishing
+%                   (please change the font size to 9pt, if you use this option)
+% - approved        use this option, after your thesis has been formally approved
+%                   (this will change the front page to meet formal/legal requirements)
+% - ownpub          adds a second bibliography (from file "ownpub.bib") for your own
+%                   publications related to the PhD thesis. According to the latest
+%                   examination regulations, own work should be part of the regular
+%                   bibliography (this option is hence obsolete)
+
+\documentclass[en,abstract,acknowledgment,inputenc=utf8]{tuhhthesis} %symbollist taken out since there will be not many formulas
+%%%%% For this projektarbeit
+\usepackage{siunitx}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning}
+
+
+\tikzset{
+    state/.style={
+           rectangle,
+           rounded corners,
+           draw=black, very thick,
+           minimum height=2em,
+           inner sep=2pt,
+           text centered,
+           },
+}
+
+%%%%%%
+\setthesistype{projectwork}
+\author{Juan Carlos Reyes Andrade}
+\title{Development of an embedded communication hub for sensor data acquisition in a robotic system}
+\institute{InstSmartPort}
+\submitdate{30.09.2020}
+\matrnumber{21863765}
+\course{Information and Communication Systems}
+\examinerFirst{Prof. Dr.-Ing. Bernd-Christian Renner}{Research Group smartPORT\newline Hamburg University of Technology}
+\supervisorFirst{MSc. Jannick Brockmann}{Head of Electronics at Han's Robot Germany}
+
+
+
+
+
+%    
+
+
+%%
+%% CONTENT AREA
+%%
+
+% mathematical symbols
+%\input{setup_math}
+
+\begin{document}
+
+%\textwidth = 20cm
+
+% The Chapters
+\input{chapter_Introduction}
+\input{chapter_State}
+\input{chapter_SolutionProposal}
+\input{chapter_Implementation}
+\input{chapter_Results}
+\input{chapter_Conclusion}
+
+
+% Bibliography
+% if you have cited papers that are not referenced, but important for your work,
+% uncommented the following line; however, this should generally by unnecessary
+% and hints at improper citing.
+% \nocite{*}
+
+\tuhhbibliography{thesis}
+
+
+% Appendix
+% Feel free to add additional appendix chapters (e.g., measurement setups, etc.)
+%Code should be added as an appendix?
+\begin{tuhhappendix}
+  \input{appendix_pcb}
+  \input{appendix_code.tex}
+\end{tuhhappendix}
+
+%\input{sms}
+
+% The End
+\end{document}
+
+

@@ -1,0 +1,56 @@
+%%
+%% This is file 'tuhhpreclassdefs.sty'
+%%
+%% Copyright 2018- Christoph Weyer
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhpreclassdefsstyloaded\relax \endinput\else\let\tuhhpreclassdefsstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+
+\makeatletter
+
+\def\tuhhpreclassdefs@PackageName{tuhhpreclassdefs}
+\def\tuhhpreclassdefs@PackageDesc{TUHH pre-class definitions}
+\def\tuhhpreclassdefs@PackageVersion{1.0}
+\def\tuhhpreclassdefs@PackageFullVersion{\tuhhpreclassdefs@PackageVersion}
+
+\ProvidesPackage{\tuhhpreclassdefs@PackageName}[%
+  2018/12/18\space%
+  v\tuhhpreclassdefs@PackageFullVersion\space\tuhhpreclassdefs@PackageDesc]
+\typeout{Package \tuhhpreclassdefs@PackageName, \csname ver@\tuhhpreclassdefs@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer, 2018^^J}
+
+%%%
+%%% these definitions are before every class file is loaded
+%%% this is especially for beamer important, since beamer
+%%% loads a lot of packages itself
+%%%
+
+%%% new in 18.12.2018
+%%% included pdf's, which are created with lualatex (graphs), has
+%%% numbers missing and there is an error that glyphs are undefined
+%%%
+%%% found solution: https://tex.stackexchange.com/questions/322010/pdflatex-glyph-undefined-symbols-disappear-from-included-pdf
+%%%
+
+%%% \pdfinclusioncopyfonts is not defined in newer luatex
+%%% installations
+\RequirePackage{ifluatex}
+\ifluatex
+  \IfFileExists{luatex85.sty}{\RequirePackage{luatex85}}{}
+\fi
+
+\pdfinclusioncopyfonts=1
+
+\makeatother
+\endinput

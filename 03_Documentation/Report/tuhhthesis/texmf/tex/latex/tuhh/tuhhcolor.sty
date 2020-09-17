@@ -1,0 +1,132 @@
+%%
+%% This is file 'tuhhcolor.sty'
+%%
+%% Copyright 2007 Christoph Weyer, Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhcolorstyloaded\relax \endinput\else\let\tuhhcolorstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhcolor.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhcolor@PackageName{tuhhcolor}
+\def\tuhhcolor@PackageDesc{TUHH color definitions}
+\def\tuhhcolor@PackageVersion{0.3}
+\def\tuhhcolor@PackageFullVersion{\tuhhcolor@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhcolor@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhcolor@PackageFullVersion\space\tuhhcolor@PackageDesc]
+\typeout{Package \tuhhcolor@PackageName, \csname ver@\tuhhcolor@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer and Christian Renner, 2007-\svnfileyear^^J}
+
+%%% using key/value pairs as options to packages and classes
+\RequirePackage{kvoptions}
+
+\SetupKeyvalOptions{%
+  family=tuhhcolor,
+  prefix=@tuhhcolor@
+}
+
+% allow for grayscale option
+\newif\if@tuhhcolor@gray
+\@tuhhcolor@grayfalse
+\DeclareVoidOption{gray}{%
+  \PassOptionsToPackage{gray}{xcolor}
+  \@tuhhcolor@graytrue
+}
+
+\DeclareDefaultOption{%
+  \PackageWarning{\tuhhcolor@PackageName}{Unknown option '\CurrentOption'}%
+}
+
+\ProcessKeyvalOptions*\relax
+
+\RequirePackage{xcolor}
+
+% black        - RGB:  0,   0,   0
+\xglobal\providecolor{tuhh_black}{RGB}{0,0,0}
+% white        - RGB 255, 255, 255
+\xglobal\providecolor{tuhh_white}{RGB}{255,255,255}
+% darkgray     - RGB  76,  76,  76
+\xglobal\providecolor{tuhh_darkgray}{RGB}{76,76,76}
+% mediumgray   - RGB 140, 140, 140
+\xglobal\providecolor{tuhh_mediumgray}{RGB}{140,140,140}
+% gray         - RGB 204, 204, 204
+\xglobal\providecolor{tuhh_gray}{RGB}{204,204,204}
+% lightgray    - RGB 242, 242, 242
+\xglobal\providecolor{tuhh_lightgray}{RGB}{242,242,242}
+% yellow       - RGB 244, 198,   0
+\xglobal\providecolor{tuhh_yellow}{RGB}{244,198,0}
+% light yellow - RGB 251, 235, 165
+\xglobal\providecolor{tuhh_lightyellow}{RGB}{251,235,165}
+% darkblue     - RGB   0,   0, 102
+\xglobal\providecolor{tuhh_darkblue}{RGB}{0,0,102}
+% blue         - RGB   0,  51, 102
+\xglobal\providecolor{tuhh_blue}{RGB}{0,51,102}
+% lightblue    - RGB  51, 102, 153
+\xglobal\providecolor{tuhh_lightblue}{RGB}{51,102,153}
+% magenta      - RGB 229,  48, 108
+\xglobal\providecolor{tuhh_magenta}{RGB}{229,48,108}
+% darkred      - RGB 153,  51,   0
+\xglobal\providecolor{tuhh_darkred}{RGB}{153,51,0}
+% orange       - RGB 204, 102,   0
+\xglobal\providecolor{tuhh_orange}{RGB}{204,102,0}
+% lightorange  - RGB 255, 153,   0
+\xglobal\providecolor{tuhh_lightorange}{RGB}{236,81,14}
+%\xglobal\providecolor{tuhh_lightorange}{RGB}{255,153,0}
+% green        - RGB 208, 227,   0
+\xglobal\providecolor{tuhh_green}{RGB}{208,227,0}
+% shinycyan    - RGB   0, 204, 204
+\xglobal\providecolor{tuhh_shinycyan}{RGB}{0,204,204}
+% dirtycyan    - RGB 153, 204, 204
+\xglobal\providecolor{tuhh_dirtycyan}{RGB}{153,204,204}
+% lightcyan    - RGB 204, 255, 255
+\xglobal\providecolor{tuhh_lightcyan}{RGB}{204,255,255}
+
+% Turquoise - RGB: 45, 198, 214 CMYK: 60, 0, 30, 0 (#2DC6D6)
+\xglobal\providecolor{tuhh_turquoise}{RGB}{45,198,214}
+% Dark Turquoise - RGB: 23, 99, 107
+\xglobal\providecolor{tuhh_darkturquoise}{RGB}{23,99,107}
+
+% AIW / GES RGB: 213, 222, 240 (#D5DEF0)
+\xglobal\providecolor{tuhh_aiw}{RGB}{213,222,240}
+% Bauingenieurwesen - RGB: 69, 208, 237 (#45D0ED)
+\xglobal\providecolor{tuhh_bauing}{RGB}{69,208,237}
+% Biotechnologie-Verfahrenstechnik - RGB: 0, 162, 131 (#00A283)
+\xglobal\providecolor{tuhh_biovt}{RGB}{0,162,131}
+% Elektrotechnik - RGB: 248, 236, 0 (#F8EC00)
+\xglobal\providecolor{tuhh_et}{RGB}{248,236,0}
+% Energie- und Umwelttechnik - RGB: 0, 172, 75 (#00AC48)
+\xglobal\providecolor{tuhh_eut}{RGB}{0,172,75}
+% Informatik-Ingenieurwesen - RGB: 244, 198, 0 (#F4C600)
+\xglobal\providecolor{tuhh_iiw}{RGB}{244,198,0}
+% Informationstechnologie - RGB: 166, 59, 139 (#A63B8B)
+\xglobal\providecolor{tuhh_inft}{RGB}{166,59,139}
+% Maschinenbau - RGB: 226, 97, 154 (#E2619A)
+\xglobal\providecolor{tuhh_mb}{RGB}{226,97,154}
+% Materialwissenschaft - RGB: 234, 124, 19 (#EA7C13)
+\xglobal\providecolor{tuhh_mw}{RGB}{234,124,19}
+% Mechatronik - RGB: 223, 0, 50 (#DF0032)
+\xglobal\providecolor{tuhh_mt}{RGB}{223,0,50}
+% Mediziningenieurwesen - RGB: 25, 0, 202 (#1900CA)
+\xglobal\providecolor{tuhh_meding}{RGB}{25,0,202}
+% Schiffbau - RGB: 0, 137, 202 (#0089CA)
+\xglobal\providecolor{tuhh_schiffbau}{RGB}{0,137,202}
+% Verfahrenstechnik - RGB: 180, 216, 0 (#B4D800)
+\xglobal\providecolor{tuhh_vt}{RGB}{180,216,0}
+
+\makeatother
+\endinput

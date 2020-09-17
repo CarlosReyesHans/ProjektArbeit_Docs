@@ -1,0 +1,174 @@
+%%
+%% This is file 'tuhhdate.sty'
+%%
+%% Copyright 2010 Christoph Weyer
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhdatestyloaded\relax \endinput\else\let\tuhhdatestyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhdate.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhdate@PackageName{tuhhdate}
+\def\tuhhdate@PackageDesc{TUHH date package}
+\def\tuhhdate@PackageVersion{0.2.0}
+\def\tuhhdate@PackageFullVersion{\tuhhdate@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhdate@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhdate@PackageFullVersion\space\tuhhdate@PackageDesc]
+\typeout{Package \tuhhdate@PackageName, \csname ver@\tuhhdate@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer, 2009-\svnfileyear^^J}
+
+
+\DeclareOption*{%
+  \PackageWarning{\tuhhdate@PackageName}{Unknown option '\CurrentOption'}%
+}
+\ProcessOptions\relax
+
+%% we also need some branching
+\RequirePackage{ifthen}
+\RequirePackage{tuhhlang}
+
+%% plus dates and substrings
+\RequirePackage[nodayofweek]{datetime}%
+\IfFileExists{substr.sty}{\RequirePackage{substr}%
+}{\PackageWarning{\tuhhdate@PackageName}{Package file substr.sty not found}{%
+  This version of \tuhhdate@PackageName.sty needs the package substr.sty.^^J%
+  You can download it from CTAN:/macros/latex/contrib/substr/^^J%
+  E.g. one CTAN node is ftp.dante.de.
+  Install substr.sty into your TeX tree.}%
+}
+
+
+%%%
+%%% LOCAL VARIABLES
+%%%
+\newcounter{tuhhdate@slash}
+\newcounter{tuhhdate@minus}
+\newcounter{tuhhdate@dot}
+
+%% flag to indentify whether date was set
+\newif\if@tuhhdate@set
+\@tuhhdate@setfalse
+
+
+%%%
+%%% GLOBAL VARIABLES
+%%%
+
+
+%%%
+%%% LOCAL COMMANDS
+%%%
+
+\DeclareRobustCommand*{\tuhhdate@setdate}[1]{%
+  \SubStringsToCounter{tuhhdate@slash}{/}{#1}%
+  \SubStringsToCounter{tuhhdate@minus}{-}{#1}%
+  \SubStringsToCounter{tuhhdate@dot}{.}{#1}%
+  \ifthenelse{\equal{\thetuhhdate@dot}{2}}{\tuhhdate@setdotdate{#1}}{%
+    \ifthenelse{\equal{\thetuhhdate@minus}{2}}{\tuhhdate@setminusdate{#1}}{%
+      \ifthenelse{\equal{\thetuhhdate@slash}{2}}{\tuhhdate@setslashdate{#1}}{%
+        \PackageError{\tuhhdate@PackageName}{unrecognized date format}{%
+          Use one of the following: DD.MM.YYYY, MM/DD/YYYY, or YYYY-MM-DD
+        }%
+      }%
+    }%
+  }%
+}%
+
+
+\DeclareRobustCommand*{\tuhhdate@setslashdate}[1]{%
+  \expandafter\tuhhdate@internalsetslashdate #1\@empty%
+}%
+\def\tuhhdate@internalsetslashdate#1/#2/#3\@empty{\tuhhdate@realsetdate{#3}{#1}{#2}}
+
+
+\DeclareRobustCommand*{\tuhhdate@setdotdate}[1]{%
+  \expandafter\tuhhdate@internalsetdotdate #1\@empty%
+}%
+\def\tuhhdate@internalsetdotdate#1.#2.#3\@empty{\tuhhdate@realsetdate{#3}{#2}{#1}}
+
+
+\DeclareRobustCommand*{\tuhhdate@setminusdate}[1]{%
+  \expandafter\tuhhdate@internalsetminusdate #1\@empty%
+}%
+\def\tuhhdate@internalsetminusdate#1-#2-#3\@empty{\tuhhdate@realsetdate{#1}{#2}{#3}}
+
+
+\DeclareRobustCommand*{\tuhhdate@realsetdate}[3]{%
+  \newdate{@tuhhdate}{#3}{#2}{#1}%
+  \@tuhhdate@settrue
+}%
+
+%%% new date formats
+\newdateformat{tuhhdate@pdfdate}{\THEYEAR\twodigit{\THEMONTH}\twodigit{\THEDAY}115500}
+\newdateformat{tuhhdate@monthdate}{\monthname[\THEMONTH] \THEYEAR}
+\newdateformat{tuhhdate@yeardate}{\THEYEAR}
+\newdateformat{tuhhdate@dedate}{\ordinal{DAY} \monthname[\THEMONTH] \THEYEAR}
+\newdateformat{tuhhdate@usdate}{\monthname[\THEMONTH] \ordinal{DAY}, \THEYEAR}
+
+%%%
+%%% GLOBAL COMMANDS
+%%%
+
+% set the date
+% #1: date, format either of YYYY-MM-DD, DD.MM.YYYY, MM/DD/YYYY
+\DeclareRobustCommand*{\setdate}[1]{%
+  \expandafter\tuhhdate@setdate\expandafter{#1}%
+  \@ifpackageloaded{hyperref}{%
+    %%%TODO: straight forward solution is not working???
+    %%%\def\tuhhdate@pdfdate{\tuhhdate@pdfdate\displaydate{@tuhhdate}}%
+    %%%work around
+    \def\tuhhdate@pdfdate{%
+        \getdateyear{@tuhhdate}%
+        \twodigit{\getdatemonth{@tuhhdate}}%
+        \twodigit{\getdateday{@tuhhdate}}%
+        115500%
+    }%
+    %%%
+    \hypersetup{pdfcreationdate={D:\tuhhdate@pdfdate}}%
+    \hypersetup{pdfmoddate={\pdfcreationdate}}%
+  }{}%
+}%
+
+% print date
+\DeclareRobustCommand*{\printdate}{%
+  \if@tuhhdate@set%
+  	\if@english%
+  		\tuhhdate@usdate%
+  	\else%
+  		\tuhhdate@dedate%
+  	\fi%
+   \displaydate{@tuhhdate}
+  \fi%
+}%
+
+% print month and year of date
+\DeclareRobustCommand*{\printmonthdate}{%
+  \if@tuhhdate@set%
+   \tuhhdate@monthdate\displaydate{@tuhhdate}%
+  \fi%
+}%
+
+% print year of date
+\DeclareRobustCommand*{\printyeardate}{%
+  \if@tuhhdate@set%
+   \tuhhdate@yeardate\displaydate{@tuhhdate}%
+  \fi%
+}%
+
+\makeatother
+\endinput

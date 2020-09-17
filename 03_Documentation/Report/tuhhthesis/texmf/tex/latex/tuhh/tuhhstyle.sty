@@ -1,0 +1,95 @@
+%%
+%% This is file 'tuhhstyle.sty'
+%%
+%% Copyright 2007 Christoph Weyer, Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhstylestyloaded\relax \endinput\else\let\tuhhstylestyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhstyle.sty 27490 2013-02-05 17:35:11Z ti5cr $}
+
+\makeatletter
+
+\def\tuhhstyle@PackageName{tuhhstyle}
+\def\tuhhstyle@PackageDesc{TUHH style definitions}
+\def\tuhhstyle@PackageVersion{0.1}
+\def\tuhhstyle@PackageFullVersion{\tuhhstyle@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhstyle@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhstyle@PackageFullVersion\space\tuhhstyle@PackageDesc]
+\typeout{Package \tuhhstyle@PackageName, \csname ver@\tuhhstyle@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer and Christian Renner, 2007-\svnfileyear^^J}
+
+%%% using key/value pairs as options to packages and classes
+\RequirePackage{kvoptions}
+
+\SetupKeyvalOptions{%
+  family=tuhhstyle,
+  prefix=@tuhhstyle@
+}
+
+% allow for grayscale option
+\DeclareBoolOption{grayfonts}
+
+\DeclareDefaultOption{%
+  \PackageWarning{\tuhhstyle@PackageName}{Unknown option '\CurrentOption'}%
+}
+
+\ProcessKeyvalOptions*\relax
+
+\RequirePackage{tuhhcolor}
+
+\if@tuhhstyle@grayfonts%
+  %
+  %\definecolor{tuhhbookdef_chapter}{named}{tuhh_blue}
+  %\definecolor{tuhhbookdef_section}{named}{tuhh_blue}
+  %\definecolor{tuhhbookdef_subsection}{named}{tuhh_blue}
+  %\definecolor{tuhhbookdef_subsubsection}{named}{tuhh_blue}
+
+  % bst
+  \definecolor{tuhh_color_bibkey}{named}{tuhh_darkgray}
+
+  % preamble
+  \definecolor{tuhh_color_enumi}{named}{tuhh_black}
+  \definecolor{tuhh_color_enumii}{named}{tuhh_darkgray}
+  \definecolor{tuhh_color_enumiii}{named}{tuhh_mediumgray}
+
+  % thesis
+  \definecolor{tuhh_color_title}{named}{tuhh_black}
+  %\definecolor{tuhh_color_subject}{named}{tuhh_darkgray}
+
+\else
+  %
+  %\definecolor{tuhhbookdef_chapter}{named}{tuhh_black}
+  %\definecolor{tuhhbookdef_section}{named}{tuhh_black}
+  %\definecolor{tuhhbookdef_subsection}{named}{tuhh_black}
+  %\definecolor{tuhhbookdef_subsubsection}{named}{tuhh_black}
+
+  % bst
+  \definecolor{tuhh_color_bibkey}{named}{tuhh_blue}
+
+  % preamble
+  \definecolor{tuhh_color_enumi}{named}{tuhh_darkblue}
+  \definecolor{tuhh_color_enumii}{named}{tuhh_blue}
+  \definecolor{tuhh_color_enumiii}{named}{tuhh_lightblue}
+
+  % thesis
+  \definecolor{tuhh_color_title}{named}{tuhh_darkblue}
+  %\definecolor{tuhh_color_subject}{named}{tuhh_darkgray}
+  %\definecolor{tuhh_color_backref}{named}{tuhh_gray!35!tuhh_blue}
+\fi
+
+
+\endinput

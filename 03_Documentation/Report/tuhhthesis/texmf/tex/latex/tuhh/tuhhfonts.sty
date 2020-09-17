@@ -1,0 +1,122 @@
+%%
+%% This is file 'tuhhfonts.sty'
+%%
+%% Copyright 2009 Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhfontsstyloaded\relax \endinput\else\let\tuhhfontsstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhfonts.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhfonts@PackageName{tuhhfonts}
+\def\tuhhfonts@PackageDesc{TUHH fonts}
+\def\tuhhfonts@PackageVersion{0.2}
+\def\tuhhfonts@PackageFullVersion{\tuhhfonts@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhfonts@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhfonts@PackageFullVersion\space\tuhhfonts@PackageDesc]
+\typeout{Package \tuhhfonts@PackageName, \csname ver@\tuhhfonts@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christian Renner, 2009-\svnfileyear^^J}
+
+
+\DeclareOption*{%
+  \PackageWarning{\tuhhfonts@PackageName}{Unknown option '\CurrentOption'}%
+}
+\ProcessOptions\relax
+
+%%
+%% Fixed TUHH Font Section
+%%
+
+% TODO Bei der benutzung von DeclareFixedFont wird die Größe nicht in den Mathemodus übernommen.
+% Das verhindert das Benutzen von Mathesymbolen in Titeln, Sections, usw.
+% Unten ein Beispiel, und ein Workaround mit DeclareTUHHFont:
+%
+% \newcommand\DeclareTUHHFont[7][]{
+% 	\expandafter\newcommand\csname#2\endcsname{%
+% 		\fontencoding{#3}\fontfamily{#4}\fontseries{#5}\fontshape{#6}\fontsize{#7}{#7}\selectfont#1%
+% 	}
+% }
+% \DeclareTUHHFont[\boldmath]{tuhhfontHugE}{T1}{phv}{b}{n}{34}
+%
+% {\tuhhfontHuge $\Delta$-foo}
+% {\tuhhfontHugE $\Delta$-foo}
+%
+%\ifcsname @tuhhpreamble@font\endcsname
+%\else
+%  \def\@tuhhpreamble@font{uglyhack}
+%\fi
+
+% fonts for header, footer and titles
+\@ifclassloaded{beamer}{
+    % TODO these could be transfered into the beamer template, where they are more apropriate and don't brake the
+    % whole structure of beamer ...
+    % Example of \tuhhfontSmallN with \setbeamerfont:
+    % \setbeamerfont{headline}{family*={phv},series*={m},shape*={n},size*={7}{7}}
+    \DeclareFixedFont{\tuhhfontBigfoot}{T1}{\@tuhhff@sf}{b}{n}{67}
+    \DeclareFixedFont{\tuhhfontTUHH}{T1}{\@tuhhff@sf}{b}{n}{26}
+    \DeclareFixedFont{\tuhhfontHuge}{T1}{\@tuhhff@sf}{b}{n}{22}
+    \DeclareFixedFont{\tuhhfontLARGE}{T1}{\@tuhhff@sf}{b}{n}{19}
+    \DeclareFixedFont{\tuhhfontLargeX}{T1}{\@tuhhff@sf}{b}{n}{16}
+    \ifthenelse{\equal{\@tuhhpreamble@font}{dejavu}}{%
+        \DeclareFixedFont{\tuhhfontTUHH}{T1}{\@tuhhff@sf}{b}{n}{26}
+        \DeclareFixedFont{\tuhhfontLargeSC}{T1}{\@tuhhff@sf}{b}{n}{16}
+    }{\ifthenelse{\equal{\@tuhhpreamble@font}{lecture}}{%
+        \DeclareFixedFont{\tuhhfontTUHH}{T1}{\@tuhhff@sf}{b}{n}{30}
+        \DeclareFixedFont{\tuhhfontLargeSC}{T1}{\@tuhhff@sf}{b}{n}{16}
+    }{%
+        \DeclareFixedFont{\tuhhfontTUHH}{T1}{\@tuhhff@sf}{b}{n}{26}
+        \DeclareFixedFont{\tuhhfontLargeSC}{T1}{\@tuhhff@sf}{b}{sc}{16}
+    }}
+    \DeclareFixedFont{\tuhhfontLarge}{T1}{\@tuhhff@sf}{b}{n}{14}
+    \DeclareFixedFont{\tuhhfontMedium}{T1}{\@tuhhff@sf}{b}{n}{12}
+    \DeclareFixedFont{\tuhhfontMediumN}{T1}{\@tuhhff@sf}{m}{n}{12}
+    \DeclareFixedFont{\tuhhfontNormal}{T1}{\@tuhhff@sf}{b}{n}{10}
+    \DeclareFixedFont{\tuhhfontSmall}{T1}{\@tuhhff@sf}{b}{n}{7}
+    \DeclareFixedFont{\tuhhfontSmallN}{T1}{\@tuhhff@sf}{m}{n}{7}
+    \DeclareFixedFont{\tuhhfontTiny}{T1}{\@tuhhff@sf}{b}{n}{6}
+    \DeclareFixedFont{\tuhhfontTinyN}{T1}{\@tuhhff@sf}{m}{n}{6}
+}{%
+    \DeclareFixedFont{\tuhhfontBigfoot}{T1}{\@tuhhff@sf}{b}{n}{111}
+    \DeclareFixedFont{\tuhhfontTUHH}{T1}{\@tuhhff@sf}{b}{n}{54}
+    \DeclareFixedFont{\tuhhfontHuge}{T1}{\@tuhhff@sf}{b}{n}{34}
+    \DeclareFixedFont{\tuhhfontLARGE}{T1}{\@tuhhff@sf}{b}{n}{26}
+    \DeclareFixedFont{\tuhhfontLargeX}{T1}{\@tuhhff@sf}{b}{n}{21}
+    \DeclareFixedFont{\tuhhfontLargeSC}{T1}{\@tuhhff@sf}{b}{sc}{21}
+    \DeclareFixedFont{\tuhhfontLarge}{T1}{\@tuhhff@sf}{b}{n}{19}
+    \DeclareFixedFont{\tuhhfontMedium}{T1}{\@tuhhff@sf}{b}{n}{17}
+    \DeclareFixedFont{\tuhhfontMediumN}{T1}{\@tuhhff@sf}{m}{n}{17}
+    \DeclareFixedFont{\tuhhfontNormal}{T1}{\@tuhhff@sf}{b}{n}{14}
+    \DeclareFixedFont{\tuhhfontSmall}{T1}{\@tuhhff@sf}{b}{n}{12}
+    \DeclareFixedFont{\tuhhfontSmallN}{T1}{\@tuhhff@sf}{m}{n}{12}
+    \DeclareFixedFont{\tuhhfontTiny}{T1}{\@tuhhff@sf}{b}{n}{10}
+    \DeclareFixedFont{\tuhhfontTinyN}{T1}{\@tuhhff@sf}{m}{n}{10}
+}
+
+%%% Fonts used for tuhhexercise
+\@ifclassloaded{tuhhexercise}{%
+  \DeclareFixedFont{\@tuhhfontTUHHLogo}{T1}{phv}{b}{n}{21}
+  \DeclareFixedFont{\@tuhhfontCourseTitle}{T1}{phv}{b}{n}{19}
+  \DeclareFixedFont{\@tuhhfontLecturer}{T1}{phv}{b}{n}{14}
+  \DeclareFixedFont{\@tuhhfontTerm}{T1}{phv}{b}{n}{14}
+
+  \DeclareFixedFont{\@tuhhfontSheetLabel}{T1}{phv}{b}{n}{16}
+  \DeclareFixedFont{\@tuhhfontPageNumber}{T1}{phv}{b}{n}{14}
+}{}
+
+\makeatother
+\endinput

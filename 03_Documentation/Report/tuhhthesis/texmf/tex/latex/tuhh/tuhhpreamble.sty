@@ -1,0 +1,700 @@
+%%
+%% This is file 'tuhhpreamble.sty'
+%%
+%% Copyright 2007-2010 Christoph Weyer
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhpreamblestyloaded\relax \endinput\else\let\tuhhpreamblestyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhpreamble.sty 43761 2020-05-25 10:13:17Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhpreamble@PackageName{tuhhpreamble}
+\def\tuhhpreamble@PackageDesc{TUHH preamble definitions}
+\def\tuhhpreamble@PackageVersion{0.3}
+\def\tuhhpreamble@PackageFullVersion{\tuhhpreamble@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhpreamble@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhpreamble@PackageFullVersion\space\tuhhpreamble@PackageDesc]
+\typeout{Package \tuhhpreamble@PackageName, \csname ver@\tuhhpreamble@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer, 2007-\svnfileyear^^J}
+
+%%% using kev/value pairs as options to packages and classes
+\RequirePackage{kvoptions}
+
+\SetupKeyvalOptions{%
+  family=tuhhpreamble,
+  prefix=@tuhhpreamble@
+}
+
+\DeclareVoidOption{gray}{%
+    \PassOptionsToPackage{gray}{tuhhcolor}
+}
+
+\DeclareBoolOption{grayfonts}
+
+\DeclareVoidOption{en}{%
+    \PassOptionsToPackage{en}{tuhhlang}
+}
+
+\DeclareVoidOption{de}{%
+    \PassOptionsToPackage{de}{tuhhlang}
+}
+
+\DeclareBoolOption{print}
+
+\DeclareBoolOption{nomicrotype}
+
+\DeclareBoolOption{nofontadjust}
+\DeclareBoolOption{nomathadjust}
+
+\DeclareBoolOption{noiecprefix}
+
+\DeclareStringOption[latin1]{inputenc}
+
+\DeclareBoolOption{preview}
+\DeclareStringOption[tikzpicture]{previewenv}[tikzpicture]
+
+\DeclareStringOption[times]{font}[times]
+
+\DeclareDefaultOption{%
+    \PackageWarning{\tuhhpreamble@PackageName}{Unknown option '\CurrentOption'}\relax%
+}
+
+%\ProcessLocalKeyvalOptions*\relax % currently not available
+\ProcessKeyvalOptions*\relax
+
+%%% first thing is to load cmap for creating searchable PDFs
+\RequirePackage{ifpdf}
+\ifpdf
+  \RequirePackage{cmap}
+\fi
+
+% encoding
+\RequirePackage{iftex}
+\RequirePackage{ifluatex}
+\ifPDFTeX%
+  \@ifpackageloaded{inputenc}{}{%
+    \RequirePackage[\@tuhhpreamble@inputenc]{inputenc}
+  }
+  \@ifpackageloaded{fontenc}{}{%
+    \RequirePackage[T1]{fontenc}
+  }
+  % small optimizations
+  %%% fixltx2e is not required with LaTeX releases after 2015 (check for \IncludeInRelease)
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname IncludeInRelease\endcsname\relax
+    \RequirePackage{fixltx2e} % optimizes some magic things within LaTeX2e
+  \fi
+  \RequirePackage{ellipsis} % important for nice spacings around \dots
+\else%
+  \ifXeTeX%
+    \RequirePackage{xltxtra}
+  \else%
+    \PassOptionsToPackage{no-math}{fontspec} % subscript not working in beamer
+    \RequirePackage{luatextra}
+  \fi%
+  \defaultfontfeatures{
+    Ligatures=TeX,
+    %Numbers=Lining,
+    %Scale=MatchLowercase,
+  }
+\fi%
+
+% using package microtype to chance some layout things
+\ifpdf
+  \if@tuhhpreamble@nomicrotype
+  \else
+    \RequirePackage[tracking=true]{microtype}%
+    \DeclareMicrotypeSet*[tracking]{my}%
+      { font = */*/*/sc/* }%
+    \SetTracking{ encoding = *, shape = sc }{ 45 }
+  \fi
+\fi
+
+% silence package to ignore some stupid warnings
+\RequirePackage[safe]{silence} % safe mode is *VERY* important
+
+% load before babel (tuhhlang) to change babel's font
+\RequirePackage{substitutefont}
+
+% required for special glyphs
+\RequirePackage{textcomp}
+
+%%% load basic TUHH packages
+% only option 'de' or 'en' should be passed
+\RequirePackage{tuhhlang}%
+% date formating library
+\RequirePackage{tuhhdate}%
+% get the color definitions of the TUHH
+% only option 'gray' should be passed
+\RequirePackage{tuhhcolor}
+% get tuhh style defs
+\RequirePackage{tuhhstyle}%
+
+%%% use lmodern instead of cm-super as fallback
+%
+%% set default font families
+\def\@tuhhff@sf{phv}
+\if@tuhhpreamble@nofontadjust%
+  \RequirePackage{mathtools} % amsmath + extensions
+  %\RequirePackage{amsfonts}
+  \RequirePackage{amssymb}
+\else
+  %\PackageWarning{\tuhhpreamble@PackageName}{Configure font option: \@tuhhpreamble@font}\relax%
+
+  \RequirePackage{lmodern}
+  %%% foreign fonts
+  \ifthenelse{\equal{\@tuhhpreamble@font}{dejavu}}{%
+    \def\@tuhhff@sf{DejaVuSans-TLF}
+
+    \RequirePackage{amsthm}
+
+    \ifluatex%
+      \@ifclassloaded{beamer}{
+        % there is a beamer template definition
+        \usefonttheme{professionalfonts}
+        %\def\mathfamilydefault{\sffamily}
+      }{%
+      }
+      \setmainfont{DejaVu Serif}
+      %\setsansfont{DejaVu Sans}
+      \setsansfont{DejaVu Sans Condensed}
+      \setmonofont[scaled=0.97826]{DejaVu Sans Mono}
+    \else
+      \RequirePackage{DejaVuSerif}
+      %\RequirePackage{DejaVuSans}
+      \RequirePackage{DejaVuSansCondensed}
+      \RequirePackage[scaled=0.97826]{DejaVuSansMono}
+    \fi%
+
+    %\if@tuhhpreamble@nomathadjust
+    %\else
+    %\RequirePackage{arevmath} % zerstört die Zahlen
+    %\fi
+
+    \RequirePackage{amsmath}
+    \RequirePackage{amssymb}
+  }{%
+  \ifthenelse{\equal{\@tuhhpreamble@font}{gyre}}{%
+    \RequirePackage{amsthm}
+
+    \RequirePackage{tgheros}
+    \RequirePackage{tgtermes}
+    \RequirePackage{tgcursor}
+
+    \RequirePackage{amsmath}
+    \RequirePackage{amssymb}
+  }{%
+  \ifthenelse{\equal{\@tuhhpreamble@font}{newtx}}{%
+    \def\@tuhhff@sf{ntxss}
+    %\def\@tuhhff@sf{qhv}
+
+    \RequirePackage{amsthm}
+
+    \RequirePackage{newtxtext}
+    \RequirePackage[varg,bigdelims]{newtxmath}
+    %\RequirePackage{amsmath} % no longer needed
+    \RequirePackage{amssymb}
+  }{%
+  \ifthenelse{\equal{\@tuhhpreamble@font}{times}}{%
+    \RequirePackage{amsthm} % if this breaks, you need a newer version of amsthm
+
+    \if@tuhhpreamble@nomathadjust
+    \else
+      \RequirePackage[sc]{mathpazo}
+    \fi
+    \ifluatex%
+      \@ifclassloaded{beamer}{
+        % there is a beamer template definition
+        %\usefonttheme{professionalfonts}
+        %\def\mathfamilydefault{\sffamily}
+        \setmainfont{Nimbus Sans L}
+      }{%
+        \setmainfont{Times}
+      }
+      %%%\setmainfont[BoldFont={Fira Sans}]{Fira Sans Light}
+      \setsansfont[
+        Scale=0.9,
+           %UprightFont = {* Regular},
+           %BoldFont    = {* Bold},
+           %ItalicFont  = {* Regular Italic},
+           %BoldItalicFont = {* Bold Italic}
+      ]{Nimbus Sans L}
+      \setmonofont{Nimbus Mono}
+      %%%\setmonofont[StylisticSet={1,3}]{Inconsolatazi4} % shapely l, upright quotes
+    \else
+      \RequirePackage{times}
+      \RequirePackage[scaled=.90]{helvet}
+      \RequirePackage{courier}
+    \fi
+
+    \RequirePackage{amsmath}
+    \RequirePackage{amssymb}
+  }{%
+  \ifthenelse{\equal{\@tuhhpreamble@font}{lecture}}{%
+    %\def\@tuhhff@sf{FiraSans}
+    \def\@tuhhff@sf{FiraSans-TLF}
+
+    % first load math font newtxsf
+    % see: https://tex.stackexchange.com/questions/345513/font-package-in-lualatex-gives-the-cm-style-figure/345518
+    \RequirePackage[cmintegrals]{newtxsf}
+
+    \ifluatex%
+      \@ifclassloaded{beamer}{
+        % there is a beamer template definition
+        \usefonttheme{professionalfonts}
+        \setmainfont{Fira Sans}
+      }{%
+        \setmainfont{XCharter}
+      }
+      \setsansfont{Fira Sans}
+      \setmonofont{Fira Mono}
+    \else
+      \@ifclassloaded{beamer}{
+        \usefonttheme{professionalfonts}
+        \RequirePackage[sfdefault,lining]{FiraSans}
+      }{%
+        \usepackage{XCharter}
+        \RequirePackage[lining]{FiraSans}
+      }
+      \RequirePackage[lining,nomap]{FiraMono}
+      % nomap should disable ligatures, but that's not working
+      \@ifpackageloaded{microtype}{%
+        \DisableLigatures{family = tt*}
+      }{}
+    \fi
+    \RequirePackage{mathtools}
+
+    %\RequirePackage[LGRgreek,italic]{mathastext}
+    %%% no... - important that e.g. = has same font as \neq etc.
+    %%% no... - important that e.g. > has same font as \le etc.
+    \RequirePackage[italic,nolessnomore,noplusnominus,noequal,noparenthesis]{mathastext}
+
+    \RequirePackage{amsmath}
+    \RequirePackage{amssymb}
+    \let\openbox\undefined
+    \RequirePackage{amsthm}
+
+  }{%
+    \PackageError{\tuhhpreamble@PackageName}{Unknown font option: \@tuhhpreamble@font}\relax%
+  }}}}}%
+\fi
+%%% TODO more debug messages: \message{XXXX~\@tuhhpreamble@font~XXXX}
+
+\RequirePackage{etex}
+
+% load after all math to give access to bold math
+\RequirePackage{bm}
+
+\RequirePackage{pifont}
+\RequirePackage[load=prefix]{siunitx}
+
+% get font definitions
+\RequirePackage{tuhhfonts}%
+
+%%% other packages
+\RequirePackage{calc}
+\RequirePackage{xifthen}
+\RequirePackage{everypage}
+\RequirePackage{etoolbox}
+
+\RequirePackage{marvosym}
+
+%%% load preview package if in preview mode
+\if@tuhhpreamble@preview
+  \PassOptionsToPackage{active}{preview}
+  \RequirePackage[delayed,tightpage]{preview}
+  \PreviewEnvironment{\@tuhhpreamble@previewenv}
+\fi
+
+%%
+%% Enumerations
+%%
+\def\tuhh@itemi{$\blacksquare$}
+\def\tuhh@itemii{\rotatebox{45}{$\blacksquare$}}
+\def\tuhh@itemiii{$\blacktriangleright$}
+
+\@ifclassloaded{beamer}{
+  % there is a beamer template definition
+}{%
+  \renewcommand{\labelitemi}{\raise0.5pt\hbox{\scriptsize\textcolor{tuhh_color_enumi}{\tuhh@itemi}}}
+  \renewcommand{\labelitemii}{\raise-0.1pt\hbox{\scriptsize\textcolor{tuhh_color_enumii}{\tuhh@itemii}}}
+  \renewcommand{\labelitemiii}{\raise1.2pt\hbox{\small\textcolor{tuhh_color_enumiii}{\tuhh@itemiii}}}
+}
+
+
+%%
+%% load the other global packages (ifpdf, graphicx, hyperref)
+%%
+\ifpdf
+
+    % if graphicx is already loaded (e.g., by beamer class) skip it
+    \@ifpackageloaded{graphicx}{}{%
+    %\@ifundefined{rotatebox}{%
+        \RequirePackage[pdftex]{graphicx}
+    }
+    \DeclareGraphicsExtensions{.jpg,.pdf,.png}
+
+    % check if beamer package is loaded
+    % The next hack is because of the warning message when used by the beamer class
+    \@ifpackageloaded{hyperref}{}{%
+    %\@ifundefined{texorpdfstring}{%
+        \RequirePackage[pdftex]{hyperref}
+    }
+
+\else
+
+    % if graphicx is already loaded (e.g., by beamer class) skip it
+    \@ifpackageloaded{graphicx}{}{%
+    %\@ifundefined{rotatebox}{%
+        \RequirePackage[dvips]{graphicx}
+    }
+    \DeclareGraphicsExtensions{.eps}
+
+    % check if beamer package is loaded
+    % The next hack is because of the warning message when used by the beamer class
+    \@ifpackageloaded{hyperref}{}{%
+    %\@ifundefined{texorpdfstring}{%
+        \RequirePackage[dvips]{hyperref}
+    }
+
+\fi
+
+% define my own hyperref options
+\hypersetup{%
+  unicode,                % required for lualatex and correct umlaute in pdftitle
+  plainpages=false,       % required to create correct anchors when using roman and arabic page numbers
+  pdflang=\tuhh@lang,     % set the language of the PDF document
+  pdftoolbar=true,        % show Acrobat's toolbar?
+  %% disabled WEYER - is no set in the different class files
+  %pdfpagemode=UseNone,    % specify how document starts when opened
+  pdfmenubar=true,        % show Acrobat's menu?
+  %% disabled WEYER
+  %pdffitwindow=true,      % page fit to window when opened
+  pdfnewwindow=true,      % links in new window
+}%
+\if@tuhhpreamble@grayfonts%
+  \hypersetup{%
+    colorlinks=false,       % false: boxed links; true: colored links
+    pdfborder=0 0 0,        % hide borders
+    citecolor=tuhh_magenta,                  % color of links to bibliography
+  }
+\else
+  \hypersetup{%
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=tuhh_darkturquoise,         % color of internal links
+    linkbordercolor=tuhh_darkturquoise,   %
+    citecolor=tuhh_blue,                  % color of links to bibliography
+    citebordercolor=tuhh_blue,            %
+    filecolor=tuhh_magenta,               % color of file links
+    filebordercolor=tuhh_magenta,         %
+    urlcolor=tuhh_darkred,                % color of external links
+    urlbordercolor=tuhh_darkred           % color of external links
+  }%
+\fi
+%%% pdfpagelabels and bookmarks are already defined by beamer, scrartcl and scrbook
+\@ifclassloaded{beamer}{}{%
+  \@ifclassloaded{scrartcl}{}{%
+    \@ifclassloaded{scrbook}{}{%
+      \hypersetup{%
+        pdfpagelabels=true,     % required for a nicer display of roman numbered page in Acrobat
+        bookmarks=true,         % enable bookmarks
+      }%
+    }%
+  }%
+}%
+\if@tuhhpreamble@print%
+  \hypersetup{%
+    colorlinks=false,       % false: boxed links; true: colored links
+    pdfborder=0 0 0         % hide borders
+  }%
+\else%
+\fi%
+
+% patch for hyperref and captions
+\@ifclassloaded{beamer}{}{%
+  \@ifpackageloaded{hyperref}{%
+  %\@ifundefined{texorpdfstring}{%
+     \RequirePackage[all]{hypcap}
+  }%
+}%
+
+% setup siunitx
+\sisetup{
+  range-phrase={\;--\;},
+  range-units=single,
+  binary-units=true,
+  detect-all,
+}
+\if@english
+  \sisetup{
+    loctolang={UK:english,DE:ngerman},
+  }
+\else
+  \sisetup{
+    decimalsymbol=comma,
+    %group-separator={\,}, % for spacing
+    %group-minimum-digits=4,
+    loctolang={DE:ngerman,UK:english},
+  }
+\fi
+
+\DeclareSIUnit{\something}{\relax}
+\DeclareSIUnit{\umdrehung}{U}
+
+\if@tuhhpreamble@noiecprefix
+  \DeclareSIUnit{\bK}{\kilo}
+  \DeclareSIUnit{\bM}{\mega}
+  \DeclareSIUnit{\bG}{\giga}
+  \DeclareSIUnit{\bT}{\tera}
+  \DeclareSIUnit{\bP}{\peta}
+  \DeclareSIUnit{\bE}{\exa}
+  \DeclareSIUnit{\bZ}{\zetta}
+  \DeclareSIUnit{\bY}{\yotta}
+\else
+  \DeclareSIUnit{\bK}{\kibi}
+  \DeclareSIUnit{\bM}{\mebi}
+  \DeclareSIUnit{\bG}{\gibi}
+  \DeclareSIUnit{\bT}{\tebi}
+  \DeclareSIUnit{\bP}{\pebi}
+  \DeclareSIUnit{\bE}{\exbi}
+  \DeclareSIUnit{\bZ}{\zebi}
+  \DeclareSIUnit{\bY}{\yobi}
+\fi
+
+\DeclareSIUnit{\KB}{\bK\byte}
+\DeclareSIUnit{\MB}{\bM\byte}
+\DeclareSIUnit{\GB}{\bG\byte}
+\DeclareSIUnit{\TB}{\bT\byte}
+\DeclareSIUnit{\PB}{\bP\byte}
+\DeclareSIUnit{\EB}{\bE\byte}
+\DeclareSIUnit{\ZB}{\bZ\byte}
+\DeclareSIUnit{\YB}{\bY\byte}
+
+\DeclareSIUnit[per-mode=symbol]{\Bps}{\byte\per\second}
+\DeclareSIUnit[per-mode=symbol]{\KBps}{\KB\per\second}
+\DeclareSIUnit[per-mode=symbol]{\MBps}{\MB\per\second}
+\DeclareSIUnit[per-mode=symbol]{\GBps}{\GB\per\second}
+\DeclareSIUnit[per-mode=symbol]{\TBps}{\TB\per\second}
+\DeclareSIUnit[per-mode=symbol]{\PBps}{\PB\per\second}
+
+\DeclareSIUnit[per-mode=symbol]{\bps}{\bit\per\second}
+\DeclareSIUnit[per-mode=symbol]{\Kbps}{\kilo\bit\per\second}
+\DeclareSIUnit[per-mode=symbol]{\Mbps}{\mega\bit\per\second}
+\DeclareSIUnit[per-mode=symbol]{\Gbps}{\giga\bit\per\second}
+\DeclareSIUnit[per-mode=symbol]{\Tbps}{\tera\bit\per\second}
+\DeclareSIUnit[per-mode=symbol]{\Pbps}{\peta\bit\per\second}
+
+
+% TUHH graphics/tikz lib
+\RequirePackage{tuhhgraphics}%
+
+% Finally get tuhh common commands (otherwise \dh will be overwritten)
+\RequirePackage{tuhhcommon}%
+
+
+%%% Patch for old koma script packages
+%%% https://tex.stackexchange.com/questions/296437/incompatible-usage-of-ssect
+\@ifundefined{KOMAClassName}{}{%
+  \@ifpackagelater{scrbase}{2014/12/12}{% for newer versions: do nothing:
+    %
+  }{% for older versions: use \@startsection instead of \scr@startsection:
+    \def\scr@startsection{\@startsection}%
+  }%
+}
+
+%%%
+%%% support of external references
+\RequirePackage{xr}
+
+
+%%%
+%%% GLOBAL COMMANDS
+%%%
+
+%%% add external document
+%%% in order to use external refences, e.g., \ref{xr:orig_label}
+\newcommand{\tuhhAddExternalDocument}[1]{%
+  \filename@parse{#1}%
+  \IfFileExists{\filename@area/\filename@base.aux}{%
+    \externaldocument[xr:]{\filename@area/\filename@base}%
+  }{%
+    \typeout{tuhhpreamble - External aux-file not found: \filename@area/\filename@base.aux}%
+  }%
+  % Test if extension was given
+  %\ifx\filename@ext\relax%
+  %  \typeout{XXX: \filename@area - \filename@base}%
+  %\else%
+  %  \typeout{XXX: \filename@area - \filename@base | \filename@ext}%
+  %\fi%
+}
+
+%%% AUTHOR
+\newif\if@tuhhAuthor
+\@tuhhAuthorfalse
+\def\tuhhpreamble@author{unset}
+\def\tuhhpreamble@shortAuthor{unset}
+\let\tuhhpreamble@oldauthor\author%
+\renewcommand{\author}[2][tuhh@empty]{%
+  \@tuhhAuthortrue%
+  \ifthenelse{\equal{#1}{tuhh@empty}}{%
+    \def\tuhhpreamble@shortauthor{#2}%
+    \def\tuhhpreamble@author{#2}%
+    \tuhhpreamble@oldauthor{#2}%
+  }{%
+    \def\tuhhpreamble@shortauthor{#1}%
+    \def\tuhhpreamble@author{#2}%
+    \@ifclassloaded{beamer}{%
+      \tuhhpreamble@oldauthor[#1]{#2}%
+    }{%
+      \tuhhpreamble@oldauthor{#2}%
+    }%
+  }%
+  \begingroup
+    % ignoring special commands in author
+    \@ifclassloaded{tuhhslides}{
+      \renewcommand{\speaker}[1]{#1}
+    }{}
+    \hypersetup{pdfauthor={\expandafter\tuhhpreamble@author}}%
+  \endgroup
+}%
+
+%%% TITLE
+\newif\if@tuhhTitle
+\@tuhhTitlefalse
+\def\tuhhpreamble@title{unset}
+\def\tuhhpreamble@shorttitle{unset}
+\let\tuhhpreamble@oldtitle\title%
+\renewcommand{\title}[2][tuhh@empty]{%
+  \@tuhhTitletrue%
+  \ifthenelse{\equal{#1}{tuhh@empty}}{%
+    \def\tuhhpreamble@shorttitle{#2}%
+    \def\tuhhpreamble@title{#2}%
+    \tuhhpreamble@oldtitle{#2}%
+  }{%
+    \def\tuhhpreamble@shorttitle{#1}%
+    \def\tuhhpreamble@title{#2}%
+    \@ifclassloaded{beamer}{%
+      \tuhhpreamble@oldtitle[#1]{#2}%
+    }{%
+      \tuhhpreamble@oldtitle{#2}%
+   }%
+  }%
+  \hypersetup{pdftitle={\tuhhpreamble@shorttitle}}%
+}%
+
+%%% SUBTITLE
+\def\tuhhpreamble@subtitle{unset}
+\@ifundefined{subtitle}{%
+  \newcommand{\subtitle}[1]{}
+}\relax
+
+\renewcommand{\subtitle}[1]{%
+    \def\tuhhpreamble@subtitle{#1}%
+}
+
+%%% SUBJECT
+\def\tuhhpreamble@subject{unset}
+\@ifundefined{subject}{%
+  \newcommand{\subject}[1]{}
+}\relax
+
+\renewcommand{\subject}[1]{%
+    \def\tuhhpreamble@subject{#1}%
+    \hypersetup{pdfsubject={#1}}%
+}
+
+%%% INSTITUTE
+\newif\if@tuhhInstitute
+\@tuhhInstitutefalse
+\def\tuhhpreamble@institute{unset}
+\@ifundefined{institute}{%
+  \newcommand{\institute}[1]{}%
+  \newcommand{\tuhh@oldInstitute}[1]{}%
+}{%
+  \let\tuhh@oldInstitute\institute%
+}
+
+\renewcommand{\institute}[1]{%
+    \@tuhhInstitutetrue%
+    \def\tuhhpreamble@institute{#1}%
+    \@ifundefined{TUHHLANG@#1}{%
+      \tuhh@oldInstitute{#1}%
+      \tuhh@AddKeywords{\tuhh@printTag{University}}%
+      \addtokeywords{#1}%
+    }{%
+      \tuhh@oldInstitute{\tuhh@printTag{#1}}%
+      \tuhh@AddKeywords{\tuhh@printTag{University}}%
+      \addtokeywords{\tuhh@printTag{#1}}%
+      \addtokeywords{\tuhh@printInstCode{#1}}%
+    }
+}
+
+%%% KEYWORDS
+\newtoks{\tuhh@keywords}
+\newcommand*{\tuhh@InitKeywords}{\tuhh@keywords={}}
+\newcommand{\tuhh@AddKeywords}[1]{\tuhh@keywords=\expandafter{\the\tuhh@keywords #1}}
+\newcommand*{\tuhh@PrintKeywords}{\the\tuhh@keywords}
+
+\newcommand{\addtokeywords}[1]{%
+    \tuhh@AddKeywords{; #1}%
+    \edef\tuhhpreamble@keywords{\tuhh@PrintKeywords}%
+    \hypersetup{pdfkeywords={\tuhhpreamble@keywords}}%
+}
+
+\tuhh@InitKeywords
+
+% write the creator pdfinfo
+\ifdefined\tuhh@ClassName
+  \hypersetup{pdfcreator={Using LaTeX class \tuhh@ClassName~version \tuhh@ClassFullVersion}}
+\fi
+
+%%
+%%
+%%
+\if@tuhhpreamble@preview
+\else
+  % only if inside a TUHH class
+  \ifdefined\tuhh@ClassName
+    \AtBeginDocument{%
+      % check if the author of the document was set
+      \if@tuhhAuthor%
+      \else%
+        \PackageError{\tuhhpreamble@PackageName}{Author is not defined}\relax%
+      \fi%
+      % check if the title of the document was set
+      \if@tuhhTitle%
+      \else%
+        \PackageError{\tuhhpreamble@PackageName}{Title is not defined}\relax%
+      \fi%
+      % check if the institute of the document was set only if this are not slides
+      \@ifclassloaded{beamer}{%
+      }{%
+        \@ifclassloaded{tuhhexercise}{%
+        }{%
+          \if@tuhhInstitute%
+          \else%
+            \PackageError{\tuhhpreamble@PackageName}{Institute is not defined}\relax%
+          \fi%
+        }
+      }
+    }
+  \fi
+\fi
+
+\makeatother
+\endinput

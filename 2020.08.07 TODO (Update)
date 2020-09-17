@@ -1,3 +1,5 @@
+2020.08.21
+2020.08.19
 2020.08.17
 2020.08.13
 2020.08.11
@@ -5,15 +7,34 @@
 
 
 Activities of today
+	1 wire parasite power working for two sensors, continue modifying the code
+	Recognisition of the SDO is not working, therefore esi should be download to master manually
+	Improve the synchronization with priorities of the temperature task and the soes
+
+	Try to implement the 1 wire protocol with only 1 hardw
+	Check the compilation of the driver
+	Check whether there are more than one mouse in the house
 	Start the report for the funcitonal units.
 
-
-	The 1 wire communication
 
 	Write the feedback to PCBway
 
 	(soes) What are the hooks for?
 	(esi) why the data types in the object dictionary are different (32bits) against to those defined in the rxpdo?
+
+2020.08.19
+The 1 wire communication
+	Bring more temperature sensors
+	Look for compatibility
+		Either a pull-up resistor is needed or internally can be added
+		Set the Tx as Output open-drain with pull-up or pull-down capability
+	Implement the low level driver		
+	Enable the LWOW_CFG_OSm along with the 4 system functions
+			System function template example is available in lwow/src/system/ folder.
+			Application must define LWOW_CFG_OS_MUTEX_HANDLE for mutex type. This shall be done in lwow_opts.h file.
+	
+	
+
 
 2020.08.17
 	Check the bug within the RX and TX Data

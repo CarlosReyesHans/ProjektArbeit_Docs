@@ -1,0 +1,122 @@
+%%
+%% This is file 'tuhhtubdok.sty'
+%%
+%% Copyright 2011 Christoph Weyer
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhtubdokstyloaded\relax \endinput\else\let\tuhhtubdokstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhtubdok.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhtubdok@PackageName{tuhhtubdok}
+\def\tuhhtubdok@PackageDesc{TUHH definitions TUB documents}
+\def\tuhhtubdok@PackageVersion{0.1}
+\def\tuhhtubdok@PackageFullVersion{\tuhhtubdok@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhtubdok@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhtubdok@PackageFullVersion\space\tuhhtubdok@PackageDesc]
+\typeout{Package \tuhhtubdok@PackageName, \csname ver@\tuhhtubdok@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer and Christian Renner, 2011-\svnfileyear^^J}
+
+%%% using key/value pairs as options to packages and classes
+\RequirePackage{kvoptions}
+
+\SetupKeyvalOptions{%
+  family=tuhhtubdok,
+  prefix=@tuhhtubdok@
+}
+
+\DeclareDefaultOption{%
+  \PackageWarning{\tuhhtubdok@PackageName}{Unknown option '\CurrentOption'}%
+}
+\ProcessKeyvalOptions*\relax%
+
+%%%
+%%% CONFIGURATION
+%%%
+
+%%% TikZ style definition for TUB document number
+\tikzstyle{TUHH tubdok number} = [%
+    rotate=90,color=tuhh_gray, anchor=center, font=\tuhhfontBigfoot, opacity=0.5]
+
+%%% x/y-shift of TUB document number
+\def\tuhhtubdok@xShift{-0.5cm}
+\def\tuhhtubdok@yShift{0.8cm}
+
+%%%
+%%% INTERNAL VARIABLES
+%%%
+
+%%% prefix for TUB document number
+\def\tuhhtubdok@shortPrefix{tubdok--}
+\def\tuhhtubdok@longPrefix{urn:nbn:de:gbv:830--\tuhhtubdok@shortPrefix}
+
+%%% TUB document number
+\def\tuhhtubdok@number{0000}
+\newif\if@tuhhtubdok@number
+\@tuhhtubdok@numberfalse
+
+
+%%%
+%%% INTERNAL COMMANDS
+%%%
+
+
+%%%
+%%% GLOBAL VARIABLES
+%%%
+
+
+%%%
+%%% GLOBAL COMMANDS
+%%%
+
+%%% Command: \printTUBDokNumberOnCurrentPage
+\newcommand{\printTUBDokNumberOnCurrentPage}{%
+  \if@tuhhtubdok@number%
+    \begin{tikzpicture}[remember picture, overlay]
+      \node[TUHH tubdok number]
+          at ($ (current page.east)
+              + (\tuhhtubdok@xShift,\tuhhtubdok@yShift) $)
+          {\shortTUBDokNumber};
+    \end{tikzpicture}
+  \fi%
+}
+
+%%% Command: \shortTUBDokNumber
+\newcommand{\shortTUBDokNumber}{%
+  \if@tuhhtubdok@number%
+    \tuhhtubdok@shortPrefix\tuhhtubdok@number
+  \fi%
+}
+
+%%% Command: \longTUBDokNumber
+\newcommand{\longTUBDokNumber}{%
+  \if@tuhhtubdok@number%
+    \tuhhtubdok@longPrefix\tuhhtubdok@number
+  \fi%
+}
+
+%%% Command: \tubdoknumber
+\newcommand{\tubdoknumber}[1]{%
+  \@tuhhtubdok@numbertrue%
+  \def\tuhhtubdok@number{#1}%
+}
+
+
+\makeatother
+\endinput

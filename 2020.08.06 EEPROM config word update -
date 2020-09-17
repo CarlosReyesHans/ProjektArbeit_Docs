@@ -1,3 +1,6 @@
+LAST UPDATE: 2020.09.16
+	Hansv6 was added to avoid initialization problem.
+	
 "Brainstorming for continue "
 
 The ESC is not updating the EtherCAT Core Registers
@@ -21,6 +24,8 @@ The ESC is not updating the EtherCAT Core Registers
 		Are all of them not accesible or only some of them?
 			DL and AL and the info ones as well
 				"SOES recommends to try reading the PDI area that skips the SOES"
+				
+				
 TESTS:
 
 Check whether the Configured Station Alias has been updated over the master. After the boot up and having read out the SII.
@@ -41,16 +46,16 @@ From the Examples I cab match a configuration word for the LAN9252
 				linux_lan9252demo
 					<ConfigData>8002000000000000</ConfigData>
 
-														LAN9252-DIGIO		SPI-withGPIO-2PortMode		linux_lan9252demo	HANS
-0140h	PDI Control Register								040F				800E					8002				8002		2 //SPI mode, no AL emulation and Enhance link detection
+														LAN9252-DIGIO		SPI-withGPIO-2PortMode		linux_lan9252demo	lan9252original		HANS	HANSv6
+0140h	PDI Control Register								040F				800E					8002				800f				8002	8002		2 //SPI mode, no AL emulation and Enhance link detection
 0141h	ESC Configuration Register			
 	
-0150h	PDI Configuration Register (only DGIO)				0044				00CC					0000				0000			2
+0150h	PDI Configuration Register (only DGIO)				0044				00CC					0000				00cc				0000	00cc	2
 0151h	Sync/Latch PDI Configuration Register	
 		(If DC is supported)
-(0982h-0983h)	Pulse Length of SyncSignals Register 		1027				8813					0000				0000		2
+(0982h-0983h)	Pulse Length of SyncSignals Register 		1027				8813					0000				8813				0000	8813		2
 				(if DC compatible)
-(0152h-0153h)	Extended PDI Configuration Register 		F0FF				f000					0000				EAEA		2	
+(0152h-0153h)	Extended PDI Configuration Register 		F0FF				f000					0000				ff00				EAEA	ff00		2	
 				(DGIOs also used in SPI)
 				D9--SCK << Input
 				D5--SCS << Input
@@ -59,22 +64,32 @@ From the Examples I cab match a configuration word for the LAN9252
 				  Open Drains 1110 1010 Input 1110 1010
 								= EAEA
 				
-(0012h-0013h)	Configured Station Alias Registe								0000										CACA		2						
+(0012h-0013h)	Configured Station Alias Registe								0000										0000				CACA	CACA	2						
 				(optional feature/needed for test if non ID Selector)
 
 (0510h-0511h)	MII Management Control/Status Register	
-(0142h-0143h)	ASIC Configuration Register 									0080		0000							0080			2											2
+(0142h-0143h)	ASIC Configuration Register 									0080		0000							0080				0080	0080		2											2
 				MII_LINK detection (8th bit) = 1
 
 									
 
 (0144h-0145h)	RESERVED Register 																										2
 
+/*--------------------------NOTES AGAINST THE ORIGINAL VERSION---------------------------------------*/
+2020.09.16
+first word:	800f vs 800f, 0f corresponds to data sync >> see page 243 of LAN9252 Page, only LSB controls the AL simulation.
+		Result: 		800E
+second word: 00cc	vs	0000, 00 is for HBI and IO, cc is for sync1 mapped to 0220h and syncx as output, instead of Latch, see 247
+		Result cc
+third word:	8813	vs 0000, length of syncsignals???
+		Result :8813 just a copy from the example >> check addresses
+fourth word: ff00 vs EA EA, extended pdi, IOS are open drain and input. EAEA was considered due to SPI pinout, but original config did not have it*
+		RESULT: ff00
 /*--------------------FROM current Axis Board-----------------------*/
 
 				<Eeprom>	
 					<ByteSize>512</ByteSize>
-					<ConfigData>800200000000EAEACACA0080</ConfigData>
+					<ConfigData>800200000000EAEAABCD0080</ConfigData>
 					<!--Bootstrap is disabled since FoE is not present-->
 					<!--<BootStrap>0010800080108000</BootStrap>-->
 				</Eeprom>
@@ -240,6 +255,21 @@ DC Supported and AL_event_Enabled should be disabled for testing
 "TODO"
 Continue from 37 in seminar about the evaluation kit
 
+/*---------------------EEPROM from LAN9252 Original----------------------------------------------------------------*/
+80 0F 00 CC 88 13 FF 00 00 00 00 80 00 00 57 00 
+D8 04 00 00 0D 00 00 00 01 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+FF FF FF FF FF FF 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 0F 00 01 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
 *-----------SSC TOOL-----------------------------------------------------------------------------*
 Where is a tutorial for ssc tool???

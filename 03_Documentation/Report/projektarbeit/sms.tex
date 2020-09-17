@@ -1,0 +1,285 @@
+\chapter{SMs tests}
+
+
+
+
+
+
+
+
+% \begin{figure}[ht]
+%     \centering
+%     \subfigure[Synchronization state machine]{\label{subfig:ecat_sm}{
+%         %General state machine 80/100
+%         \begin{tikzpicture}[->,>=stealth']
+%         % Position of QUERY 
+%         % Use previously defined 'state' as layout (see above)
+%         % use tabular for content to get columns/rows
+%         % parbox to limit width of the listing
+%         \node[state,
+%             text width=3.2cm 	
+%             ] (E_CONFIG) 
+%         {\begin{tabular}{l}
+%             \textbf{Config}\\[.1em]
+%             \parbox{4cm}{
+%             \textbf{entry:}\\
+%             $spi\_init()$\\
+%             $open\_soesPort()$\\
+%             \textbf{exit:}
+%             }
+%         \end{tabular}};
+
+%         % STATE START 
+%         % Use previously defined 'state' as layout (see above)
+%         % use tabular for content to get columns/rows
+%         % parbox to limit width of the listing
+%         \node[state,
+%             text width=3.2cm,
+%             above of = E_CONFIG,
+%             node distance = 3.5cm,
+%             anchor = center] (E_START) 
+%         {\begin{tabular}{l}
+%             \textbf{Start}\\[.1em]
+            
+%         \end{tabular}};
+
+
+            
+%         % State: ACK with different content
+%         \node[state,    	% layout (defined above)
+%             text width=3.2cm, 	% max text width
+%             yshift=2cm, 		% move 2cm in y
+%             right of=E_CONFIG, 	% Position is to the right of QUERY
+%             node distance=5cm, 	% distance to QUERY
+%             anchor=center] (E_CHCK) 	% posistion relative to the center of the 'box'
+%         {%
+%         \begin{tabular}{l} 	% content
+%             \textbf{Check comm}\\[.1em]
+%             \parbox{2.8cm}{
+%                 \textbf{entry:}\\
+%                 $timeout\_start()$
+%                 \textbf{exit:}\\
+%                 $resume\_SOES()$
+%                 }
+%         \end{tabular}
+%         };
+        
+%         % STATE E_WAIT
+%         \node[state,
+%         text width=3.2cm,
+%             %below of=ACK,
+%             right of=E_CHCK,
+%             yshift=-2cm,
+%             node distance=5cm, 
+%             anchor=center ] (E_WAIT) 
+%         {%
+%         \begin{tabular}{l}
+%             \textbf{Waiting SOES}\\[.1em]
+%             \parbox{2.8cm}{
+%                 \textbf{entry:}\\
+%                 $osWaitEvent()$\\
+%                 \textbf{exit:}
+%                 }
+%         \end{tabular}
+%         };
+        
+
+        
+%         %STATE CONNECTED
+%         \node[state,
+%         text width = 3.2cm,
+%         below of=E_WAIT,
+%         xshift= 2.5cm,
+%         node distance=4.5cm,
+%         anchor=center] (E_CONNECTED) 
+%         {%
+%         \begin{tabular}{l}
+%         \textbf{Connected}\\[.1em]
+%         \parbox{4cm}{
+%             \textbf{entry:}\\
+%             $osResume(SOES)$\\[.1em]
+%             $update\_state()$\\
+%             \textbf{exit:}
+%             }
+%         \end{tabular}
+%         };
+
+%         % STATE E_FAULT
+%         \node[state,
+%             text width=3.2cm,
+%             below of=E_WAIT,
+%             xshift=-2.5cm,
+%             node distance=4.5cm,
+%             anchor=center] (E_FAULT) 
+%         {%
+%         \begin{tabular}{l}
+%         \textbf{Fault}\\[.1em]
+%         \parbox{4cm}{
+%             \textbf{entry:}\\
+%             $notify\_error()$\\
+%             $osThreadRemove()$\\
+%             \textbf{exit:}
+%             }
+%         \end{tabular}
+%         };
+
+%         %STATE RESTART
+%         \node[state,
+%         text width = 3.2cm,
+%         left of=E_FAULT,
+%         node distance=5cm,
+%         %xshift = 2cm,
+%         anchor=center] (E_RESTART) 
+%         {%
+%         \begin{tabular}{l}
+%         \textbf{Restart}\\[.1em]
+%         \parbox{4cm}{
+%             \textbf{entry:}\\
+%             $deInit_SPI()$\\[.1em]
+%             $restartSOES$\\
+%             $delay()$
+%             }
+%         \end{tabular}
+%         };
+
+%         % draw the paths and and print some Text below/above the graph
+%         \path
+%             (E_START)       edge node[anchor=center,left]{$os\_ready$}  (E_CONFIG) 
+%             (E_CONFIG) 	    edge[bend left=20]  node[anchor=north,above]{$port\_ok$} (E_CHCK)
+%             (E_CHCK)     	edge[bend left=20] node[anchor=north,right]{$Resume!$} (E_WAIT)
+%             (E_WAIT)       	edge[bend left=10]  node[anchor=center,right]{$Comm?$}     (E_CONNECTED)
+%             (E_WAIT)       	edge[bend right=10] node[anchor=center,left]{$soes\_timeout$}                                         (E_FAULT)
+%             (E_CONNECTED)   edge            node[anchor=north,above]{$soes$}     
+%                                             node[anchor=south,below]{$timeout$}(E_FAULT)
+%             (E_CONNECTED)   edge[loop below]  node[anchor=center,below]{$update\_loop$}                   (E_CONNECTED)
+%             (E_FAULT)  	    edge            node[anchor=north,above]{$thread$} 
+%                                             node[anchor=center,below]{$removed?$}   (E_RESTART)
+%             (E_RESTART)  	edge[bend left=30]  node[anchor=center,left]{$delay\_done$}                                          (E_CONFIG)
+%             ;
+
+%         \end{tikzpicture}
+%     }}\hfill
+%     \subfigure[SOES application state machine]{\label{subfig:soes_sm}{
+%         %SOES state machine 80/100
+%         \begin{tikzpicture}[->,>=stealth']
+%         % STATE 1 SOES
+%         % Use previously defined 'state' as layout (see above)
+%         % use tabular for content to get columns/rows
+%         % parbox to limit width of the listing
+%         \node[state,
+%             text width=3.2cm 	
+%             ] (SOES_INIT1) 
+%         {\begin{tabular}{l}
+%             \textbf{Init1}\\[.1em]
+%             \parbox{4cm}{
+            
+%             $lib\_init()$\\
+            
+%             }
+%         \end{tabular}};
+            
+%         % STATE SOES INIT 2
+%         \node[state,    	% layout (defined above)
+%             text width=3.2cm, 	% max text width
+%             %yshift=2cm, 		% move 2cm in y
+%             below of=SOES_INIT1, 	
+%             node distance=3cm, 	% 
+%             anchor=center] (SOES_INIT2) 	% posistion relative to the center of the 'box'
+%         {%
+%         \begin{tabular}{l} 	% content
+%             \textbf{Init2}\\[.1em]
+%             \parbox{2.8cm}{
+%                 $suspend\_thread()$\\
+%                 }
+%         \end{tabular}
+%         };
+
+%         % STATE 0 SOES
+%         % Use previously defined 'state' as layout (see above)
+%         % use tabular for content to get columns/rows
+%         % parbox to limit width of the listing
+%         \node[state,
+%             text width=3.2cm,
+%             right of = SOES_INIT1,
+%             node distance = 5cm,
+%             anchor = center] (SOES_INIT0) 
+%         {\begin{tabular}{l}
+%             \textbf{Start}\\[.1em]
+%             \parbox{4cm}{
+            
+%             }
+%         \end{tabular}};
+        
+%         % STATE SET TIMER
+%         \node[state,
+%         text width=3.2cm,
+%             %below of=ACK,
+%             right of=SOES_INIT2,
+%             %yshift=-2cm,
+%             node distance=5cm, 
+%             anchor=center ] (SOES_TIMER) 
+%         {%
+%         \begin{tabular}{l}
+%             \textbf{Timer}\\[.1em]
+%             \parbox{2.8cm}{
+%                 $osGetTick()$\\
+%                 $osStartTimeout()$
+%                 }
+%         \end{tabular}
+%         };
+        
+
+        
+%         %STATE SLAVE LOOP
+%         \node[state,
+%         text width = 3.2cm,
+%         right of=SOES_TIMER,
+%         %xshift= 2.5cm,
+%         node distance=5cm,
+%         anchor=center] (SOES_SLAVE) 
+%         {%
+%         \begin{tabular}{l}
+%         \textbf{Slave loop}\\[.1em]
+%         \parbox{4cm}{
+%             $eca\_slv()$\\
+%             }
+%         \end{tabular}
+%         };
+
+%         % STATE SOES_RESET TIMEOUT
+%         \node[state,
+%             text width=3.2cm,
+%             below of=SOES_SLAVE,
+%             xshift=-2.5cm,
+%             node distance=3cm,
+%             anchor=center] (SOES_RESET) 
+%         {%
+%         \begin{tabular}{l}
+%         \textbf{Timeout Reset}\\[.1em]
+%         \parbox{4cm}{
+%             $reset\_Timeout()$\\
+%             $osDelay()$\\
+%             }
+%         \end{tabular}
+%         };
+
+        
+%         draw the paths and and print some Text below/above the graph
+%         \path
+%         (SOES_INIT0)    edge node[anchor=center,above]{$Resume?$} (SOES_INIT1) 
+%         (SOES_INIT1) 	edge  node[anchor=south,right]{$Comm!$}  (SOES_INIT2)
+%         (SOES_INIT1)    edge [loop above]   node[anchor=east,above]{$no\_comm\_loop$} (SOES_INIT1)
+%         (SOES_INIT2)    edge [loop below]   node[anchor=south,below]{$no\_eventFlag$} (SOES_INIT2)
+%         (SOES_INIT2)    edge node [anchor=center,above]{$Resume?$} (SOES_TIMER)                                          (SOES_TIMER)
+%         (SOES_TIMER)    edge                   (SOES_SLAVE)
+%         (SOES_SLAVE)    edge [loop above]       node[anchor=center,above]{$no\_comm\_loop$}       (SOES_SLAVE)
+%         (SOES_SLAVE)    edge [bend left = 50]   node[anchor=center,right]{$esc\_updated$}   (SOES_RESET)
+%         (SOES_RESET)    edge [bend left = 50]   node[anchor=center,left]{$delay\_done$}   (SOES_TIMER)
+%         ;
+
+%         \end{tikzpicture}
+%     }}
+%     \caption{State machines for EtherCAT slave functionality} %EtherCAT Device Protocol poster from EtherCAT resources
+%     \label{fig:syncmodes}
+% \end{figure} 
+  

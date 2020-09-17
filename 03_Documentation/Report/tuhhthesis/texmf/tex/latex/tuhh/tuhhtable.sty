@@ -1,0 +1,232 @@
+%%
+%% This is file 'tuhhtable.sty'
+%%
+%% Copyright 2009 Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \@tuhhtablestyloaded\relax \endinput\else\let\@tuhhtablestyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhtable.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\@tuhhtable@PackageName{tuhhtable}
+\def\@tuhhtable@PackageDesc{TUHH table definitions}
+\def\@tuhhtable@PackageVersion{0.1.3}
+\def\@tuhhtable@PackageFullVersion{\@tuhhtable@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\@tuhhtable@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\@tuhhtable@PackageFullVersion\space\@tuhhtable@PackageDesc]
+\typeout{Package \@tuhhtable@PackageName, \csname ver@\@tuhhtable@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christian Renner, 2009-\svnfileyear^^J}
+
+\DeclareOption*{%
+  \PackageWarning{\@tuhhtable@PackageName}{Unknown option '\CurrentOption'}%
+}
+
+\ProcessOptions\relax
+
+
+%% we need TUHH colors
+\RequirePackage{tuhhcolor}
+%\RequirePackage{tuhhfonts}  % why should be need this?
+
+%% and TikZ
+\RequirePackage{tikz}
+
+%% we also need some branching
+\RequirePackage{ifthen}
+
+%% as well as colored tables and cooler horiz lines
+\RequirePackage{colortbl}
+\RequirePackage{booktabs}
+
+
+%%%
+%%% Local Variables
+%%%
+
+% length parameters
+\newlength{\@tuhhtable@bulletSize}
+\newlength{\@tuhhtable@bulletSpacing}
+\newlength{\@tuhhtable@dashLength}
+\newlength{\@tuhhtable@dashHeight}
+\newlength{\@tuhhtable@heavyrulewidth}
+\newlength{\@tuhhtable@abovebodyabovesep}
+\newlength{\@tuhhtable@abovebodybelowsep}
+\newlength{\@tuhhtable@belowbodyabovesep}
+\newlength{\@tuhhtable@belowbodybelowsep}
+
+% setup own length parameters
+\setlength{\@tuhhtable@bulletSize}{1.5ex}
+\setlength{\@tuhhtable@bulletSpacing}{1.2\@tuhhtable@bulletSize}
+\setlength{\@tuhhtable@dashLength}{0.65\@tuhhtable@bulletSize}
+\setlength{\@tuhhtable@dashHeight}{0.08\@tuhhtable@bulletSize}
+\setlength{\@tuhhtable@heavyrulewidth}{0.5pt}
+\setlength{\@tuhhtable@abovebodyabovesep}{2pt}
+\setlength{\@tuhhtable@abovebodybelowsep}{0.5pt}
+\setlength{\@tuhhtable@belowbodyabovesep}{0.5pt}
+\setlength{\@tuhhtable@belowbodybelowsep}{0pt}
+
+% adjust row spacing in tables
+\def\@tuhhtable@defaultRowHeight{1.4}
+\renewcommand\arraystretch{\@tuhhtable@defaultRowHeight}
+
+% other sizes and parameters
+\arrayrulecolor{\@tuhhtable@ruleColor}
+\setlength{\heavyrulewidth}{1pt}     % TODO explain
+\setlength{\defaultaddspace}{0.5mm}  % TODO explain
+
+% colors
+\newcommand{\@tuhhtable@ruleColor}{tuhh_gray}
+\newcommand{\@tuhhtable@headBG}{tuhh_darkturquoise}
+\newcommand{\@tuhhtable@headColor}{tuhh_white}
+\newcommand{\@tuhhtable@blockBG}{tuhh_gray}
+\newcommand{\@tuhhtable@blockColor}{tuhh_black}
+\newcommand{\@tuhhtable@rowBG}{tuhh_lightgray}
+\newcommand{\@tuhhtable@rowheadBG}{tuhh_lightgray}
+\newcommand{\@tuhhtable@rowheadBGc}{tuhh_gray!40!tuhh_lightgray}
+
+%%
+%% TikZ styles
+%%
+\tikzstyle{tuhhtableBullet} = [top color=tuhh_gray, bottom color=tuhh_white, circle, draw=tuhh_mediumgray, line width=0.4pt]
+\tikzstyle{tuhhtableBulletGood} = [top color=tuhh_turquoise!20!tuhh_gray, bottom color=tuhh_white]
+\tikzstyle{tuhhtableBulletBad} = [top color=tuhh_orange!20!tuhh_gray, bottom color=tuhh_white]
+\tikzstyle{tuhhtableBulletInner} = [fill=tuhh_black]
+
+%%%
+%%% extend the language tag database for local purposes
+%%%
+%%% LANGUAGE: German
+\RequirePackage{tuhhlang}
+\if@german%
+  \def\TUHHLANG@tblNotAvailable{n.v.}
+\fi
+%%% LANGUAGE: English
+\if@english%
+  \def\TUHHLANG@tblNotAvailable{n.a.}
+\fi
+
+%%%
+%%% INTERNAL COMMANDS
+%%%
+
+%% draw bullet for quality indicators (++, +, ...)
+\newcommand{\@tuhhtable@drawBullet}[1]{%
+    \filldraw[tuhhtableBullet,#1] circle (0.5\@tuhhtable@bulletSize);
+}
+
+%% draw dash for + and -
+\newcommand{\@tuhhtable@drawDash}{%
+  \fill[tuhhtableBulletInner] (-0.5\@tuhhtable@dashLength,-0.5\@tuhhtable@dashHeight) rectangle +(\@tuhhtable@dashLength,\@tuhhtable@dashHeight);
+}
+
+%% actually draw the plus using dashes
+\newcommand{\@tuhhtable@drawPlus}{%
+  \@tuhhtable@drawDash
+  \begin{scope}[rotate=90]
+    \@tuhhtable@drawDash
+  \end{scope}
+}
+
+
+%%%
+%%% GLOBAL VARIABLES
+%%%
+
+
+%%%
+%%% GLOBAL ENVIRONMENTS
+%%%
+
+% tuhh table environment
+\newenvironment{tuhhtable}{%
+  %%% BEGIN definition
+  \begin{table}
+    \footnotesize\centering
+}{%
+  %% END definition
+%    \caption{#1\label{#2}}
+  \end{table}
+}
+
+
+%%%
+%%% GLOBAL COMMANDS
+%%%
+
+%% table row and cell definitions
+\newcommand{\THc}[3]{\multicolumn{#1}{>{\color{\@tuhhtable@headColor}}#2}{\cellcolor{\@tuhhtable@headBG}{\textbf{#3}}}}   % Table Header colored
+\newcommand{\THempty}{\cellcolor{\@tuhhtable@headBG}}     % Table Header empty
+\newcommand{\THsub}[3]{\multicolumn{#1}{>{\color{\@tuhhtable@headColor}}#2}{\cellcolor{\@tuhhtable@headBG}{#3}}}   % Table Header subtitle
+\newcommand{\TRc}{\rowcolor{\@tuhhtable@rowBG}}           % Table Row colored
+\newcommand{\TDc}{\cellcolor{\@tuhhtable@rowBG}}          % Table Data (cell) colored
+\newcommand{\TRh}[3]{\multicolumn{#1}{#2}{\cellcolor{\@tuhhtable@rowheadBG}{#3}}}   % Row Header for plain rows
+\newcommand{\TRhc}[3]{\multicolumn{#1}{#2}{\cellcolor{\@tuhhtable@rowheadBGc}{#3}}} % Row Header for colored rows
+\newcommand{\TRx}[3]{\addlinespace\multicolumn{#1}{>{\color{\@tuhhtable@blockColor}}#2}{\cellcolor{\@tuhhtable@blockBG}\hspace{-.4ex}\textbf{#3}}\vspace{-.75\@tuhhtable@abovebodyabovesep}}
+
+%% new cell types
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}} % ragged right text with fixed cell width
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}   % centered text with fixed cell width
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}  % ragged left text with fixed cell width
+
+%% special table entries
+%% * checker stuff: checkmark, missing indicator, not available
+%% * quality metrics: ++, +, o, -, --
+\newcommand{\tblYes}{\ding{51}}    % checkmark
+\newcommand{\tblNo}{\textbf{--}}   % dash (e.g., for feature does not exist)
+\newcommand{\tblNA}{n.a.}          % not available
+\newcommand{\tblBest}{%            % best (++)
+  \begin{tikzpicture}
+    \@tuhhtable@drawBullet{tuhhtableBulletGood}\@tuhhtable@drawPlus
+    \begin{scope}[xshift=\@tuhhtable@bulletSpacing]
+    \@tuhhtable@drawBullet{tuhhtableBulletGood}\@tuhhtable@drawPlus
+    \end{scope}
+  \end{tikzpicture}
+}
+\newcommand{\tblGood}{%            % good (+)
+  \begin{tikzpicture}
+    \@tuhhtable@drawBullet{tuhhtableBulletGood}\@tuhhtable@drawPlus
+  \end{tikzpicture}
+}
+\newcommand{\tblFair}{%            % fair (o)
+  \begin{tikzpicture}
+    \@tuhhtable@drawBullet{}
+  \end{tikzpicture}
+}
+\newcommand{\tblBad}{%             % bad (-)
+  \begin{tikzpicture}
+    \@tuhhtable@drawBullet{tuhhtableBulletBad}\@tuhhtable@drawDash
+  \end{tikzpicture}
+}
+\newcommand{\tblWorst}{%           % worst (--)
+  \begin{tikzpicture}
+    \@tuhhtable@drawBullet{tuhhtableBulletBad}\@tuhhtable@drawDash
+    \begin{scope}[xshift=\@tuhhtable@bulletSpacing]
+    \@tuhhtable@drawBullet{tuhhtableBulletBad}\@tuhhtable@drawDash
+    \end{scope}
+  \end{tikzpicture}
+}
+
+%% table body rules (start body, end body)
+% TODO use \specialrule{width}{abovesep}{belowsep}
+%\newcommand{\abovebodyrule}{\bottomrule}
+\newcommand{\abovebodyrule}{\specialrule{\@tuhhtable@heavyrulewidth}{\@tuhhtable@abovebodyabovesep}{\@tuhhtable@abovebodybelowsep}}
+%\newcommand{\belowbodyrule}{\toprule}
+\newcommand{\belowbodyrule}{\specialrule{\@tuhhtable@heavyrulewidth}{\@tuhhtable@belowbodyabovesep}{\@tuhhtable@belowbodybelowsep}}
+
+\makeatother
+\endinput

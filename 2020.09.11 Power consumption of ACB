@@ -1,0 +1,44 @@
+2020.09.11
+POWER CONSUMPTION ESTIMATION ACCORDING TO DATASHEET
+
+STM32 --- External clock,
+
+From Table 24. Typical and maximum current consumption in Run mode, code with data processing
+running from Flash memory (ART accelerator enabled with prefetch) or RAM(1)
+
+PLL ON,
+all peripherals but as inpusts
+enabled(3)(4) @ 3.3v for typical
+79-80 mA
+
+@ 3.6 for maximal
+Max at 85`C
+85 - 112 mA
+15 Capacitors as in 6.1.6 Power supply scheme
+
+
+
+For good working
+VDD = 2.7 to 3.6 V(5)
+
+
+only one or two leds supplying
+
+Vdd usb is considered apart
+
+typica 80mA @ 3.3V >>>> 264mW
+----------------------------------------------------------------------------------
+
+LAN 9252
+3.0 - 3.6 V , when the internal regulators are enabled
+The core logic works with 1.2 V >>> 1.14-1.26
+URRENT CONSUMPTION AND POWER DISSIPATION (REGS. ENABLED)
+Divided
+
+CORE
+TX MAgnetics (zero if both PHYs are using 100BASE-FX mode)
+
+With power management D0 and traffic
+Typical 112.0 82.0  = 194 mA @ 3.3V
+
+Disipation 642 mW

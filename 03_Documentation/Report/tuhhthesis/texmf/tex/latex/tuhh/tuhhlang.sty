@@ -1,0 +1,219 @@
+%%
+%% This is file 'tuhhlang.sty'
+%%
+%% Copyright 2007-2010 Christoph Weyer
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhlangstyloaded\relax \endinput\else\let\tuhhlangstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhlang.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhlang@PackageName{tuhhlang}
+\def\tuhhlang@PackageDesc{TUHH language definitions}
+\def\tuhhlang@PackageVersion{0.2.1}
+\def\tuhhlang@PackageFullVersion{\tuhhlang@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhlang@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhlang@PackageFullVersion\space\tuhhlang@PackageDesc]
+\typeout{Package \tuhhlang@PackageName, \csname ver@\tuhhlang@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer, 2007-\svnfileyear^^J}
+
+
+\def\tuhhlang@DE{de}
+\def\tuhhlang@EN{en}
+
+\global\newif\if@english
+\@englishfalse
+\DeclareOption{\tuhhlang@EN}{%
+    \@englishtrue%
+    \gdef\tuhh@lang{\tuhhlang@EN}%
+}
+
+\global\newif\if@german
+\@germanfalse
+\DeclareOption{\tuhhlang@DE}{%
+    \if@english%
+        \PackageWarning{\tuhhlang@PackageName}{German and English packet option are set}\relax%
+    \fi
+    \@germantrue%
+    \gdef\tuhh@lang{\tuhhlang@DE}%
+}
+
+\DeclareOption*{%
+    \PackageWarning{\tuhhlang@PackageName}{Unknown option '\CurrentOption'}\relax%
+}
+\ProcessOptions\relax
+
+%\RequirePackage[american,ngerman]{babel}
+\RequirePackage[english,ngerman]{babel}
+
+\if@english%
+%    \selectlanguage{english}
+%    \main@language{american}
+    \main@language{english}
+\else
+    \if@german%
+%        \selectlanguage{ngerman}
+        \main@language{ngerman}
+    \else
+%        \selectlanguage{english}
+%        \main@language{american}
+        \main@language{english}
+        \@englishtrue%
+        \def\tuhh@lang{\tuhhlang@EN}%
+    \fi
+\fi
+
+% patch to fake interface of translator package
+\@ifpackageloaded{translator}{%
+  \if@english
+    \trans@use@and@alias{english}{English}
+  \fi
+  \if@german
+    \trans@use@and@alias{ngerman}{German}
+  \fi
+}{}
+
+%%% LANGUAGE: German
+\if@german%
+    \def\TUHHLANG@SummerTerm{Sommersemester}
+    \def\TUHHLANG@WinterTerm{Wintersemester}
+    % types of theses et. al.
+    \def\TUHHLANG@RikaProject{Projekt-Praktikum -- Aufgabe}
+    \def\TUHHLANG@ProjectWork{Forschungsprojekt und Seminar}
+    \def\TUHHLANG@HiwiWork{Studentische Hilfskraft}
+    \def\TUHHLANG@BachelorThesis{Bachelorarbeit}
+    \def\TUHHLANG@MasterThesis{Masterarbeit}
+    \def\TUHHLANG@DiplomaThesis{Diplomarbeit}
+    \def\TUHHLANG@PhDThesis{Doktorarbeit}
+    \def\TUHHLANG@Dissertation{Dissertation}
+    % contact information
+    \def\TUHHLANG@Contact{Kontakt}
+    \def\TUHHLANG@Phone{Tel.}
+    \def\TUHHLANG@Email{E-Mail}
+    \def\TUHHLANG@Room{Raum}
+    % general stuff
+    \def\TUHHLANG@Hamburg{Hamburg}
+    \def\TUHHLANG@Germany{Deutschland}
+
+    \def\TUHHLANG@ResearchAssistant{Wissenschaftlicher Mitarbeiter}
+
+    \def\TUHHLANG@Exercise{Aufgabe}
+    \def\TUHHLANG@Solutions{L{\"o}sungen}
+    \def\TUHHLANG@SolutionsFor{L{\"o}sung zu}
+    \def\TUHHLANG@Sheet{Aufgabenblatt}
+
+\fi
+
+%%% LANGUAGE: English
+\if@english%
+    \def\TUHHLANG@SummerTerm{Summer Term}
+    \def\TUHHLANG@WinterTerm{Winter Term}
+    % types of theses et. al.
+    \def\TUHHLANG@RikaProject{Project Laboratory -- Task}
+    \def\TUHHLANG@ProjectWork{Research Project and Seminar}
+    %\def\TUHHLANG@HiwiWork{Research Assistant}
+    \def\TUHHLANG@HiwiWork{Student Assistant}
+    \def\TUHHLANG@BachelorThesis{Bachelor's Thesis}
+    \def\TUHHLANG@MasterThesis{Master's Thesis}
+    \def\TUHHLANG@DiplomaThesis{Diploma Thesis}
+    \def\TUHHLANG@PhDThesis{Ph.\,D.~Thesis}
+    \def\TUHHLANG@Dissertation{Dissertation}
+    % contact information
+    \def\TUHHLANG@Contact{Contact}
+    \def\TUHHLANG@Phone{Phone}
+    \def\TUHHLANG@Email{e-Mail}
+    \def\TUHHLANG@Room{Room}
+    % general stuff
+    \def\TUHHLANG@Hamburg{Hamburg}
+    \def\TUHHLANG@Germany{Germany}
+
+    \def\TUHHLANG@ResearchAssistant{Research Assistant}
+
+    \def\TUHHLANG@Exercise{Task}
+    \def\TUHHLANG@Solutions{Solutions}
+    \def\TUHHLANG@SolutionsFor{Solution for}
+    \def\TUHHLANG@Sheet{Exercise Sheet}
+
+\fi
+
+%%%
+%%% Local Commands
+%%%
+
+%% tuhh@printTag: command to printout the correct text for each language
+\newcommand{\tuhh@printTag}[1]{%
+    \@ifundefined{TUHHLANG@#1}{%
+        \PackageError{\tuhhlang@PackageName}{Language Tag #1 for language '\tuhh@lang' not defined}\relax%
+    }{%
+        \csname TUHHLANG@#1\endcsname
+    }%
+}
+
+%% tuhh@printInstCode: command to printout the correct Institute code (e.g., E--17)
+\newcommand{\tuhh@printInstCode}[1]{%
+    \@ifundefined{TUHHLANG@Code#1}{%
+        \PackageError{\tuhhlang@PackageName}{Code for Institute #1 not defined}\relax%
+    }{%
+        \csname TUHHLANG@Code#1\endcsname
+    }%
+}
+
+%%%
+%%% Load Language Definitions
+%%%
+%\edef\tuhhlang@defFile{\lowercase{\def\noexpand\tuhhlang@defFilef{tuhhlangnames.def}}}%
+\edef\tuhhlang@defFile{tuhhlangnames.def}%
+%\tuhhlang@defFile
+\InputIfFileExists\tuhhlang@defFile
+    {}{\PackageError{\tuhhlang@PackageName}%
+    {Language definition file `\tuhhlang@defFile' not found.}%
+    {Necessary code for this definition file was not loaded.}}%
+\let\tuhhlang@defFile\relax
+
+
+%%%
+%%% Global Commands
+%%%
+
+%% handling of correct naming of the term
+\newcommand{\winterterm}[1]{\tuhh@printTag{WinterTerm}~#1}
+\newcommand{\summerterm}[1]{\tuhh@printTag{SummerTerm}~#1}
+
+%% commands to printout common phrases
+\def\TUHHPhonePrefix{\tuhh@printTag{PhonePrefix}}
+\def\TUHHBachelorThesis{\tuhh@printTag{BachelorThesis}}
+\def\TUHHMasterThesis{\tuhh@printTag{MasterThesis}}
+\def\TUHHRikaProject{\tuhh@printTag{RikaProject}}
+\def\TUHHHiwiWork{\tuhh@printTag{HiwiWork}}
+\def\TUHHProjectWork{\tuhh@printTag{ProjectWork}}
+
+\def\TUHHResearchAssistant{\tuhh@printTag{ResearchAssistant}}
+
+%%% Command: \validateLangTag
+%%%
+\DeclareRobustCommand{\validateLangTag}[3]{%
+  \ifthenelse{\equal{#1}{en}}{}{%
+    \ifthenelse{\equal{#1}{de}}{}{%
+      \PackageError{#2}
+        {Undefined Language Token '#1' #3}\relax%
+    }%
+  }%
+}
+
+\makeatother
+\endinput

@@ -1,0 +1,412 @@
+%%
+%% This is file 'tuhhbookdef.sty'
+%%
+%% Copyright 2011 Christoph Weyer and Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhbookdefstyloaded\relax \endinput\else\let\tuhhbookdefstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhbookdef.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhbookdef@PackageName{tuhhbookdef}
+\def\tuhhbookdef@PackageDesc{TUHH common definitions for books}
+\def\tuhhbookdef@PackageVersion{0.1}
+\def\tuhhbookdef@PackageFullVersion{\tuhhbookdef@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhbookdef@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhbookdef@PackageFullVersion\space\tuhhbookdef@PackageDesc]
+\typeout{Package \tuhhbookdef@PackageName, \csname ver@\tuhhbookdef@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer and Christian Renner, 2007-\svnfileyear^^J}
+
+%%% using key/value pairs as options to packages and classes
+\RequirePackage{kvoptions}
+
+\SetupKeyvalOptions{%
+  family=tuhhbookdef,
+  prefix=@tuhhbookdef@
+}
+
+\DeclareBoolOption{grayfonts}
+
+\DeclareDefaultOption{%
+  \PackageWarning{\tuhhbookdef@PackageName}{Unknown option '\CurrentOption'}%
+}
+
+\ProcessKeyvalOptions*\relax
+
+%%%
+%%% PACKAGE LOADING
+%%%
+
+%\RequirePackage[listings=false]{scrhack}
+\RequirePackage{scrhack}
+
+% use scrpage2
+% edited by JC 25.08.2020
+%\RequirePackage{scrpage2}
+\RequirePackage{scrlayer-scrpage}
+
+%%% captions and subcaptions (for subfigures)
+\RequirePackage[%
+  font=small,%
+  labelfont=bf,%
+  margin=0.5cm,%
+  singlelinecheck=off,%
+  %format=plain,% alternative: "hang"
+  format=plain,% alternative: "hang"
+  indention=3ex,%
+  position=bottom%
+]{caption}
+\RequirePackage[
+  hang,%
+  raggedright,%
+  tight%
+]{subfigure}
+
+%%% floating stuff
+\RequirePackage{float}
+
+%%% listings
+\RequirePackage{listings}
+
+%%% tables
+\RequirePackage{tuhhtable}
+\RequirePackage{supertabular}
+
+%%% add sideways tables
+\RequirePackage{rotating}
+
+%%% then load the TUHH packages
+\RequirePackage{tuhhpreamble}
+
+%%% fancy chapters
+\RequirePackage[fancy]{tuhhchap}
+
+%%% text layout
+\RequirePackage[onehalfspacing]{setspace}
+
+%%% common definitions
+\RequirePackage{tuhhcommon}
+
+%%%
+%%% CONFIGURATION
+%%%
+
+%%% text layout
+%\frenchspacing%
+\setlength{\headheight}{2.5\baselineskip}
+
+%%% adjusting komascript page layout
+\KOMAoptions{DIV=13}
+\KOMAoptions{BCOR=25mm}
+\KOMAoptions{headinclude=true}
+\KOMAoptions{footinclude=false}
+\KOMAoptions{mpinclude=false}
+\recalctypearea
+
+%%% set more suitable values for placing figures and other floating objects
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+
+%%% penalties for clubs and widows ("Schusterjungen" und "Hurenkinder")
+\clubpenalty=9999
+\widowpenalty=9999
+\displaywidowpenalty=9999
+\tolerance=500                 % line break
+
+%%% typearea
+%\typearea[current]{current}
+
+%%% adjusting color scheme
+% old option gray interfered with same-name option of xcolor package, so changed it
+\if@tuhhbookdef@grayfonts%
+  \definecolor{tuhhbookdef_chapter}{named}{tuhh_black}
+  \definecolor{tuhhbookdef_section}{named}{tuhh_black}
+  \definecolor{tuhhbookdef_subsection}{named}{tuhh_black}
+  \definecolor{tuhhbookdef_subsubsection}{named}{tuhh_black}
+\else%
+  \definecolor{tuhhbookdef_chapter}{named}{tuhh_blue}
+  \definecolor{tuhhbookdef_section}{named}{tuhh_blue}
+  \definecolor{tuhhbookdef_subsection}{named}{tuhh_blue}
+  \definecolor{tuhhbookdef_subsubsection}{named}{tuhh_blue}
+\fi%
+
+%%% font definitions
+\newcommand*{\tuhhbookdef@fnt@titlepage}{\normalfont\sffamily\LARGE}
+
+%%% chapter, sections, subsections, ...
+\newcommand*{\tuhhbookdef@fnt@chapter}{\normalfont\sffamily\Huge\bfseries}
+\newcommand*{\tuhhbookdef@fnt@section}{\normalfont\sffamily\Large\bfseries}
+\newcommand*{\tuhhbookdef@fnt@subsection}{\normalfont\sffamily\large\bfseries}
+\newcommand*{\tuhhbookdef@fnt@subsubsection}{\normalfont\sffamily\normalsize\bfseries}
+\setkomafont{chapter}{\tuhhbookdef@fnt@chapter\color{tuhhbookdef_chapter}}
+\setkomafont{section}{\tuhhbookdef@fnt@section\color{tuhhbookdef_section}}
+\setkomafont{subsection}{\tuhhbookdef@fnt@subsection\color{tuhhbookdef_subsection}}
+\setkomafont{subsubsection}{\tuhhbookdef@fnt@subsubsection\color{tuhhbookdef_subsubsection}}
+
+%%% header and footer
+\setkomafont{pageheadfoot}{\normalfont\scshape\normalcolor}
+\renewcommand*{\chaptermarkformat}{\thechapter\autodot\enskip}
+
+%%% section numbering until which level
+\setcounter{secnumdepth}{2}
+
+%%% math how to number equations, e.g., starting with 1 in a new chapter
+\numberwithin{equation}{chapter}
+
+%%% listings
+\lstset{%
+  language=C++,%
+  morekeywords={uint8_t,int8_t,uint16_t,int16_t,uint32_t,int32_t,uint64_t,int64_t},%
+  basicstyle=\scriptsize\ttfamily,%
+  commentstyle=\ttfamily\color{tuhh_darkgray},%
+  keywordstyle=\ttfamily\color{tuhh_darkblue},
+  stringstyle=\ttfamily\color{tuhh_darkred},
+  identifierstyle=\ttfamily\color{tuhh_black},
+  tabsize=3,%
+  xleftmargin=.5em,%
+  xrightmargin=.5em,%
+  frame=single,%
+  framesep=.6em,%
+  framerule=.4pt,%
+  aboveskip=1em,%
+  belowskip=1.5em,%
+  rulecolor=\color{\tuhh@bookdef@figBoxColor},
+  backgroundcolor=\color{\tuhh@bookdef@figBoxBG},%
+  captionpos=b,%
+  float,%
+  breaklines=true,%
+  breakatwhitespace,%
+  prebreak=\mbox{\tiny${}_\swarrow$},%
+  showstringspaces=false,%
+  lineskip=0pt%
+}
+
+
+%%%
+%%% INTERNAL VARIABLES
+%%%
+
+%%% extend the language tag database for local purposes
+%%% LANGUAGE: German
+\RequirePackage{tuhhlang}
+\if@german%
+    \def\TUHHLANG@Titlepage{Titelseite}
+    \def\TUHHLANG@TocName{Inhaltsverzeichnis}
+    \def\TUHHLANG@LofName{Abbildungsverzeichnis}
+    \def\TUHHLANG@LotName{Tabellenverzeichnis}
+\fi
+%%% LANGUAGE: English
+\if@english%
+    \def\TUHHLANG@Titlepage{Titlepage}
+    \def\TUHHLANG@TocName{Table of Contents}
+    \def\TUHHLANG@LofName{List of Figures}
+    \def\TUHHLANG@LotName{List of Tables}
+\fi
+
+%%% figure stuff
+\AtBeginDocument{
+  % do this only at the begin of the document, when textwidth is known
+  \newlength{\tuhh@bookdef@figBoxWidth}
+%Modify by JC 27.08.2020
+  \setlength{\tuhh@bookdef@figBoxWidth}{0.15\textwidth}
+}
+
+%%% bullets
+\def\tuhhbookdef@captionBulletType{copied}
+\def\tuhhbookdef@captionBulletColor{tuhh_darkturquoise}
+\def\tuhhbookdef@captionBulletCopyColor{tuhh_dirtycyan!35!tuhh_darkturquoise}
+\def\tuhhbookdef@captionBulletExpandColor{tuhh_darkturquoise}
+\def\tuhhbookdef@captionBulletChar{\small$\blacksquare$}
+\def\tuhhbookdef@captionBulletCopyChar{\scriptsize$\blacksquare$}
+\def\tuhhbookdef@captionBulletExpandChar{\scriptsize$\square$}
+
+
+%%%
+%%% INTERNAL COMMANDS
+%%%
+
+%%% figure stuff
+\newcommand{\tuhh@bookdef@figBoxBG}{tuhh_lightgray}
+\newcommand{\tuhh@bookdef@figBoxColor}{tuhh_gray}
+
+%%% bullets
+\newcommand{\tuhhbookdef@printCaptionBullet}{%
+  \ifthenelse{\equal{\tuhhbookdef@captionBulletType}{plain}}{%
+    \tuhhbookdef@printCaptionBulletPlain
+  }{%
+    \ifthenelse{\equal{\tuhhbookdef@captionBulletType}{copied}}{%
+      \tuhhbookdef@printCaptionBulletCopied
+    }{%
+      \ifthenelse{\equal{\tuhhbookdef@captionBulletType}{expanded}}{%
+        \tuhhbookdef@printCaptionBulletExpanded
+      }{%
+        \ClassError{\tuhh@ClassName}{bullet type '\tuhhbookdef@captionBulletType' unknown}
+      }%
+    }%
+  }%
+}
+
+%% print plain bullet using bulletChar and bulletColor
+\newcommand{\tuhhbookdef@printCaptionBulletPlain}{%
+  \textcolor{\tuhhbookdef@captionBulletColor}{\tuhhbookdef@captionBulletChar}%
+  \hskip0.5ex
+}
+
+%% print plain bullet using captionBulletChar and captionBulletColor
+%% and above it - on the lower left - a copy using captionBulletCopy{Char|Color}
+\newcommand{\tuhhbookdef@printCaptionBulletCopied}{%
+  \raise0.1ex\hbox{\textcolor{\tuhhbookdef@captionBulletColor}{\tuhhbookdef@captionBulletChar}}%
+  \hskip-2ex%
+  \raise-0.2ex\hbox{\textcolor{\tuhhbookdef@captionBulletCopyColor}{\tuhhbookdef@captionBulletCopyChar}}%
+  \hskip0.55em
+}
+
+%% print plain bullet using captionBulletChar and captionBulletColor
+%% and above it - on the lower left - an expanded bullet using captionBulletExpand{Char|Color}
+\newcommand{\tuhhbookdef@printCaptionBulletExpanded}{%
+  \raise0.1ex\hbox{\textcolor{\tuhhbookdef@captionBulletColor}{\tuhhbookdef@captionBulletChar}}%
+  \hskip-2ex%
+  \raise-0.2ex\hbox{\textcolor{\tuhhbookdef@captionBulletExpandColor}{\tuhhbookdef@captionBulletExpandChar}}%
+  \hskip0.3em
+  \hskip0.1cm
+}
+
+
+%%%
+%%% GLOBAL VARIABLES
+%%%
+
+
+%%%
+%%% GLOBAL COMMANDS
+%%%
+
+%%% print bullets before earch caption
+\renewcommand*{\figureformat}{\tuhhbookdef@printCaptionBullet~\figurename~\thefigure%
+  \autodot%
+}
+
+\renewcommand*{\tableformat}{\tuhhbookdef@printCaptionBullet~\tablename~\thetable%
+  \autodot%
+}
+
+\renewcommand*{\lstlistingname}{\tuhhbookdef@printCaptionBullet~Listing}
+
+%%%
+%%% Command: \setcaptionbullettype
+%%% sets the bullet type used in figure, table, and listing captions
+%%%
+\newcommand{\setcaptionbullettype}[1]{%
+  \def\tuhhbookdef@captionBulletType{#1}%
+}
+
+%%%
+%%% Command: \tuhhbibliography
+%%%
+\if@english%
+  \def\tuhhDefaultBSTStyle{tuhhalpha}
+\else
+  \if@german%
+    \def\tuhhDefaultBSTStyle{tuhhalphadin}
+  \else
+    \def\tuhhDefaultBSTStyle{tuhhalpha}
+  \fi
+\fi
+\newcommand{\tuhhbibliography}[2][\tuhhDefaultBSTStyle]{%
+  \begin{singlespacing}
+    \small\frenchspacing%
+    \bibliographystyle{#1}
+    \bibliography{#2}
+  \end{singlespacing}
+}
+
+% COMMAND \fignoframe[altcap]{filename}{caption}{label}
+% full width figure without a frame
+\newcommand{\fignoframe}[4][\empty]{%
+\begin{figure}[tp]%
+  \begin{minipage}{\tuhh@bookdef@figBoxWidth}\begin{center}%
+    \vspace*{1em}%
+    \includegraphics{#2}%
+  \end{center}\end{minipage}%
+  \ifthenelse{\equal{#1}{\empty}}{%
+    \caption{#3\label{#4}}%
+  }{%
+    \caption[#1]{#3\label{#4}}%
+  }
+\end{figure}%
+}
+
+% COMMAND \fig[altcap]{filename}{caption}{label}
+% full width figure with frame and inner spacing
+\newcommand{\fig}[4][\empty]{%
+\begin{figure}[tp]%
+  \centering%
+  \fboxsep=0.02\textwidth%
+  \fcolorbox{\tuhh@bookdef@figBoxColor}{\tuhh@bookdef@figBoxBG}{%
+    \begin{minipage}{\tuhh@bookdef@figBoxWidth}\begin{center}%
+     %\vspace*{-0.1cm}%
+      \includegraphics{#2}%
+     %\vspace*{-0.1cm}%
+    \end{center}\end{minipage}
+  }%
+  \ifthenelse{\equal{#1}{\empty}}{%
+    \caption{#3\label{#4}}%
+  }{%
+    \caption[#1]{#3\label{#4}}%
+  }
+\end{figure}%
+}
+
+% COMMAND \fignoframe{filename}{caption}{label}
+% full width figure with frame, but without inner spacing
+\newcommand{\fignospacing}[4][\empty]{
+  \begin{figure}[tp]%
+    \centering%
+    \fboxsep=0cm%
+    \fcolorbox{\tuhh@bookdef@figBoxColor}{\tuhh@bookdef@figBoxBG}{%
+      \includegraphics{#2}%
+    }%
+  \ifthenelse{\equal{#1}{\empty}}{%
+    \caption{#3\label{#4}}%
+  }{%
+    \caption[#1]{#3\label{#4}}%
+  }
+  \end{figure}%
+}
+
+% box for subfigures
+\newcommand{\subfigbox}[4][\empty]{
+  \begin{figure}[tp]%
+    \centering%
+    \fboxsep=0.02\textwidth%
+    \fcolorbox{\tuhh@bookdef@figBoxColor}{\tuhh@bookdef@figBoxBG}{\begin{minipage}{\tuhh@bookdef@figBoxWidth}\begin{center}%
+      %\vspace*{-0.1cm}%
+      #2%
+      %\vspace*{-0.1cm}%
+      \end{center}\end{minipage}}%
+  \ifthenelse{\equal{#1}{\empty}}{%
+    \caption{#3\label{#4}}%
+  }{%
+    \caption[#1]{#3\label{#4}}%
+  }
+  \end{figure}%
+}
+
+\makeatother
+\endinput

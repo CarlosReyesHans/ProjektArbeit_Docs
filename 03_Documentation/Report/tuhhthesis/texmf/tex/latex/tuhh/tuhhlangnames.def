@@ -1,0 +1,138 @@
+%%
+%% This is file 'tuhhlangnames.def'
+%%
+%% Copyright 2009 Christoph Weyer
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+%\makeatletter
+%
+\def\tuhh@FileName{tuhhlangnames}
+\def\tuhh@FileDesc{TUHH common names}
+\def\tuhh@FileVersion{0.1}
+
+\ProvidesFile{\tuhh@FileName}[%
+  File \tuhh@FileName%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer, 2009^^J]
+
+
+%%% LANGUAGE: German
+\if@german%
+    \def\TUHHLANG@University{Technische Universit\"at Hamburg}
+    \def\TUHHLANG@PhonePrefix{+49 40 / 428 78}
+
+
+    \def\TUHHLANG@InstAutomationSystems{Institut f\"ur Automatisierungstechnik}
+    \def\TUHHLANG@InstVisionSystems{Institut f\"ur Bildverarbeitungssysteme}
+    \def\TUHHLANG@InstHighFrequencyTechnology{Institut f\"ur Hochfrequenztechnik}
+    \def\TUHHLANG@InstCommunicationNetworks{Institut f\"ur Kommunikationsnetze}
+    \def\TUHHLANG@InstEasternEurope{Koordinationsstelle Osteuropa/GUS-Staaten}
+    \def\TUHHLANG@InstMeasurementTechnology{Institut f\"ur Messtechnik}
+    \def\TUHHLANG@InstMicrosystemTechnology{Institut f\"ur Mikrosystemtechnik}
+    \def\TUHHLANG@InstTelecommunications{Institut f\"ur Nachrichtentechnik}
+    \def\TUHHLANG@InstNanoelectronics{Institut f\"ur Nanoelektronik}
+    \def\TUHHLANG@InstNumericalSimulation{Institut f\"ur Numerische Simulation}
+    \def\TUHHLANG@InstOpticalCommunicationTechnology{Institut f\"ur Optische Kommunikationstechnik}
+    \def\TUHHLANG@InstOpticalElectronicMaterials{Institut f\"ur Optische und Elektronische Materialien}
+    \def\TUHHLANG@InstComputerTechnology{Institut f\"ur Rechnertechnologie}
+    \def\TUHHLANG@InstControlSystems{Institut f\"ur Regelungstechnik}
+    \def\TUHHLANG@InstSecurity{Institut f\"ur Sicherheit in verteilten Anwendungen}
+    %\def\TUHHLANG@InstSmartPort{Institut smartPORT}
+    %\def\TUHHLANG@InstSmartPort{Exzellenzkolleg | Arbeitsgruppe smartPORT}
+    \def\TUHHLANG@InstSmartPort{Arbeitsgruppe smartPORT}
+    \def\TUHHLANG@InstSoftwareSystems{Institut f\"ur Softwaresysteme}
+    \def\TUHHLANG@InstTelematics{Institut f\"ur Telematik}
+    \def\TUHHLANG@InstElectromagneticsTheory{Institut f\"ur Theoretische Elektrotechnik}
+    \def\TUHHLANG@InstReliableComputing{Institut f\"ur Zuverlässiges Rechnen}
+
+    %%%
+    \def\TUHHLANG@InstSchoolOfEEIT{Studiendekanat ET\,/\,IT}
+
+    %%% For cooperations of Telematics and Communication Networks:
+    \def\TUHHLANG@InstTelematicsCommunicationNetworks{Institute f\"ur Telematik und f\"ur Kommunikationsnetze}
+
+\fi
+
+%%% LANGUAGE: English
+\if@english%
+    \def\TUHHLANG@University{Hamburg University of Technology}
+    \def\TUHHLANG@PhonePrefix{+49 40 / 428 78}
+
+
+    \def\TUHHLANG@InstAutomationSystems{Institute of Automation Systems}
+    \def\TUHHLANG@InstVisionSystems{Institute of Vision Systems}
+    \def\TUHHLANG@InstHighFrequencyTechnology{Institute of High Frequency Technology}
+    \def\TUHHLANG@InstCommunicationNetworks{Institute of Communication Networks}
+    \def\TUHHLANG@InstEasternEurope{Coordination Center Eastern Europe}
+    \def\TUHHLANG@InstMeasurementTechnology{Department of Measurement Technology}
+    \def\TUHHLANG@InstMicrosystemTechnology{Institute of Microsystem Technology}
+    \def\TUHHLANG@InstTelecommunications{Institute of Telecommunications}
+    \def\TUHHLANG@InstNanoelectronics{Institute of Nanoelectronics}
+    \def\TUHHLANG@InstNumericalSimulation{Institute of Numerical Simulation}
+    \def\TUHHLANG@InstOpticalCommunicationTechnology{Institute of Optical Communication Technology}
+    \def\TUHHLANG@InstOpticalElectronicMaterials{Institute of Optical and Electronic Materials}
+    \def\TUHHLANG@InstComputerTechnology{Institute of Computer Technology}
+    \def\TUHHLANG@InstControlSystems{Institute of Control Systems}
+    \def\TUHHLANG@InstSecurity{Institute of Security in Distributed Applications}
+    %\def\TUHHLANG@InstSmartPort{Institute smartPORT}
+    %\def\TUHHLANG@InstSmartPort{College of Excellence | Research Group smartPORT}
+    \def\TUHHLANG@InstSmartPort{Research Group smartPORT}
+    \def\TUHHLANG@InstSoftwareSystems{Institute of Software Systems}
+    \def\TUHHLANG@InstTelematics{Institute of Telematics}
+    \def\TUHHLANG@InstElectromagneticsTheory{Institute of Electromagnetics Theory}
+    \def\TUHHLANG@InstReliableComputing{Institute of Reliable Computing}
+
+    %%%
+    \def\TUHHLANG@InstSchoolOfEEIT{School of EE\,/\,IT}
+
+%%% For cooperations of Telematics and Communication Networks:
+    \def\TUHHLANG@InstTelematicsCommunicationNetworks{Institutes of Telematics and of Communication Networks}
+
+\fi
+
+\def\TUHHLANG@CodeInstAutomationSystems{E--1}
+\def\TUHHLANG@CodeInstVisionSystems{E--2}
+\def\TUHHLANG@CodeInstHighFrequencyTechnology{E--3}
+\def\TUHHLANG@CodeInstCommunicationNetworks{E--4}
+\def\TUHHLANG@CodeInstEasternEurope{CIS-NISE--5}
+\def\TUHHLANG@CodeInstMeasurementTechnology{E--6}
+\def\TUHHLANG@CodeInstMicrosystemTechnology{E--7}
+\def\TUHHLANG@CodeInstTelecommunications{E--8}
+\def\TUHHLANG@CodeInstNanoelectronics{E--9}
+\def\TUHHLANG@CodeInstNumericalSimulation{E--10}
+\def\TUHHLANG@CodeInstOpticalCommunicationTechnology{E--11}
+\def\TUHHLANG@CodeInstOpticalElectronicMaterials{E--12}
+\def\TUHHLANG@CodeInstComputerTechnology{E--13}
+\def\TUHHLANG@CodeInstControlSystems{E--14}
+\def\TUHHLANG@CodeInstSecurity{E--15}
+\def\TUHHLANG@CodeInstSoftwareSystems{E--16}
+\def\TUHHLANG@CodeInstTelematics{E--17}
+\def\TUHHLANG@CodeInstElectromagneticsTheory{E--18}
+\def\TUHHLANG@CodeInstReliableComputing{E--19}
+
+\def\TUHHLANG@CodeInstSmartPort{E--EXK2}
+
+\def\TUHHLANG@CodeInstTelematicsCommunicationNetworks{E--17, E--4}
+
+%%%
+%%% Global Commands
+%%%
+
+%% command to printout the correct University name
+\def\TUHHUniversity{\tuhh@printTag{University}}
+
+%% commands to printout the correct Institute name
+\def\TUHHInstTelecommunications{\tuhh@printTag{InstTelecommunications}}
+\def\TUHHInstTelematics{\tuhh@printTag{InstTelematics}}
+\def\TUHHInstTelematicsCommunicationNetworks{\tuhh@printTag{InstTelematicsCommunicationNetworks}}
+
+
+%\makeatother
+\endinput
+

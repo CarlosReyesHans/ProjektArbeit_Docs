@@ -1,0 +1,102 @@
+%%
+%% This is file 'tuhhcommon.sty'
+%%
+%% Copyright 2011 Christoph Weyer and Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhcommonstyloaded\relax \endinput\else\let\tuhhcommonstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhcommon.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhcommon@PackageName{tuhhcommon}
+\def\tuhhcommon@PackageDesc{TUHH common definitions}
+\def\tuhhcommon@PackageVersion{0.1}
+\def\tuhhcommon@PackageFullVersion{\tuhhcommon@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhcommon@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhcommon@PackageFullVersion\space\tuhhcommon@PackageDesc]
+\typeout{Package \tuhhcommon@PackageName, \csname ver@\tuhhcommon@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christoph Weyer and Christian Renner, 2007-\svnfileyear^^J}
+
+%%% using key/value pairs as options to packages and classes
+\RequirePackage{kvoptions}
+
+\SetupKeyvalOptions{%
+  family=tuhhcommon,
+  prefix=@tuhhcommon@
+}
+
+\DeclareDefaultOption{%
+  \PackageWarning{\tuhhcommon@PackageName}{Unknown option '\CurrentOption'}%
+}
+
+\ProcessKeyvalOptions*\relax
+
+%%%
+%%% CONFIGURATION
+%%%
+\RequirePackage{hyperref}
+
+%%%
+%%% INTERNAL VARIABLES
+%%%
+
+%%%
+%%% INTERNAL COMMANDS
+%%%
+
+%%%
+%%% GLOBAL VARIABLES
+%%%
+
+%%%
+%%% GLOBAL COMMANDS
+%%%
+
+%%%
+%%% Command: \TODO and \markTODO
+%%%
+% better include tikz-todo package (which is much nicer!)
+%\usepackage[colorinlistoftodos]{todonotes}
+\newcommand{\TODO}[1]{\textit{\colorbox{tuhh_lightgray}{#1}}\markTODO}
+\newcommand{\markTODO}{\marginline{\textcolor{red}{\texttt{TODO}}}}
+
+%%%
+%%% Command: \keyword
+%%%
+\newcommand{\keyword}[1]{\textsl{#1}}
+
+%%%
+%%% Command: \cmd
+%%%
+\newcommand{\cmd}[1]{\texttt{#1}}
+
+%%%
+%%% Command: \file
+%%%
+\newcommand{\file}[1]{\textsl{#1}}
+
+%%%
+%%% Command: \zB \ZB \dH \DH
+%%%
+\newcommand{\zB}{\texorpdfstring{\mbox{z.\,B.}}{z.B.}\xspace}
+\newcommand{\ZB}{\texorpdfstring{\mbox{Z.\,B.}}{Z.B.}\xspace}
+\renewcommand{\dh}{\texorpdfstring{\mbox{d.\,h.}}{d.h.}\xspace}
+\newcommand{\Dh}{\texorpdfstring{\mbox{D.\,h.}}{D.h.}\xspace}
+
+\makeatother
+\endinput

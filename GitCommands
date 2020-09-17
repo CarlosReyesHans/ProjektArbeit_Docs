@@ -71,16 +71,36 @@ git merge --no-ff develop	//now feature has incorporated the updated version of 
 **************************************************************
 Before changing to any other branch when the modifications are not yet ready
 
-git stash
-After having shown what was needed and being again in the initial branch, 
-	to recover what was previously stashed
-git stash pop
+	git stash
+	After having shown what was needed and being again in the initial branch, 
+		to recover what was previously stashed
+	git stash pop
 
-Before commiting or discarding some changes
+	Before commiting or discarding some changes
 
-git diff 
+	git diff 
 
-git reset --hard is not recommended better use git stash
+	git reset --hard is not recommended better use git stash
+
+	git stash list >> shows the stash stack
+	
+	When stashing it is more convenient to use messages:
+	git stash save "this is a short description for stash"
+	
+	Select which version of the stash to pop or apply
+	git stash pop stash@{X}
+
+**************************************************************
+*	To Go back to a previous commited point of the branch
+**************************************************************
+	
+	git stash				//if there is not-committed modifications 
+	git log --oneline		//to see all commits in the branchline
+	git checkout <commit hash>
+	
+	git revert <unwanted commit hash>	//if the current branch needs to be reverted to a desired state.
+	
+	git checkout -b new_branch_name	//if a new branch is willed to be create from the detached HEAD commit stash
 
 
 
@@ -113,17 +133,7 @@ $ clip < ~/.ssh/id_rsa.pub
 
 git config push.default matching # whenever is needed to match names	
 
-**************************************************************
-*	To Go back to a previous commited point of the branch
-**************************************************************
-	
-	git stash				//if there is not-committed modifications 
-	git log --oneline		//to see all commits in the branchline
-	git checkout <commit hash>
-	
-	git revert <unwanted commit hash>	//if the current branch needs to be reverted to a desired state.
-	
-	git checkout -b new_branch_name	//if a new branch is willed to be create from the detached HEAD commit stash
+
 
 **************************************************************
 *	To filter big files in a branch

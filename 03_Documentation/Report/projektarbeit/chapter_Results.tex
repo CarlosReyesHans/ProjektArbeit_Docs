@@ -1,0 +1,60 @@
+\chapter{Results}\label{cha:results}
+
+In this chapter it is presented a set* of evidences from the final results. And it is summarized the challenges and further improvements that can be considered in later versions of the \emph{Axis Communication Hub}.
+
+\section{Photographic evidences*}
+\begin{description}
+\item[Wireshark trace] **Insert captures of the EtherCAT frames/datagrams for initialization or a change of state INIT-OP
+\item[TwinCAT] **Insert a capture of XAE showing the EtherCAT Slave within the EtherCAT tree. Moreover, the data types declared in SText to update in free-run mode the values sent by the Slave device.
+\item[Board peripherals] The figure that shows two LED strips and 10 temperature sensor connected to the Board. **inserts the figure**
+\end{description}
+
+\section{Challenges and accomplishments}\label{sec:challenges}
+\subsection{LED Control}
+
+An open point which did not represent an obstacle for the project, but keeps the door open to further improvement is the possibility of using more than one channel per PWM generator. The reason was this was not implemented lays on the time required for testing. The straightforward option is use one DMA channel and one PWM Channel per ring, as the MCU host contains several DMA channels* *here comes a reference to a table* this does not represent a problem. Nonetheless, it could be argued that with the same PWM X generator more channels could be controlled if they are updated in a row; this is, updating the Y number of LEDs within the Ring1 using DMA stream attached to PWM X, then switching the channel to CH+1 and, using the same DMA stream, update the Ring 2 and so on. This approach would imply apparently longer times but if the Rings are taken as a fraction of the same buffer then it's the same time*. This could also lead to the discussion about using two streams at the same time for a total of 8 Rings with only two PWM generators and two DMA streams, since they rely on independent hardware -one of the main characteristics of the DMA modules-. The optimization of this LEDs control is not part of the scope of this project but the following links resulted interesing.*add the link*
+
+*Mention the priority of the functionalities << important, maybe in introduction
+
+\subsection{Temperature acquisition}
+
+*here comes the problematic about the parasistic power supply* and the polling of the hardware status, this means, there is more space for improvement with YIELD or timeouts from OS funcitons.***
+
+
+\subsection{SOES}
+
+Understand the variations between Little/Big Endian within buses. That the library is based on polling by one by one the unique FIFO register of the ESC, such that the PDOs can be written and read in the PD RAM, as it was thought that a direct access to the RAM would permit the User Address Space of the MCU to be extended and the access then would be transparent for manipulating the data,  and that the SM would permit only the safe access from the Master device to read/write the same address space. It could be then understood that there is a significant delay that van be even measure, that in some papers is determined as "Stack Delay" which in this case *Reference the paper of the design of the communication/delay analysis*.
+The advantages of reducing it through the implementation of the SQI or the HSI interface -which at the end does not have that much purpose since for achieving less delays the FPGA or ASIC maybe implemented-. The question, is it still sensible to develop EtherCAT devices with this approach or should it be switched completely to the FPGA and ASIC approach. An analysis considering costs and other things could be then carried out. ***
+**Making available the Szstem Interrupt Controller without polling would also increase the performance of the application, this can be aimed in next versions where physically the the pins are connected to the Host MCU.
+**A brief analysis of the bandwidht achieved as the bandwidth necessarz to make sensible a change of PDI would make sensce, since the HBI****reference to internet or anz specification of HBI*** is mainly foucsed to Board-To-Board connections or communication between ASICS, hence  4Gbps per pin die-to-die connectivity with low latency may not be needed at all *https://www.synopsys.com/designware-ip/interface-ip/die-to-die.html**.
+**Important to mention is the HBI only helps exchanging process data, so it could be implemented for applications where data chunks are needed to be transmitted at high bandwidth since it is a direct fifo access to the ESC's SRAM.
+**Here should be also commented the problems by reading and writing, mainly writting due to the noisy medium (cabling).
+
+\subsection{State Machines and RTOS}
+\subsection{PCB and hardware}
+\subsection{Challenges}
+The overall functionalities of the PCB were achieved from the first attempt, leaving only one disadvantage that appeared until the tests for the readout of temperature sensors were in the final stage. According to the library integration process commented in ~\ref{sec:temperature}, during the first month a rather simplistic approach was coded to have access to the temperature values. The final library that was included made use of the UART peripheral in a full duplex mode, which means that two independant pins were explicetely needed, namely RX and TX. Since, within the first approach only one GPIO was being driven, the current physical routing of the board was not appropiate to test properly the one-wire communication. Nonetheless, arrangements werd carried out to use the UART RX/TX pins available in the JTAG connector. This approach was marely for testing and will be corrected in any further development out of the scope of this Project Research.
+
+\subsubsection{SPI communication}
+During the final tests some communication errors appeared that were tracked back to the following conditions: %TODO Investigate if this can be called failure modes
+\begin{description}
+    \item[Voltage drops] The on-board Low-Dropout voltage regulator* LDO that provided 3.3 V had random failures, where 
+    the output voltage was from 3.28 to 3.29 V. This caused that the LAN9252 chip was not always ready to work as intended. 
+    This behaviour increased from not-happening to failed completely to start. The mentioned condition obly affected the ESC functionalities,
+    whereas the host MCU worked realiably. To revert this failure mode, an external 3.3V power source was used to continue
+    the current tests. 
+    \item[Noisy channels] While troubleshooting the communication problems mentioned above, an SPI communication
+    test was carried out, such that the effects of different configurations could be characterized. It was concluded that
+    the higher frequencies the SPI was set up, the greater communication faults appeared, leading to error states in the 
+    internal SMs. Moreover, even within rhe stable range, the higher frequencies were not implying shorter execution times.
+    A summary of this observations are presented in the table \ref{dummy}.  
+\end{description}
+Regarding the no-improvement of the execution time at a high-speed SPI configuration, the figure \ref{dummy} shows 
+a relatevely constant software delay within the words being sent over the SPI bus. Therefore, it does not matter how fast the
+words are sent, for this Software delay is always present *write the order of the delay*. This emergent characteristic of
+the system could be optimized as long as it is determined, whether its impact is critical on the overall throughput of the system.
+The reader should take into consideration the rather small amount of data and the refresh speed of the overall system. However, this
+could be a stating point for improvement of the SOES stack, for those SW delays can be approached by using a fixed sending buffer
+through DMA instead of the usage of the native* API functions that send word by word. A further evaluation of the worthiness*
+of the library changes may be needed.*
+The above mentioned challanges are addressed within the proposals for improvement presented in the section \ref{sec:improve}.

@@ -1,0 +1,401 @@
+%%
+% TUHH Chapter style file, derived from fncychap
+%
+% author: Bernd-Christian Renner
+%         Institute of Telematics
+%         Hamburg University of Technology
+%
+
+% TODO
+% * numbers 1-6 and letters A-C are the only ones having an adjusted box frame => update remainder
+%
+
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesPackage{tuhhchap}
+             [2008/08/19 v0.1
+                 LaTeX package (Revised chapters)]
+
+%%%% package requirements
+\RequirePackage{tuhhgraphics}
+
+%\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+%\usetikzlibrary{patterns}
+
+
+% tile pattern
+%\pgfdeclarepatterninherentlycolored{TUHH tile}
+%{\pgfqpoint{-1mm}{-1mm}}{\pgfpoint{6mm}{6mm}}
+%{\pgfpoint{5mm}{5mm}}
+%{
+%  \pgfsetfillcolor{tuhh_turquoise}
+%  \pgfpathrectangle{\pgfqpoint{.7mm}{.7mm}}{\pgfpoint{2.8mm}{2.8mm}}
+%  \pgfusepath{fill}
+%}
+
+
+%%%% For conditional inclusion of color
+\newif\ifusecolor
+\usecolorfalse
+
+
+
+%%%% DEFINITION OF Chapapp variables
+\newcommand{\CNV}{\huge\bfseries}
+\newcommand{\ChNameVar}[1]{\renewcommand{\CNV}{#1}}
+
+
+%%%% DEFINITION OF TheChapter variables
+\newcommand{\CNoV}{\huge\bfseries}
+\newcommand{\ChNumVar}[1]{\renewcommand{\CNoV}{#1}}
+
+\newif\ifUCN
+\UCNfalse
+\newif\ifLCN
+\LCNfalse
+\def\ChNameLowerCase{\LCNtrue\UCNfalse}
+\def\ChNameUpperCase{\UCNtrue\LCNfalse}
+\def\ChNameAsIs{\UCNfalse\LCNfalse}
+
+%%%%% Fix for AMSBook 971008
+
+\@ifundefined{@chapapp}{\let\@chapapp\chaptername}{}
+
+
+%%%%% Fix for Bjarne and appendix 980211
+
+\newif\ifinapp
+\inappfalse
+%\renewcommand\appendix{\par
+%  \setcounter{chapter}{0}%
+%  \setcounter{section}{0}%
+%  \inapptrue%
+%  \renewcommand\@chapapp{\appendixname}%
+%  \renewcommand\thechapter{\@Alph\c@chapter}}
+
+%%%
+%%% Environment: tuhhappendix
+%%%
+\newenvironment{tuhhappendix}{%
+  \appendix
+  \inapptrue%
+}{%
+}
+
+
+%%%%% Fix for frontmatter, mainmatter, and backmatter 040920
+
+\@ifundefined{@mainmatter}{\newif\if@mainmatter \@mainmattertrue}{}
+
+%%%%%
+
+
+
+\newcommand{\FmN}[1]{%
+\ifUCN
+   {\MakeUppercase{#1}}\LCNfalse
+\else
+   \ifLCN
+      {\MakeLowercase{#1}}\UCNfalse
+   \else #1
+   \fi
+\fi}
+
+
+%%%% DEFINITION OF Title variables
+\newcommand{\CTV}{\Huge\bfseries}
+\newcommand{\ChTitleVar}[1]{\renewcommand{\CTV}{#1}}
+
+\newcommand{\ATV}{\large\bfseries}
+\newcommand{\ChAppendixVar}[1]{\renewcommand{\ATV}{#1}}
+
+
+%%%% DEFINITION OF the basic rule width
+\newlength{\RW}
+\setlength{\RW}{1pt}
+\newcommand{\ChRuleWidth}[1]{\setlength{\RW}{#1}}
+
+\newif\ifUCT
+\UCTfalse
+\newif\ifLCT
+\LCTfalse
+\def\ChTitleLowerCase{\LCTtrue\UCTfalse}
+\def\ChTitleUpperCase{\UCTtrue\LCTfalse}
+\def\ChTitleAsIs{\UCTfalse\LCTfalse}
+\newcommand{\FmTi}[1]{%
+\ifUCT
+   {\MakeUppercase{#1}}\LCTfalse
+\else
+   \ifLCT
+      {\MakeLowercase{#1}}\UCTfalse
+   \else {#1}
+   \fi
+\fi}
+
+
+
+\newlength{\mylen}
+\newlength{\myhi}
+\newlength{\px}
+\newlength{\py}
+\newlength{\pyy}
+\newlength{\pxx}
+
+
+\def\mghrulefill#1{\leavevmode\leaders\hrule\@height #1\hfill\kern\z@}
+
+\newcommand{\DOCH}{%
+  \CNV\FmN{\@chapapp}\space \CNoV\thechapter
+  \par\nobreak
+  \vskip 20\p@
+  }
+\newcommand{\DOTI}[1]{%
+    \CTV\FmTi{#1}\par\nobreak
+    \vskip 40\p@
+    }
+\newcommand{\DOTIS}[1]{%
+    \CTV\FmTi{#1}\par\nobreak
+    \vskip 40\p@
+    }
+
+% color setup (box fill)
+\newcommand{\ChapBoxColor}{tuhh_lightgray}
+
+
+%%%%%% TUHH chapters fancy
+\DeclareOption{fancy}{%
+  %% make fancy stuff only in PDF mode
+  \ifpdf
+    \ChNameVar{\normalfont\sffamily\Large}
+    \ChNumVar{\normalfont\sffamily\fontsize{58}{58}\bfseries}
+    \ChTitleVar{\normalfont\sffamily\Huge\bfseries}
+    \ChRuleWidth{.4pt}
+    \pgfdeclareimage[height=1.5cm]{chapPic}{chap/tuhhchap-chapter}
+%
+    \renewcommand{\DOCH}{%
+      \begin{tikzpicture}[remember picture, overlay]
+        \node[anchor=north west, inner sep=0, outer sep=0] at (0, 1.5) {\pgfuseimage{chapPic}};
+        \fill[opacity=0.35, pattern=TUHH tile] (0, 0) rectangle +(\paperwidth, 1.5);
+        \fill[fill=tuhh_turquoise!50!tuhh_darkturquoise, opacity=0.65] (0, 0) rectangle +(\paperwidth, 1.5);
+        \fill[fill=tuhh_darkturquoise, opacity=.2] (2, 0) rectangle +(6, 1.5);
+        \fill[fill=tuhh_darkturquoise, opacity=.2] (3.5, 0) rectangle +(1, 1.5);
+        \fill[fill=tuhh_darkturquoise, opacity=.2] (3.7, 0) rectangle +(0.6, 1.5);
+        \fill[fill=tuhh_darkturquoise, opacity=.2] (9, 0) rectangle +(6.5, 1.5);
+        \fill[fill=tuhh_darkturquoise, opacity=.2] (11.5, 0) rectangle +(3.8, 1.5);
+        \fill[fill=tuhh_darkturquoise, opacity=.2] (\textwidth-1.2cm, 0) rectangle +(1.2, 1.5);
+        \coordinate (CHAP) at (\textwidth,-0.7pt);
+        \begin{scope}
+          \clip (0, -1.4pt) rectangle +(\paperwidth, -0.2);
+          \fill[fill=tuhh_black] (0,0) rectangle +(\paperwidth,-0.2);
+          \node[inner sep=0, outer sep=0, anchor=base east] at (CHAP) {\textcolor{tuhh_white}{\CNV\@chapapp\space\CNoV\thechapter}};
+        \end{scope}
+        \begin{scope}
+          \clip (0, 0) rectangle +(\paperwidth, 1.5);
+  %        \node[inner sep=0, outer sep=0, base left=of CHAP, opacity=1] {\textcolor{tuhh_white}{\CNV\@chapapp\space\CNoV\thechapter}};
+          \node[inner sep=0, outer sep=0, anchor=base east, opacity=1] at (CHAP) {\textcolor{tuhh_white}{\CNV\@chapapp\space\CNoV\thechapter}};
+        \end{scope}
+      \end{tikzpicture}}
+  \fi
+
+    \renewcommand{\DOTI}[1]{%
+      \chapterheadstartvskip{
+      \normalfont\sectfont\size@chapter
+      \par\nobreak\vskip.5\baselineskip
+      {\raggedsection \interlinepenalty \@M #1\par}}%
+      \nobreak\chapterheadendvskip}
+
+    \renewcommand{\DOTIS}[1]{%
+      \chapterheadstartvskip{
+      \normalfont\sectfont\size@chapter
+      \par\nobreak\vskip.5\baselineskip
+      {\raggedsection \interlinepenalty \@M #1\par}}%
+      \nobreak\chapterheadendvskip}
+ }
+
+
+\DeclareOption{plain}{%
+
+% five new lengths 
+\newlength{\bl}                           %  bottom left   : orig \space
+\setlength{\bl}{6pt}
+\newcommand{\BL}[1]{\setlength{\bl}{#1}}
+\newlength{\br}                           %  bottom right  : orig 1pt
+\setlength{\br}{1pt}
+\newcommand{\BR}[1]{\setlength{\br}{#1}}
+\newlength{\tl}                           %  top left      : orig 2pt
+\setlength{\tl}{2pt}
+\newcommand{\TL}[1]{\setlength{\tl}{#1}}
+\newlength{\trr}                           %  top right      :orig 1pt 
+\setlength{\trr}{1pt}
+\newcommand{\TR}[1]{\setlength{\trr}{#1}}
+\newlength{\blrule}                           %  top right      :orig 1pt 
+\setlength{\trr}{0pt}
+\newcommand{\BLrule}[1]{\setlength{\blrule}{#1}}
+
+%  \ChNameVar{\fontsize{14}{16}\usefont{OT1}{phv}{m}{n}\selectfont}
+%  \ChNumVar{\fontsize{60}{62}\usefont{OT1}{ptm}{m}{n}\selectfont}
+  \ChNameVar{\normalfont\sffamily\Large}
+  \ChNumVar{\normalfont\sffamily\fontsize{60}{62}\bfseries}
+  \ChTitleVar{\normalfont\sffamily\Huge\bfseries}
+  \ChRuleWidth{.4pt}
+  \renewcommand{\DOCH}{%
+%%%%%%%                                   tweaks for 1--9 and A--Z
+\ifcase\c@chapter\relax%
+\or\BL{-3pt}\TL{0pt}\BR{-4pt}\TR{-10pt}%1
+\or\BL{0pt}\TL{-1pt}\BR{2pt}\TR{-5pt}%2
+\or\BL{0pt}\TL{-1pt}\BR{-1pt}\TR{-5pt}%3
+\or\BL{0pt}\TL{8pt}\BR{-1pt}\TR{-5pt}%4
+\or\BL{0pt}\TL{0pt}\BR{-2pt}\TR{-3pt}%5
+\or\BL{-1pt}\TL{0pt}\BR{-1pt}\TR{-5pt}%6
+\or\BL{0pt}\TL{-3pt}\BR{2pt}\TR{-2pt}%7
+\or\BL{0pt}\TL{-3pt}\BR{2pt}\TR{-2pt}%8
+\or\BL{0pt}\TL{-3pt}\BR{-4pt}\TR{-2pt}%9
+\or\BL{-3pt}\TL{-3pt}\BR{2pt}\TR{-7pt}%10
+\or\BL{-6pt}\TL{-6pt}\BR{0pt}\TR{-9pt}%11
+\or\BL{-6pt}\TL{-6pt}\BR{2pt}\TR{-7pt}%12
+\or\BL{-5pt}\TL{-5pt}\BR{0pt}\TR{-9pt}%13
+\or\BL{-6pt}\TL{-6pt}\BR{0pt}\TR{-9pt}%14
+\or\BL{-3pt}\TL{-3pt}\BR{3pt}\TR{-6pt}%15
+\or\BL{-3pt}\TL{-3pt}\BR{3pt}\TR{-6pt}%16
+\or\BL{-5pt}\TL{-3pt}\BR{-8pt}\TR{-6pt}%17
+\or\BL{-5pt}\TL{-5pt}\BR{0pt}\TR{-9pt}%18
+\or\BL{-3pt}\TL{-3pt}\BR{-6pt}\TR{-9pt}%19
+\or\BL{0pt}\TL{0pt}\BR{0pt}\TR{-5pt}%20
+\fi
+
+\ifinapp\ifcase\c@chapter\relax%
+\or\BL{0pt}\TL{8pt}\BR{4pt}\TR{-12pt}%A
+\or\BL{0pt}\TL{-1pt}\BR{-4pt}\TR{-7pt}%B
+\or\BL{-3pt}\TL{1pt}\BR{-2pt}\TR{-10pt}\BLrule{0pt}%C
+\or\BL{0pt}\TL{-5pt}\BR{-3pt}\TR{-8pt}\BLrule{0pt}%D
+\or\BL{0pt}\TL{-5pt}\BR{2pt}\TR{-3pt}%E
+\or\BL{0pt}\TL{-5pt}\BR{-10pt}\TR{-1pt}%F
+\or\BL{-3pt}\TL{0pt}\BR{0pt}\TR{-7pt}%G
+\or\BL{0pt}\TL{-5pt}\BR{3pt}\TR{-1pt}%H
+\or\BL{0pt}\TL{-5pt}\BR{3pt}\TR{-1pt}%I
+\or\BL{2pt}\TL{0pt}\BR{-3pt}\TR{1pt}%J
+\or\BL{0pt}\TL{-5pt}\BR{3pt}\TR{-1pt}%K
+\or\BL{0pt}\TL{-5pt}\BR{2pt}\TR{-19pt}%L
+\or\BL{0pt}\TL{-5pt}\BR{3pt}\TR{-1pt}%M
+\or\BL{0pt}\TL{-5pt}\BR{-2pt}\TR{-1pt}%N
+\or\BL{-3pt}\TL{-2pt}\BR{-3pt}\TR{-11pt}%O
+\or\BL{0pt}\TL{-5pt}\BR{-9pt}\TR{-3pt}%P
+\or\BL{-3pt}\TL{-2pt}\BR{-3pt}\TR{-11pt}%Q
+\or\BL{0pt}\TL{-5pt}\BR{4pt}\TR{-8pt}%R
+\or\BL{-2pt}\TL{-2pt}\BR{-2pt}\TR{-7pt}%S
+\or\BL{-3pt}\TL{0pt}\BR{-5pt}\TR{4pt}\BLrule{8pt}%T
+\or\BL{-7pt}\TL{-11pt}\BR{-5pt}\TR{-7pt}\BLrule{0pt}%U
+\or\BL{-14pt}\TL{-5pt}\BR{-14pt}\TR{-1pt}\BLrule{14pt}%V
+\or\BL{-10pt}\TL{-9pt}\BR{-13pt}\TR{-3pt}\BLrule{7pt}%W
+\or\BL{0pt}\TL{-5pt}\BR{3pt}\TR{-1pt}\BLrule{0pt}%X
+\or\BL{-6pt}\TL{-4pt}\BR{-7pt}\TR{1pt}\BLrule{7pt}%Y
+\or\BL{0pt}\TL{-5pt}\BR{3pt}\TR{-1pt}\BLrule{0pt}%Z
+\fi\fi
+%%%%%%%
+    \settowidth{\px}{\CNV\FmN{\@chapapp}}
+    \addtolength{\px}{\tl}
+    \settoheight{\py}{\CNV\FmN{\@chapapp}}
+    \addtolength{\py}{1pt}
+
+    \settowidth{\mylen}{\CNV\FmN{\@chapapp}\space\CNoV\thechapter}
+    \addtolength{\mylen}{\trr}
+    \settowidth{\pxx}{\CNoV\thechapter}
+    \addtolength{\pxx}{-2pt}
+
+    \settoheight{\pyy}{\CNoV\thechapter}
+    \addtolength{\pyy}{0pt}
+    \setlength{\myhi}{\pyy}
+    \addtolength{\myhi}{-1\py}
+    \par
+    \setlength{\fboxsep}{0.04pt}
+    %\colorbox[gray]{.95}{%
+    \colorbox{\ChapBoxColor}{%
+    \parbox[b]{\textwidth}{%
+    \rule[\py]{\RW}{\myhi}%
+    \hskip -\RW%
+    \rule[\pyy]{\px}{\RW}%
+    \hskip -\px%
+    \raggedright%
+    \CNV\FmN{\@chapapp}\rule{\blrule}{\RW}\hskip\bl\CNoV\thechapter%
+    \hskip\br%
+    \mghrulefill{\RW}%
+    \rule{\RW}{\pyy}\par\nobreak%
+    \vskip -\baselineskip%
+    \vskip -\pyy%
+    \hskip \mylen%
+    \mghrulefill{\RW}\par\nobreak%
+    \vskip \pyy}}%
+    \vskip 24\p@}
+%    \colorbox{\ChapBoxColor}{\rule{0pt}{40pt}\parbox[b]{\textwidth}{\hfill}}}%
+
+  \renewcommand{\DOTI}[1]{%
+    \raggedright
+    \CTV\FmTi{#1}\par\nobreak
+    \vskip 40\p@}
+
+  \renewcommand{\DOTIS}[1]{%
+    \raggedright
+    \ATV\FmTi{#1}\par\nobreak
+    \vskip 40\p@}
+ }
+
+
+
+
+
+%%%%%%% DEFAULT DEF
+
+\DeclareOption*{%
+  \PackageWarning{tuhhchapter}{unknown style option}
+}
+
+\ProcessOptions* \relax
+
+\ifusecolor
+  \RequirePackage{color}
+\fi
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter%%%%% Fix for frontmatter, mainmatter, and backmatter 040920
+        \DOCH
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \if@mainmatter%%%%% Fix for frontmatter, mainmatter, and backmatter 060424
+      \ifinapp%
+        \DOTIS{#1}%
+      \else%
+        \DOTI{#1}%
+      \fi
+    \else%
+      \DOTIS{#1}%
+    \fi
+  }}
+
+
+%%% Two-column handling
+%% DISABLED by weyer in order to allow scrhack
+%\def\@schapter#1{%
+%\if@twocolumn%
+%  \@makeschapterhead{#1}%
+%\else%
+%  \@makeschapterhead{#1}%
+%  \@afterheading%
+%\fi}
+
+%%% End: To avoid problem with scrbook.cls (fncychap version 1.32)
+\def\@makeschapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    %% WEYER move the beginning of non fancy chapters up
+    \vspace*{-10em}\DOTIS{#1}
+    \vskip 40\p@
+  }}
+
+\endinput
+
+

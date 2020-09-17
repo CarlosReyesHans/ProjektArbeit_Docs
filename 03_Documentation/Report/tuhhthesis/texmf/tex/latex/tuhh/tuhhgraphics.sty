@@ -1,0 +1,277 @@
+%%
+%% This is file 'tuhhgraphics.sty'
+%%
+%% Copyright 2009 Christian Renner
+%%
+%% This file is part of the TUHH-Script-bundle.
+%%
+%% This system is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%%
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+\ifx \tuhhgraphicsstyloaded\relax \endinput\else\let\tuhhgraphicsstyloaded\relax\fi
+
+\NeedsTeXFormat{LaTeX2e}[2009/09/24]
+\RequirePackage{svn-multi}[2011/08/20]
+\svnid{$Id: tuhhgraphics.sty 42772 2019-06-28 12:21:48Z ti5cw $}
+
+\makeatletter
+
+\def\tuhhgraphics@PackageName{tuhhgraphics}
+\def\tuhhgraphics@PackageDesc{TUHH graphics definitions, mostly a TikZ toolkit}
+\def\tuhhgraphics@PackageVersion{0.1}
+\def\tuhhgraphics@PackageFullVersion{\tuhhgraphics@PackageVersion\space(rev\space\svnfilerev)}
+
+\ProvidesPackage{\tuhhgraphics@PackageName}[%
+  \svnfileyear/\svnfilemonth/\svnfileday\space%
+  v\tuhhgraphics@PackageFullVersion\space\tuhhgraphics@PackageDesc]
+\typeout{Package \tuhhgraphics@PackageName, \csname ver@\tuhhgraphics@PackageName.sty\endcsname%
+  ^^J\@spaces\@spaces\@spaces\@spaces\space\space
+  Copyright (C) Christian Renner, 2009-\svnfileyear^^J}
+
+
+\DeclareOption*{%
+  \PackageWarning{\tuhhgraphics@PackageName}{Unknown option '\CurrentOption'}%
+}
+\ProcessOptions\relax
+
+%% we need TUHH colors and fonts
+\RequirePackage{tuhhcolor}
+\RequirePackage{tuhhfonts}
+
+%% workaround for pgf breaking pdf
+%% MUST be before loading tikz
+% \AtEndDocument{\clearpage}
+%% workaround that was actually committed to pgf repo
+%% http://pgf.cvs.sourceforge.net/viewvc/pgf/pgf/generic/pgf/utilities/pgfutil-latex.def?r1=1.19&r2=1.20
+\AtEndDocument{\par\vfil\penalty-10000\relax}
+
+%% and TikZ
+% suppress warnings about dvips does not support fadings
+\RequirePackage[safe]{silence}
+\WarningFilter{pgf}{Your graphic driver pgfsys-dvips.def does not support fadi}
+\RequirePackage{tikz}
+\usetikzlibrary{patterns,shadows,calc}
+
+%\SafeMode % important to switch back to safe mode
+
+%% we also need some branching
+\RequirePackage{ifthen}
+
+
+%%%
+%%% Local Variables
+%%%
+
+%%% Used length parameters
+\newlength{\tuhhgraphics@shadowLen}
+\newlength{\tuhhgraphics@textShadowLen}
+\newlength{\tuhhgraphics@barHeightDiff}
+\newlength{\tuhhgraphics@barCurveLeftOffset}
+
+\setlength{\tuhhgraphics@shadowLen}{0.2cm}
+\setlength{\tuhhgraphics@textShadowLen}{0.6mm}
+\setlength{\tuhhgraphics@barHeightDiff}{0.2cm}
+\setlength{\tuhhgraphics@barCurveLeftOffset}{0.35\paperwidth}
+
+
+%%
+%% TikZ patterns
+%%
+
+% tile pattern
+\pgfdeclarepatternformonly{TUHH tile}
+{\pgfqpoint{-1mm}{-1mm}}{\pgfpoint{6mm}{6mm}}
+{\pgfpoint{5mm}{5mm}}
+{
+  \pgfpathrectangle{\pgfqpoint{.7mm}{.7mm}}{\pgfpoint{2.8mm}{2.8mm}}
+  \pgfusepath{fill}
+}
+
+% tiny tile pattern
+\pgfdeclarepatternformonly{TUHH tiny tile}
+{\pgfqpoint{-1mm}{-1mm}}{\pgfpoint{3mm}{3mm}}
+{\pgfpoint{2mm}{2mm}}
+{
+  \pgfpathrectangle{\pgfqpoint{.7mm}{.7mm}}{\pgfpoint{1.2mm}{1.2mm}}
+  \pgfusepath{fill}
+}
+
+%%
+%% TikZ styles
+%%
+
+% fading (glowing effect)
+% \tikzfading[name=fade out, inner color=transparent!0, outer color=transparent!100]
+
+% no automatic spacing between nodes (avoid any trouble with positioning)
+\tikzstyle{TUHH node} = [every node, node distance=0mm]
+
+% fonts
+\tikzstyle{TUHH font} = [TUHH node, color=tuhh_white, inner sep=0pt, outer sep=0pt]
+\tikzstyle{TUHH font shadow} = [TUHH node, color=tuhh_darkturquoise!60!tuhh_black, opacity=.75, inner sep=0pt, outer sep=0pt, transform canvas={xshift=\tuhhgraphics@textShadowLen,yshift=-\tuhhgraphics@textShadowLen}]
+
+% tuhh bars (those turquoise ones with the little squares inside)
+\tikzstyle{TUHH fill east lighted} = [right color=tuhh_turquoise, left color=tuhh_darkturquoise, draw=none]
+\tikzstyle{TUHH fill west lighted} = [right color=tuhh_darkturquoise, left color=tuhh_turquoise, draw=none]
+%
+\tikzstyle{TUHH fading} = [fill=tuhh_darkturquoise, opacity=.6, draw=none]
+%WEYER \tikzstyle{TUHH south fading} = [path fading=south, TUHH fading]
+%WEYER \tikzstyle{TUHH north fading} = [path fading=north, TUHH fading]
+\tikzstyle{TUHH south fading} = [TUHH fading]
+\tikzstyle{TUHH north fading} = [TUHH fading]
+%
+\tikzstyle{TUHH tile overlay} = [TUHH node, pattern=#1, pattern color=tuhh_turquoise, opacity=0.1, draw=none]%, fill = tuhh_turquoise]
+%
+\tikzstyle{TUHH pattern shiny ne} = [preaction={TUHH fill east lighted}, TUHH north fading, postaction={TUHH tile overlay=#1}]
+\tikzstyle{TUHH pattern shiny nw} = [preaction={TUHH fill west lighted}, TUHH north fading, postaction={TUHH tile overlay=#1}]
+\tikzstyle{TUHH pattern shiny se} = [preaction={TUHH fill east lighted}, TUHH south fading, postaction={TUHH tile overlay=#1}]
+\tikzstyle{TUHH pattern shiny sw} = [preaction={TUHH fill west lighted}, TUHH south fading, postaction={TUHH tile overlay=#1}]
+%
+%WEYER \tikzstyle{TUHH circle fading} = [path fading={circle with fuzzy edge 10 percent}, draw=none]
+\tikzstyle{TUHH circle fading} = [draw=none]
+\tikzstyle{TUHH circle background} = [fill=tuhh_darkturquoise, draw=none, TUHH circle fading]
+\tikzstyle{TUHH circle overlay} = [TUHH node, pattern=lines tuhh dark, opacity=0.1, draw=none, TUHH circle fading]
+\tikzstyle{TUHH circle shadow} = [fill=tuhh_darkturquoise!60!tuhh_black, draw=none]
+\tikzstyle{TUHH circle} = [preaction={TUHH circle shadow}, preaction={TUHH circle background}, TUHH tile overlay=#1]
+
+% shadows
+\tikzstyle{TUHH shadow} = [TUHH node, fill=tuhh_black, draw=none, opacity=.3]
+%WEYER \tikzstyle{TUHH shadow up}   = [TUHH shadow, path fading=north]
+\tikzstyle{TUHH shadow up}   = [TUHH shadow]
+%WEYER \tikzstyle{TUHH shadow down} = [TUHH shadow, path fading=south]
+\tikzstyle{TUHH shadow down} = [TUHH shadow]
+
+% a box
+%\tikzstyle{TUHH textbox} = [TUHH node, fill=tuhh_lightgray, minimum width=18cm, anchor=center, color=tuhh_black, font=\normalsize]
+
+
+% if we are using beamer, tiny tiles are required, otherwise use the larger ones
+\@ifclassloaded{beamer}{%
+    \def\tuhhgraphics@tile{TUHH tiny tile}
+}{%
+    \def\tuhhgraphics@tile{TUHH tile}
+}
+
+
+%%
+%% commands
+%%
+
+% draw text with shadow
+% #1 options
+% #2 text
+\def\textshadowed[#1]#2;{
+    \node[TUHH font shadow, #1] {#2};
+    \node[TUHH font, #1] {#2};
+}
+
+% header/footer bars
+% #1: "l" or "r" to select the position of the lighter shading
+% #2: top left corner
+% #3: bottom right corner
+\newcommand{\tuhhgraphics@drawBar}[3]{%
+    \ifthenelse{\equal{#1}{north east}}{%
+        \filldraw[TUHH pattern shiny ne=\tuhhgraphics@tile] (#2) rectangle (#3);
+    }{}
+    \ifthenelse{\equal{#1}{north west}}{%
+        \filldraw[TUHH pattern shiny nw=\tuhhgraphics@tile] (#2) rectangle (#3);
+    }{}
+    \ifthenelse{\equal{#1}{south east}}{%
+        \filldraw[TUHH pattern shiny se=\tuhhgraphics@tile] (#2) rectangle (#3);
+    }{}
+    \ifthenelse{\equal{#1}{south west}}{%
+        \filldraw[TUHH pattern shiny sw=\tuhhgraphics@tile] (#2) rectangle (#3);
+    }{}
+%
+    % FIXME \paperwidth should be replaced by actual length/width of bar
+    \filldraw[TUHH shadow down] (#2) rectangle +(\paperwidth,-\tuhhgraphics@shadowLen);
+    \filldraw[TUHH shadow up]   (#3) rectangle +(-\paperwidth,\tuhhgraphics@shadowLen);
+}
+
+
+% draw title page background
+% #1 optional title to be places into upper bar (header)
+\newcommand{\tuhhgraphics@drawTitlePageBackground}[1][tuhh@empty]{%
+    % TODO get rid of hard coded layout
+    % header
+    %\tuhhgraphics@drawBar{north east}{current page.north west}{$ (current page.north east) + (0,-2.0) $}
+    \begin{scope}[rotate=180]
+        \tuhhgraphics@drawCurvedBar%
+          {north east}%
+          {$ (current page.north west) + (-\paperwidth,0) $}%
+          {$ (current page.north west) + (0,2.0) $}%
+          {\tuhhgraphics@barHeightDiff}%
+          {\tuhhgraphics@barCurveLeftOffset}
+    \end{scope}
+    \ifthenelse{\equal{#1}{tuhh@empty}}{}{%
+        \textshadowed[at={($ (current page.north) + (0, -1.2cm) $)}] {\tuhhfontHuge{#1}};
+    }%
+
+    % footer
+    %\tuhhgraphics@drawBar{south west}{$ (current page.south west) + (0,3.0) $}{current page.south east}
+    \tuhhgraphics@drawCurvedBar
+      {south west}
+      {current page.south west}
+      {$ (current page.south east) + (0,3.0) $}
+      {\tuhhgraphics@barHeightDiff}
+      {\tuhhgraphics@barCurveLeftOffset}
+    \coordinate (FTLOGO) at ($ (current page.south east) + (-6.5,1.5) $);
+    \textshadowed[at={(FTLOGO)}, anchor=west]
+      {\hspace*{.6cm}\tuhhfontTUHH{T\hspace*{-.19mm}U\hspace*{-.19mm}H\hspace*{-.19mm}H}};
+    \textshadowed[at={($ (FTLOGO) + (0,0.45) $)}, anchor=east] {\tuhhfontNormal{\tuhh@printTag{\tuhhpreamble@institute}}};
+    \textshadowed[at={($ (FTLOGO) - (0,0.45) $)}, anchor=east] {\tuhhfontNormal{\TUHHUniversity}};
+}
+
+
+% draw title slide for presentations
+\newcommand{\tuhhgraphics@drawTitleSlide}{%
+}
+
+
+% draw a bar with a curve (lowered right top corner) at the top edge
+% #1 position of lighted portion, e.g., "south west"
+% #2 bottom left corner
+% #3 top right corner (without curve)
+% #4 offset to shift right top corner downwards
+% #5 offset of curve from left
+\newcommand{\tuhhgraphics@drawCurvedBar}[5]{%
+    \coordinate (cbLB) at (#2);
+    \coordinate (cbRT) at (#3);
+    \coordinate (cbRTLow) at ($(#3) + (0,-#4)$);
+    \coordinate (cbRB) at (cbLB -| cbRT);
+    \coordinate (cbLT) at (cbLB |- cbRT);
+    \coordinate (cbCV) at ($(cbLT) + (#5,-#4)$);
+
+    % draw inside scope to prevent clipping area being used outside the curved bar drawing
+    \begin{scope}
+        % set up top-curved clipping area
+        \clip (cbLB) -- (cbRB) -- (cbRTLow) .. controls (cbCV) .. (cbLT) -- cycle;
+
+        % draw the filled box
+        \ifthenelse{\equal{#1}{north east}}{%
+            \filldraw[TUHH pattern shiny ne=\tuhhgraphics@tile] (cbLB) rectangle (cbRT);
+        }{}
+        \ifthenelse{\equal{#1}{north west}}{%
+            \filldraw[TUHH pattern shiny nw=\tuhhgraphics@tile] (cbLB) rectangle (cbRT);
+        }{}
+        \ifthenelse{\equal{#1}{south east}}{%
+            \filldraw[TUHH pattern shiny se=\tuhhgraphics@tile] (cbLB) rectangle (cbRT);
+        }{}
+        \ifthenelse{\equal{#1}{south west}}{%
+            \filldraw[TUHH pattern shiny sw=\tuhhgraphics@tile] (cbLB) rectangle (cbRT);
+        }{}
+       \draw[line width=2pt, tuhh_darkturquoise, opacity=0.3] (cbRTLow) .. controls (cbCV) .. (cbLT);
+
+        % and the shadow
+        %WEYER \filldraw[fill=tuhh_black, path fading=fade out]
+        %WEYER    ($(cbRT)+(0,\tuhhgraphics@shadowLen)$) ellipse ({1.5\paperwidth} and {2\tuhhgraphics@shadowLen+#4});
+    \end{scope}
+}
+
+
+\makeatother
+\endinput
