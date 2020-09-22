@@ -1,5 +1,23 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
-\begin{thebibliography}{{Bec}20b}
+\begin{thebibliography}{{STM}19}
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Arm}20}]{cmsis_doc}
+{Arm Ltd}.
+\newblock {Real-Time Operating System: API and RTX Reference Implementation}.
+\newblock https://www.keil.com/pack/doc/CMSIS/RTOS2/html/index.html, April
+  2020.
+\newblock Last visited: 20/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{BB17}]{led_library}
+U.~{Becker} and M.~{Becker}.
+\newblock {Mikrocontroller}.
+\newblock https://mikrocontroller.bplaced.net/wordpress/, January 2017.
+\newblock Last visited: 20/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{BDL06}]{uppaal_tutorial}
+Gerd Behrmann, Alexandre David, and Kim~G Larsen.
+\newblock A tutorial on uppaal 4.0.
+\newblock {\em Department of computer science, Aalborg university}, 2006.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{Bec}13}]{beckhoff_automation}
 {Beckhoff Automation GmbH}.
@@ -68,6 +86,15 @@ M.~Felser.
 \newblock The fieldbus standards: History and structures.
 \newblock 2002.
 
+\bibitem[\textcolor{tuhh_color_bibkey}{{For}12}]{pcb_design_grounding}
+M.~{Fortunato}.
+\newblock {SUCCESSFUL PCB GROUNDING WITH MIXED-SIGNAL CHIPS - FOLLOW THE PATH
+  OF LEAST IMPEDANCE}.
+\newblock
+  https://www.maximintegrated.com/en/design/technical-documents/tutorials/5/5450.html,
+  October 2012.
+\newblock Last visited: 17/09/2020.
+
 \bibitem[\textcolor{tuhh_color_bibkey}{Gmb20}]{beckhoff_esccomparison}
 Beckhoff~Automation GmbH.
 \newblock {EtherCAT Slave Controller Overview}.
@@ -134,6 +161,23 @@ Sanghoon Ji, Donguk Yu, Hoseok Jung, and Hong~Seong Park.
 \newblock In Antoni Grau and Zhuping Wang, editors, {\em Industrial Robotics},
   chapter~6. IntechOpen, Rijeka, 2020.
 
+\bibitem[\textcolor{tuhh_color_bibkey}{{MAj}20}]{temp_library}
+T.~{MAjerle}.
+\newblock {LwOW Lightweight, platform independent library to interface 1-Wire
+  devices over UART protocol}.
+\newblock
+  https://majerle.eu/index.php/projects/lwow-one-wire-uart-communication,
+  January 2020.
+\newblock Last visited: 20/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Max}02}]{onewire_theory}
+{Maxim Integrated Products}.
+\newblock {USING A UART TO IMPLEMENT A 1-WIRE BUS MASTER}.
+\newblock
+  https://www.maximintegrated.com/en/design/technical-documents/tutorials/2/214.html,
+  September 2002.
+\newblock Last visited: 20/09/2020.
+
 \bibitem[\textcolor{tuhh_color_bibkey}{MGSR20}]{tsn_and_sdn}
 M.~A. {Metaal}, R.~{Guillaume}, R.~{Steinmetz}, and A.~{Rizk}.
 \newblock Integrated industrial ethernet networks: Time-sensitive networking
@@ -146,6 +190,13 @@ C.~{Mastalli}, I.~{Havoutis}, M.~{Focchi}, D.~G. {Caldwell}, and C.~{Semini}.
 \newblock Motion planning for quadrupedal locomotion: Coupled planning, terrain
   mapping, and whole-body control.
 \newblock {\em IEEE Transactions on Robotics}, pages 1--14, 2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Mik}20}]{led_protocol}
+{Mikrocontroller.net Artikelsammlung}.
+\newblock {WS2812 Ansteuerung}.
+\newblock https://www.mikrocontroller.net/articles/WS2812$\_$Ansteuerung,
+  January 2020.
+\newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{MLH{\etalchar{+}}17}]{middleware_xbotcore}
 L.~{Muratore}, A.~{Laurenzi}, E.~M. {Hoffman}, A.~{Rocchi}, D.~G. {Caldwell},
@@ -196,6 +247,14 @@ M.~{Norris}.
 \newblock https://rt-labs.com/products/ethercat/, January 2020.
 \newblock Last visited: 11/09/2020.
 
+\bibitem[\textcolor{tuhh_color_bibkey}{{SEG}20}]{rtos_segger}
+{SEGGER Microcontroller GmbH}.
+\newblock {What is SystemView?}
+\newblock
+  https://www.segger.com/products/development-tools/systemview/technology/what-is-systemview/,
+  April 2020.
+\newblock Last visited: 20/09/2020.
+
 \bibitem[\textcolor{tuhh_color_bibkey}{{Ser}18}]{sercos_tsn}
 {Sercos}.
 \newblock {Ethernet TSN heralds a new era of industrial communication}.
@@ -238,11 +297,27 @@ SERCOS Staff.
   January 2020.
 \newblock Last visited: 11/09/2020.
 
+\bibitem[\textcolor{tuhh_color_bibkey}{{STM}19}]{stm32f446_data}
+{STMicroelectronics NV}.
+\newblock {DS10693 Rev 7 STM32F446xC/E}.
+\newblock
+  https://www.st.com/en/microcontrollers-microprocessors/stm32f446.html,
+  October 2019.
+\newblock Last visited: 20/09/2020.
+
 \bibitem[\textcolor{tuhh_color_bibkey}{VZS19}]{future_iiot}
 S.~{Vitturi}, C.~{Zunino}, and T.~{Sauter}.
 \newblock Industrial communication systems and their future challenges:
   Next-generation ethernet, iiot, and 5g.
 \newblock {\em Proceedings of the IEEE}, 107(6):944--961, 2019.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Weg}19}]{stm32_dmaapp}
+J.~{Wegrzyn}.
+\newblock {OPTIMIZING RENDERING PERFORMANCE ON STM32 USING DMA2D}.
+\newblock
+  https://auto.siili.com/blog/optimizing-rendering-performance-on-stm32-using-dma2d,
+  March 2019.
+\newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{XJY11}]{ecat_sercos}
 Hu~Xing, Huan Jia, and Liu Yanqianga.

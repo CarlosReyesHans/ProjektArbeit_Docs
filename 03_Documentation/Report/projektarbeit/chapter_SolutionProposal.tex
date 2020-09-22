@@ -1,4 +1,5 @@
 \chapter{Solution proposal}\label{cha:solution}
+**Redaction style at 90/100
 
 This chapter is intended to give the reader a summary of the proposed solution and its structure, as well as 
 the technical specifications that were given and taken into account. Any other constraint not mentioned here 
@@ -25,7 +26,7 @@ This comparison helps as a good summary of the overall achievments that are furt
       \TRhc{1}{l}{PCB}                  & PCB Prototype\newline Layout and size: tbd   
                                         & Attachable PCB for LAN9252-EVB-SPI.\newline Size: 55mm$x$38mm & \tblYes\newline Second layout with both chips included posible in the short term. \\
       \TRh{1}{l}{Safety}                & \tblNA     
-                                        & Non-safety relevant for this prototype & \tblNo\newline SFoE could be researched in the long term.\\\TRc
+                                        & Non Safety-Critical for this prototype & \tblNo\newline SFoE could be researched in the long term.\\\TRc
       \TRhc{1}{l}{Extra interface}      & SPI or I2C interface for current/IMU/black channel   
                                         & Extra SPI considered in PCB and SW\newline JTAG/SWD compatible interface & \tblYes   \\
       \TRh{1}{l}{Speed/position}        & Possible interface of BISS-C type
@@ -42,11 +43,16 @@ This comparison helps as a good summary of the overall achievments that are furt
     \label{tbl:tech_specs}
   \end{tuhhtable}
 
-\section{Available Hardware}
+Regarding the safety feature of the device, it is important to mention that, even though this device is considered as non Safety-Critical within
+this prototyping stage, the means to create a framework that could be extended to address further reliable development are taken into account, namely
+by considering fault tolerance within the software. More comments about this will be done in the results section. 
+
+
+\section{Hardware}
 
 In this part it is presented the base hardware that was available to develop the prototype. The microcontroller (MCU) was chosen
 due to its active community, resources and current on-develop projects. Other MCUs were considered since the overall characteristics
-are somewhat similar and generic -regarding peripherals like serial interfaces or dma, processing power and memory, for instance-. 
+are somewhat similar and generic -regarding peripherals like serial interfaces or Direct Memory Access (DMA), processing power and memory, for instance-. 
 MCUs from Infineon \cite{infineon_esc}\cite{infineon_dramfine} and 
 Texas Instruments \cite{texasi_esc} were good possible candidates; however, the basic familiarity with the STM32CUBE IDE and the related ST technology 
 was a crucial factor, since the learning curve is not negligible when it comes to develop any firmware at a fair level, even more when it deals with other to-learn*
@@ -107,7 +113,7 @@ the developer has experience. The table \ref{tbl:hardware_characteristics} lists
     \label{fig:evalboards}
 \end{figure}
 
-\section{PCB proposal}
+\section{PCB proposal}\label{sec:pcb_proposal}
 As it can be seen in the Fig. \ref{subfig:lanboard}, the evaluation board counts with on-board male pins, this was taken as an advantage and the PCB to be designed
 consisted on a plugable PCB that would be mounted on top of it, increasing minimaly the volume already occupied by the evaluation board. This idea needed to be 
 designed taking into account the minimum of components based on the Nucleo-STM32F446ZE original design and the requirements of the LAN9252. This means that 
@@ -115,6 +121,8 @@ it had to provide, both 5V and 3.3 V power supply, physical ports for the priori
 according to the technical specifications \ref{tbl:tech_specs}.
 
 \section{Software structure}
+**Redaction style at 80/100
+
 The final proposal for the structure of the embedded system can be seen in fig. ~\ref{fig:sysStruct}. 
 The functional blocks represented in grey or dashed lines are mainly components that are planned not to be modified
 at all or not in deep, because of either its complexity or its given reliability. This means its functionality is almost granted. 

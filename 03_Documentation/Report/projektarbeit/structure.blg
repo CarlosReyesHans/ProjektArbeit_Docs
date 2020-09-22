@@ -9,45 +9,45 @@ Warning--string name "march" is undefined
 --line 93 of file thesis.bib
 Warning--empty booktitle in fieldbus_history
 Warning--empty booktitle in opc_tsn_application
-You've used 38 entries,
+You've used 48 entries,
             2545 wiz_defined-function locations,
-            733 strings with 10211 characters,
-and the built_in function-call counts, 13190 in all, are:
-= -- 1282
-> -- 570
-< -- 32
-+ -- 188
-- -- 185
-* -- 780
-:= -- 2133
-add.period$ -- 138
-call.type$ -- 38
-change.case$ -- 223
-chr.to.int$ -- 37
-cite$ -- 40
-duplicate$ -- 521
-empty$ -- 1063
-format.name$ -- 246
-if$ -- 2767
+            776 strings with 11768 characters,
+and the built_in function-call counts, 16105 in all, are:
+= -- 1575
+> -- 678
+< -- 40
++ -- 220
+- -- 216
+* -- 928
+:= -- 2599
+add.period$ -- 177
+call.type$ -- 48
+change.case$ -- 276
+chr.to.int$ -- 47
+cite$ -- 50
+duplicate$ -- 632
+empty$ -- 1308
+format.name$ -- 295
+if$ -- 3378
 int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 12
-newline$ -- 217
-num.names$ -- 116
-pop$ -- 338
+missing$ -- 13
+newline$ -- 276
+num.names$ -- 146
+pop$ -- 425
 preamble$ -- 1
-purify$ -- 261
+purify$ -- 324
 quote$ -- 0
-skip$ -- 451
+skip$ -- 559
 stack$ -- 0
-substring$ -- 442
-swap$ -- 79
-text.length$ -- 32
-text.prefix$ -- 25
+substring$ -- 513
+swap$ -- 89
+text.length$ -- 40
+text.prefix$ -- 33
 top$ -- 0
-type$ -- 304
+type$ -- 384
 warning$ -- 2
-while$ -- 105
-width$ -- 45
-write$ -- 515
+while$ -- 127
+width$ -- 51
+write$ -- 653
 (There were 3 warnings)

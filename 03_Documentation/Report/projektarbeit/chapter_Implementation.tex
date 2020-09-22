@@ -1,46 +1,73 @@
 \chapter{Implementation}\label{cha:implementation}
-
-The following chapter will documet the different functional modules that were implemented according to the proposal. Most of them interact with each other through the SMs, which has been added as well as a module for its understanding.
-
+The following chapter documents the different functional modules that were implemented according to the proposal. 
+Most of them interact with each other through the DSMs, which has been added as well as a module for its 
+understanding.
 
 \section{LED Control}\label{sec:leds}
+*Redaction style at 95/100
 
-The robot counts" with at least two LED rings that notify to the user the overall state of each access, this is considered only a visual aid which means that is not critical for the system. Currently there is a control for them using Arduino* devices. One of the goals of this prototype is to integrate the control of the LED rings within a single board; therefore, different apporaches were taken into account depending on the stages and experience in devloping on STM32 chips and its IDEs.
-The following stages were carried out:
-\subsection{Technical background}
-*Here comes one picture of the LED ring and a very brief description of the LED and its interface, is it interface or protocol?-> interface*
-Also a basic description of DMA in STM32
+In order to notify to the user the current state of each axis, the robot includes one or more LED rings. These rings are 
+ a serial array of LEDs that are programmed and controlled through a serial communication protocol. Basically, the final implementation
+ is an adaptation of a library that uses a PWM peripheral to generate a signal that is modulated according to the data that 
+ controls the LEDs, namely digital 1s, 0s and reset as a specific duty cycle. The input pin of the first LED is connected to the MCU and depending on the modulated data, it will be 
+ passed over the next LEDs, being the first LED's output the input of the next til the last component. A summary of the 
+ protocol is explained in ~\cite{led_protocol}. 
 
-\subsection{Development*}
+ In the next paragraphs a summary of the activities that were carried out during the implementation is presented.
+
 \begin{description}
 \item[First control tests] Learning the basics of the interface used to control one LED
-\item[Writing code for one LED control] Using the peripherals of the MCU, simple routines were written to set different basic colors in RGB. The peripherals used were a PWM channel and one timer to keep control of the timing.
-\item[Exploration of libraries] Once the basic communication was understood, it was clear that the usage of libraries would be more practical since the control demanded cofnigurable number of LEDs and updating all of them at once, even with the possibility of including effects. From this exploration around STM32, the codes were mainly divided in two types: libraries for 8/16 bits processors that whose main task was controlling the LEDs, and a pair of libraries that used DMA Module within 32-bit processor. The latter was divided into two different approaches, namely rewritting an unique buffer for only one PWM channel and another highly focused on performance by divinding a circular buffer and interrupting the main processor only to update parts of it as the data was sent.
-\item[First library selection] Due to the unexperience working with DMA modules and as the LED control was not of a high priority as the EtherCAT implementation, it was decided to run first one of the basic libraries to achieve a multi LED control and look for its adequating to the Axis Communication Board*.
-\item[Trial of adequation of the library into the SM task] *here comes the explanation of why that library did not match with a multitask apporach*
-\item[Second library selection] As the first library was able to control a set of 20 LEDs, some drawbacks were found in the approach, since the processor was focused only on polling Timers states. Event though, this first trial helped improving the overall understanding of the host MCU and the LEDs, it was not suitable to multi-tasking. Moreover, usage of DMA became clearer and it was decided to improve the approach by selecting a 32-bit processor based library. The Library* was then included and following the guidelines of the GNU* license it was modified to use two independant PWM generators -easily extendable* to four-. Furthermore, the main logic* of the library was divided such that its execution becomes non-sequential but triggered by events. The new interactions with other parts of the code can be seen in following subsections for SM*s.
+\item[Code for one LED control] Using the peripherals of the MCU simple routines were written to set different basic colors in RGB. 
+    The peripheral used were a two Timers (hardware libraries) to keep control of the data timing and refresh rate.
+\item[Search for libraries] Once the basic communication was understood, it was clear that the usage of libraries would be more practical,
+    since the first approach were not suitable for higher number of LEDs and effects; moreover, the CPU was kept busy while waiting 
+    the timer state polling. The libraries found were aiming roughly either 8/16 bits processors whose main task was controlling the LEDs, 
+    or more complex libraries that used DMA modules within 32-bit processor. One of the latter implemented modulation of the data over a PWM and a
+    DMA peripheral for one LED strip.
+\item[First library selection] Due to the inexperience working with DMA modules and as the LED control was not of a higher priority compared to other tasks, 
+    it was decided to run first one of the basic libraries to achieve a multi LED control. The implementation was able to control a set of 20 LEDs
+    with the processor mainly polling the Timer states.
+\item[Further control tests] Despite the success of the library with one channel, the overall structure of the basic library
+    was not easily portable to the proposed solution using FreeRTOS. Additionally, the DMA libraries showed afterwards being easier 
+    to modify as they were designed with a more abstracted and multi-purpose approach.
+\item[Second library selection] As the usage of DMA became clearer, it was decided to improve the approach by 
+selecting a 32-bit processor based library, that implemented only general control functions to avoid massive code lines
+related to effects and other rather unnecessary features, yet structured enough to be easily adapted. 
+The final result was based upon the WS2812 Library for STM32F4 from Uwe Becker, see \cite{led_library}. 
+    Main modifications were the addition of multiple channels capability and global flags needed for synchronizing with DSMs.
 \end{description}
-
 
 
 \section{Temperature acquisition}\label{sec:temperature}
+*Redaction style at 90/100
 
-\subsection{Technical background}
-*Here comes the image of the sensor, datasheet and summary of translating the one-wire protocol to usart*
-\subsection{Development}
+Similar to the LED control's library, the temperature readout needed a library to be modified to match the current project.
 \begin{description}
-\item[First readouts] Within the project's schedule this was the first set of test, so through them the IDE stm32cubei was learnt, along with the general configuration of the MCU. First trials* included set up of internal clocks, interruptions, GPIO basic usage, basic configuration of freeRTOS in STM32 *here comes a reference to a future subsection where the structure and relation of freeRTOS and CMSIS is explained*; as well as the introduction to the one-wire protocol. The first approach, similar to the one of the LED, was to understand the sensor and its protocol. Therefore, self written functions were tested based on peripherals, namely two timers, through which the timing of the data streams are controled as wel as the duration of ones and zeros. This approach worked as intended but it was knew from the beginning that does not match the multi-tasking and that further was needed. This implementation was able only to access in a generic way to the temperature conversion, and further functions were needed to access the sensor's ROM needed e.g. for identification.
-\item[Readouts as a task/FreeRTOS first tests] Short after the working code was used to do the first tests with the RTOS, in this manner the code was translated as a Task (Thread as used by CMSIS) and some features like prioritization, task attributes, task handling and signals were tested with other generic functions, e.g. clocks and pwm generators or blinking LEDs. *here could come a reference to the captures of signals and PWM being generated and interrupted*. However, this implementation was not able to handle multiple one-wire devices due to its abscense of CRC** comparison.
-\item[Integration of library] Finally, it was decided to adapt one open source library designed for STM32 processors. This is based on the principle that UART speeds @9600 and @11200 bps suits the One-Wire timing, such that the detection of One-Wire devices and communication process can be downloaded to hardware already included in many general-purposes processors using USART. The integration of this library is from design compatible with RTOS, namely with CMSIS-RTOS within the smt32cube development environment.
+\item[First readouts] Working with the temperature sensors was the first task in schedule, so it helped train the basic usage
+    of the IDE \emph{STM32Cube}, along with the hardware configuration of the MCU and the HAL libraries. 
+    The sensor uses a one-wire serial protocol, which similarly to LED Control's first approach was implemented by using 
+    timers for controlling 1s and 0s high levels, a continuous polling of data and a general while loop approach. 
+    This method worked as intended but it was known from the beginning that it would not match the multi-tasking proposal. 
+    However, it was of great importance to get to know the hardware and software, besides more functions were needed to 
+    access the sensor's ROM needed e.g. for identification.
+\item[FreeRTOS first tests] Short after the working code was used to do the first tests with the RTOS, 
+    in this manner the code was translated as a Task (Thread as called by CMSIS) and some features like prioritization, 
+    task attributes, task handling and signals were tested with other generic functions, e.g. clocks and PWM generators. 
+    However, this implementation was not able to handle multiple one-wire devices due to its absence of CRC comparison.
+\item[Integration of library] Finally, it was decided to adapt one open source library designed for STM32 processors. 
+    This is based on the principle that UART speeds @9600 and @11200 bps suits the One-Wire timing, such that the 
+    detection of One-Wire devices and communication process can be downloaded to hardware already included in many 
+    general-purposes processors using USART. The integration of this library is from design compatible with RTOS, 
+    namely with CMSIS-RTOS. The library selected was developed by Tilen MAJERLE, review in \cite{temp_library}, and it 
+    was barely modified as it contained already the desired functionalities and the development
+    focused only on the integration into the DSMs and usage of it. 
 \end{description}
 
-
-\section{Extra SPI Service/Auxiliar}\label{sec:spi}
-
-An extra SPI apart from the one that is used to interface the MCU host to the LAN9252 Evaluation Board was included in the design, mainly for comming applications and development that may include interface SPI sensors, for instance, IMU sensors. The DMA streams and pins had to be taken into account to avoid overlapping functions** with other functionalities.
-This section will also wrap the auxiliar functional block such that it can be addressed similarly to the proposed structure in Fig. ~\ref{fig:sysStruct}.
+The strategy the final library is based on is rather interesting and more details can be read in \cite{onewire_theory}.
 
 \section{EtherCAT Slave communication: SOES adaptation}\label{sec:soes}
+*Redaction style at 85/100
+
 This functional module is the one with highest priority, therefore most of the effort given was focused not only 
 on the library itself but the protocol and the hardware commissioning. Hence, this section was extended and divided
 as follows: first, more technical details are presented regarding the EtherCAT specification, such that the SOES
@@ -58,59 +85,12 @@ The reader may recall the set of Communication Profiles that are available withi
 are the main features with which the Axis Communication Board works. Leaving aside for future integration the FoE and EoE, the forme would make possible 
 update the device by sending a firmware binaries to the device's bootloade; whereas the latter would make the ACB* accessible for any IT tool based on TCP/IP.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{imgs/impl-dataframe.jpg}
-    \caption{EtherCAT Datagram within the Ethernet Frame. Source: ETG.1000.4 - EtherCAT frame structure.}
-    \label{fig:dataframe}
-\end{figure}
 
-\subsubsection{The data frame and the Synchronization Managers}
-Besides the challange of setting up the hardware and basic firmware for a correct data transmission between ESC and the host MCU; the description of the EtherCAT 
-Slave device is a task that demands, at least, a basic understanding of the data frame exchange and how the protocol demands its synchronization. From here on, the following
-topics are going to be summarized: Synchronization modes and managers.
-Whenever there are Real Time constraints, and the device takes part of a control loop, synchronization modes are needed to be set correctly between the Master and
-any Device present. For this task the Distributed Clocs (DC) are need to be synchronzied. [?][?] %ETG.1020 - Synchronization and ETG.2000 - DC
-
-There are three synchronization modes:  
-\begin{description}
-    \item[Free Run] Application is triggered by local clock and runs independently from EtherCAT cycle. 
-    \item[SM-Synchronous] Application is synchronized whenever there are process data being written to the Synchronization Manager 2 (SM2).
-    Moreover, any event generated by the Master is mapped onto an internal register or physically triggering an IRQ Pin of the ESC. 
-    \item[DM-Synchronous] Within this synchronization mode the frame jitter can be even reduce down to $ns$ and use two different synchronization
-    units within the ESC, namely the SM2 and SYNC/LATCH UNIT. 
-\end{description}
-
-The scope of this prototype covers the Freerun and SM-Synchronous mode, as they are the basic ones for communication Master-Slave. A graphical representation of them
-is shown in figure \ref{fig:syncmodes}.
-
-\begin{figure}[ht]
-    \centering
-    \subfigure[Free Run]{\label{subfig:syncm1}{\includegraphics[width=0.3\textwidth]{imgs/impl-sync1.jpg}}}\hfill
-    \subfigure[SM-Synchronization]{\label{subfig:syncm2}{\includegraphics[width=0.3\textwidth]{imgs/impl-sync2.jpg}}}\hfill
-    \subfigure[DC-Synchronization modes]{\label{subfig:syncm3}{\includegraphics[width=0.3\textwidth]{imgs/impl-sync3.jpg}}}
-    \caption{Synchronization modes defined in ETG.1000. Source [?]} %EtherCAT Device Protocol poster from EtherCAT resources
-    \label{fig:syncmodes}
-\end{figure} 
-
-SMXs (Synchronization Managers 1,2,3 ...) coordinate access to the ESC memory from both sides, EtherCAT and
-Host MCU (PDI). In case of process data communication it ensures that process data can
-always be written to the memory by EtherCAT and can always be read by PDI side and vice versa (3-buffer mode). SyncManager 2/3 length is equal
-to the Data Object lengths defined for receive and transmit data chunks respectively. [?] %ETG.1000.4 Sync manager
-The mapping of the process data objects within the Ethernet Frame can be seen in figure \ref{fig:dataframe} and \ref{fig:pdomapping}.
-The correct setup of the SMXs ensure the consistency of the data and needs to be linked correctly depending on the specifactions of each type of ESC,
- and SW Stack that are being used, this information is also linked to the CoE Object Dictionary (OD) and EtherCAT Slave Information (ESI) file.
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=.85\textwidth]{imgs/impl-dataframe_pdo.jpg}
-    \caption{Depending on the different states of the Slave, there will be different data frames being exchanged with the Master. 
-    The above one corresponds to the Proces Data Object which is updated continuosly by the SM2/3 during Operation State. Referece: 
-    ETG.1000.6-SDO}
-    \label{fig:pdomapping}
-\end{figure}
 
 
 \subsection{SOES}
+*Redaction style at 90/100
+
 %*Here comes the information about what SOES do, how is the license, what are the features that has already included, the futures that don't, how general it is, an image of its structure, the work that needs to be done*
 As briefly commented in section \ref{sec:openness}, the types of licenses allow open development and integration of software. 
 SOES software stack was written in C and published based upon the GPLv2, which is a Copyleft License. However, the tools developed 
@@ -153,7 +133,8 @@ will be dropped. The overall structure of the ASIC can be seen in \ref{fig:lan92
 \fignoframe{imgs/impl-lan-structure_s}{Internal structure of the LAN9252, highlighting the PDI which was selected for this application to be SPI}{fig:lan92struct}
 
 \subsection{Development}
-Once explained the general information regarding the Communication Profile, the library and the hardware, the following lines will enlist and
+*Redaction style at 70/100
+Once explained the general information regarding the Communication Profile, the library and the hardware, the following lines will list and
 expose some of the most relevant information during the integration. 
 
 \begin{description}
@@ -168,333 +149,161 @@ expose some of the most relevant information during the integration.
 \end{description}
 
 
-\section{Device's State Machines (DSMs)}
+\section{Device State Machines (DSMs)}\label{sec:statemachines}
+*Redaction style at 85/100
+% Guideline
+%     Introduction
+%     SMS and interaction    
+%     Synchronization approach, UPPAAL representation
+%     Introduce the SMs what things have to be taken into account for the scheduling and prioritization
 
-In order to have a deterministic behaviour of the embedded system, a set of State Machines (DSM to not be confused with Synchronization Manager) were proposed and implemented as part of the project library. 
-The DSMs follow a case comparator approach, since it was simple, yet effective and flexible enough, to work during the prototype. 
-This characteristics was very important, since the DSMs structures were in constant change as the integration of new libraries and the functionalities developed. 
-The proposed DSMs are as follows:
-
-\begin{description}
-\item[Event Handler] Its purpose is to react to notifications or errors that could appear within other SMs and update the state of the LED rings in accordance.
-
-\item[Temperature] Initializes and runs the temperature related functions.
-
-\item[ECAT] Initializes the EtherCAT communication and activates the SOES App. It is important to mention, that this DSM is rather a synchronization of two state machines,
-      in order to adapt the native infinite loop the SOES library is based on, to the DSMs of the system, see figure \ref{fig:soes_sms}. 
-
-\item[LED] Initializes and updates periodically the RGB value of the LED Rings.
-
-\end{description}
-
-***Here come all the SMs diagrams
-\begin{figure}[ht]
-  \centering
-  \subfigure[Synchronization state machine]{\label{subfig:ecat_sm}{
-      %General state machine 80/100
-      \begin{tikzpicture}[->,>=stealth']
-      % Position of QUERY 
-      % Use previously defined 'state' as layout (see above)
-      % use tabular for content to get columns/rows
-      % parbox to limit width of the listing
-      \node[state,
-          text width=3.2cm 	
-          ] (E_CONFIG) 
-      {\begin{tabular}{l}
-          \textbf{Config}\\[.1em]
-          \parbox{4cm}{
-          \textbf{entry:}\\
-          $spi\_init()$\\
-          $open\_soesPort()$\\
-          \textbf{exit:}
-          }
-      \end{tabular}};
-
-      % STATE START 
-      % Use previously defined 'state' as layout (see above)
-      % use tabular for content to get columns/rows
-      % parbox to limit width of the listing
-      \node[state,
-          text width=3.2cm,
-          above of = E_CONFIG,
-          node distance = 3.5cm,
-          anchor = center] (E_START) 
-      {\begin{tabular}{l}
-          \textbf{Start}\\[.1em]
-          
-      \end{tabular}};
-
-
-          
-      % State: ACK with different content
-      \node[state,    	% layout (defined above)
-          text width=3.2cm, 	% max text width
-          yshift=2cm, 		% move 2cm in y
-          right of=E_CONFIG, 	% Position is to the right of QUERY
-          node distance=5cm, 	% distance to QUERY
-          anchor=center] (E_CHCK) 	% posistion relative to the center of the 'box'
-      {%
-      \begin{tabular}{l} 	% content
-          \textbf{Check comm}\\[.1em]
-          \parbox{2.8cm}{
-              \textbf{entry:}\\
-              $timeout\_start()$
-              \textbf{exit:}\\
-              $resume\_SOES()$
-              }
-      \end{tabular}
-      };
-      
-      % STATE E_WAIT
-      \node[state,
-      text width=3.2cm,
-          %below of=ACK,
-          right of=E_CHCK,
-          yshift=-2cm,
-          node distance=5cm, 
-          anchor=center ] (E_WAIT) 
-      {%
-      \begin{tabular}{l}
-          \textbf{Waiting SOES}\\[.1em]
-          \parbox{2.8cm}{
-              \textbf{entry:}\\
-              $osWaitEvent()$\\
-              \textbf{exit:}
-              }
-      \end{tabular}
-      };
-      
-
-      
-      %STATE CONNECTED
-      \node[state,
-      text width = 3.2cm,
-      below of=E_WAIT,
-      xshift= 2.5cm,
-      node distance=4.5cm,
-      anchor=center] (E_CONNECTED) 
-      {%
-      \begin{tabular}{l}
-      \textbf{Connected}\\[.1em]
-      \parbox{4cm}{
-          \textbf{entry:}\\
-          $osResume(SOES)$\\[.1em]
-          $update\_state()$\\
-          \textbf{exit:}
-          }
-      \end{tabular}
-      };
-
-      % STATE E_FAULT
-      \node[state,
-          text width=3.2cm,
-          below of=E_WAIT,
-          xshift=-2.5cm,
-          node distance=4.5cm,
-          anchor=center] (E_FAULT) 
-      {%
-      \begin{tabular}{l}
-      \textbf{Fault}\\[.1em]
-      \parbox{4cm}{
-          \textbf{entry:}\\
-          $notify\_error()$\\
-          $osThreadRemove()$\\
-          \textbf{exit:}
-          }
-      \end{tabular}
-      };
-
-      %STATE RESTART
-      \node[state,
-      text width = 3.2cm,
-      left of=E_FAULT,
-      node distance=5cm,
-      %xshift = 2cm,
-      anchor=center] (E_RESTART) 
-      {%
-      \begin{tabular}{l}
-      \textbf{Restart}\\[.1em]
-      \parbox{4cm}{
-          \textbf{entry:}\\
-          $deInit_SPI()$\\[.1em]
-          $restartSOES$\\
-          $delay()$
-          }
-      \end{tabular}
-      };
-
-      % draw the paths and and print some Text below/above the graph
-      \path
-          (E_START)       edge node[anchor=center,left]{$os\_ready$}  (E_CONFIG) 
-          (E_CONFIG) 	    edge[bend left=20]  node[anchor=north,above]{$port\_ok$} (E_CHCK)
-          (E_CHCK)     	edge[bend left=20] node[anchor=north,right]{$Resume!$} (E_WAIT)
-          (E_WAIT)       	edge[bend left=10]  node[anchor=center,right]{$Comm?$}     (E_CONNECTED)
-          (E_WAIT)       	edge[bend right=10] node[anchor=center,left]{$soes\_timeout$}                                         (E_FAULT)
-          (E_CONNECTED)   edge            node[anchor=north,above]{$soes$}     
-                                          node[anchor=south,below]{$timeout$}(E_FAULT)
-          (E_CONNECTED)   edge[loop below]  node[anchor=center,below]{$update\_loop$}                   (E_CONNECTED)
-          (E_FAULT)  	    edge            node[anchor=north,above]{$thread$} 
-                                          node[anchor=center,below]{$removed?$}   (E_RESTART)
-          (E_RESTART)  	edge[bend left=30]  node[anchor=center,left]{$delay\_done$}                                          (E_CONFIG)
-          ;
-
-      \end{tikzpicture}
-  }}\hfill
-  \subfigure[SOES application state machine]{\label{subfig:soes_sm}{
-      %SOES state machine 80/100
-      \begin{tikzpicture}[->,>=stealth']
-      % STATE 1 SOES
-      % Use previously defined 'state' as layout (see above)
-      % use tabular for content to get columns/rows
-      % parbox to limit width of the listing
-      \node[state,
-          text width=3.2cm 	
-          ] (SOES_INIT1) 
-      {\begin{tabular}{l}
-          \textbf{Init1}\\[.1em]
-          \parbox{4cm}{
-          
-          $lib\_init()$\\
-          
-          }
-      \end{tabular}};
-          
-      % STATE SOES INIT 2
-      \node[state,    	% layout (defined above)
-          text width=3.2cm, 	% max text width
-          %yshift=2cm, 		% move 2cm in y
-          below of=SOES_INIT1, 	
-          node distance=3cm, 	% 
-          anchor=center] (SOES_INIT2) 	% posistion relative to the center of the 'box'
-      {%
-      \begin{tabular}{l} 	% content
-          \textbf{Init2}\\[.1em]
-          \parbox{2.8cm}{
-              $suspend\_thread()$\\
-              }
-      \end{tabular}
-      };
-
-      % STATE 0 SOES
-      % Use previously defined 'state' as layout (see above)
-      % use tabular for content to get columns/rows
-      % parbox to limit width of the listing
-      \node[state,
-          text width=3.2cm,
-          right of = SOES_INIT1,
-          node distance = 5cm,
-          anchor = center] (SOES_INIT0) 
-      {\begin{tabular}{l}
-          \textbf{Start}\\[.1em]
-          \parbox{4cm}{
-          
-          }
-      \end{tabular}};
-      
-      % STATE SET TIMER
-      \node[state,
-      text width=3.2cm,
-          %below of=ACK,
-          right of=SOES_INIT2,
-          %yshift=-2cm,
-          node distance=5cm, 
-          anchor=center ] (SOES_TIMER) 
-      {%
-      \begin{tabular}{l}
-          \textbf{Timer}\\[.1em]
-          \parbox{2.8cm}{
-              $osGetTick()$\\
-              $osStartTimeout()$
-              }
-      \end{tabular}
-      };
-      
-
-      
-      %STATE SLAVE LOOP
-      \node[state,
-      text width = 3.2cm,
-      right of=SOES_TIMER,
-      %xshift= 2.5cm,
-      node distance=5cm,
-      anchor=center] (SOES_SLAVE) 
-      {%
-      \begin{tabular}{l}
-      \textbf{Slave loop}\\[.1em]
-      \parbox{4cm}{
-          $eca\_slv()$\\
-          }
-      \end{tabular}
-      };
-
-      % STATE SOES_RESET TIMEOUT
-      \node[state,
-          text width=3.2cm,
-          below of=SOES_SLAVE,
-          xshift=-2.5cm,
-          node distance=3cm,
-          anchor=center] (SOES_RESET) 
-      {%
-      \begin{tabular}{l}
-      \textbf{Timeout Reset}\\[.1em]
-      \parbox{4cm}{
-          $reset\_Timeout()$\\
-          $osDelay()$\\
-          }
-      \end{tabular}
-      };
-
-      
-      draw the paths and and print some Text below/above the graph
-      \path
-      (SOES_INIT0)    edge node[anchor=center,above]{$Resume?$} (SOES_INIT1) 
-      (SOES_INIT1) 	edge  node[anchor=south,right]{$Comm!$}  (SOES_INIT2)
-      (SOES_INIT1)    edge [loop above]   node[anchor=east,above]{$no\_comm\_loop$} (SOES_INIT1)
-      (SOES_INIT2)    edge [loop below]   node[anchor=south,below]{$no\_eventFlag$} (SOES_INIT2)
-      (SOES_INIT2)    edge node [anchor=center,above]{$Resume?$} (SOES_TIMER)                                          (SOES_TIMER)
-      (SOES_TIMER)    edge                   (SOES_SLAVE)
-      (SOES_SLAVE)    edge [loop above]       node[anchor=center,above]{$no\_comm\_loop$}       (SOES_SLAVE)
-      (SOES_SLAVE)    edge [bend left = 50]   node[anchor=center,right]{$esc\_updated$}   (SOES_RESET)
-      (SOES_RESET)    edge [bend left = 50]   node[anchor=center,left]{$delay\_done$}   (SOES_TIMER)
-      ;
-
-      \end{tikzpicture}
-  }}
-  \caption{State machines for EtherCAT slave functionality} %EtherCAT Device Protocol poster from EtherCAT resources
-  \label{fig:soes_sms}
-\end{figure} 
-
-\subsection{Scheduling}
-All the SMs and two super states are implemented as Threads using CMSIS-RTOS on STM32. All threads have fixed priorities and the timeslot assigned to each Thread is control by a OS-native delay function, which allows the scheduler to allocate CPU resources to the next priority tasks. The only time constraint is defined as desired so it is no hard real time constraints* and the overall execution follows a best effort approach. This, however, opens the door to further improvement in the sense of characterizing the task durantion. For instance, since it is quite demanding to know the exact precise execution time of each Task and without that is not possible to think about optimizing the OS configuration -if required-, the following is a list of proposed activities that could take place in future stages of the project (out of scope)****. **This is related to a calculation of the Utilization factor that is helpful for more demanding design cases, e.g., while considering heat sinks for processors within enclosed devices.
+In order to have a deterministic behaviour of the embedded system, a set of State Machines (DSM) -not to be confused with Synchronization Manager- were proposed 
+and implemented as part of the project library. 
+The DSMs software implementation follows a case comparator approach, since it was simple, yet effective and flexible enough, 
+to work during the prototype. 
+These characteristics were very important, since the DSMs structures were in constant change as the integration of new libraries 
+and the functionalities developed. 
+The proposed DSMs are as follows and the diagrams can be reviewed in appendix \ref{cha:state_machines}.
 
 \begin{description}
-\item[Execution Time estimation per task] each task can be isolated by software and through adding a piece of code to toggle a free GPIO at the end of the thread, a signal can be traced with a fair digital analizer (**include example of one ). Omiting the rather small HAL overhead added with the GPIO control, an estimation could be achieved.
-\item[Live thread tracing]  a trace debugging like SEGGER SystemView**reference to fastbitlab** can be used to debug freeRTOS applications running on ARM Cortex Mx based Microcontroller such as STM32Fx. With this tool it could be possible to have at runtime a trace of the thread allocations, knowing in consequence the duration of the threads. **Further information regarding this methodology is needed.
-\item[Optimization of threads] By knowing the WCET of each thread an optimization of the utilization could be carried out by using differnet OS-native features to improve the scheduling, as long as the application demands it.
+\item[Event Handler] Its purpose is to react to notifications or errors that could appear within other DSMs and notify to update the LED rings in accordance.
+                    The approach of having defined this DSM was mainly thought for fault handling and will be the base for the inclusion of future features, e.g.,
+                    receiving commands or interruption requests from any of the interfaces. See in \ref{fig:sm_event}.
+\item[Temperature] Initializes and runs the temperature related functions. It relies primarily on the open-source library. See in \ref{fig:sm_temp}.
+\item[ECAT] Initializes the EtherCAT communication and activates the SOES App. It is important to mention, that this DSM is rather focused on synchronization 
+            with the SOES state machine. The latter changed as the development advanced, since the native infinite loop the SOES library is based on had to be adapted.
+            The two involved DSMs can be seen in \ref{fig:sm_ecatsoes}.
+\item[LED] Initializes and updates periodically the RGB value of the LED Rings. See in \ref{fig:sm_led}.
 \end{description}
 
+As to the representation of the DSM, it is important to consider the general two apporaches for Finite State Machines, namely Mealy and Moore, since both 
+of them provide advantages while abstracting the desire logic of the different functional blocks. In this rather practical approach the formalities are not fully
+met, for instance, to choose strictly for transitions dependent on the state and inputs with actions, but using exit actions as part of each state, when it is convenient.
+There are though transitions that explicitly executes a synchronization edge. This flexibility was opted due to the inherent interconnection of the DSMs
+as they are not fully independent. To meet a suitable representation, the previously said is integrated with the approach of \emph{UPPAAL} 
+software to model timed automata and the reader is invited to look it up in \cite{uppaal_tutorial}.
+As a summary, since the modelling of automata for real time systems demands a synchronization feature, this is represented and attached to the edges between 
+locations (location in the sense that a state is a location constrained to valuated time and other variables) with the symbols $?$ and $!$, the one* acting as 
+a wait action and the latter as a notification. Those, clearly can be understood as signals between different threads.
 
-**Here comes a table with the priority for each task**
 
-RAte monotonic oder deadline monotonic???
+\subsection{Scheduling}\label{sec:scheduling_intro}
+*Redaction style at 85/100
+%Guidelines
+% introduction
+% --------------------
+%     Mention the scheduling apporach of RTOS
+        
+%         List of proposed threads and description of them (only proposal)
+%         Priority based, fixed and not based on Execution times
+%            >> Time proposed for each one, mention that it is also configurable. 
+%           SPI speed calculation?
+%         This is a Table
+     
+% ---------------------This is in results-----------------------------------
+%     Problems in the implementation 
+%         Priority of each task + timer priority
+%             Solutions + Task manager
+%          Present the final table of threads
+%         explains events its problems with timers, etc    
+%             Solutions
+%     List of resources that might demand mutex
+%             List of general variables
+%         Regardinf the synchronization: How the OS prevents from problems?
+%             solutions
+%           Future improvement (3 items for OS debugging)
 
+In the present section, the main points regarding thread management and scheduling is presented.
+All the DSMs were implemented as \emph{Threads} using CMSIS-RTOS on STM32. All threads have fixed priorities and the desired execution time
+(\emph{release}) is controlled to each thread through the OS-native delay function. The previously mentioned function is not to be confused 
+with the \emph{HAL} version of it, since using HW-related functions while executing an OS is conveniently avoided. The OS-function allows 
+the scheduler to allocate CPU resources to any next-priority tasks. For further information regarding HAL and CMSIS implementation of delay
+can be seen in [?] and [?]. The time constraints are defined as \emph{desired}, since the system is
+non Safety-Critical -recall the safety specifcation in \ref{tbl:tech_specs}-; hence, it has no hard real time constraint and the overall 
+execution follows a best effort approach. This, however, opens the door to further improvement in the sense of characterizing and optimizing
+the reliability and task execution; the latter will be commented in the results section \ref{sec:scheduling_results}. 
 
-EDF ----Scheduling , is this for dynamic priorities?
+In \ref{tbl:threads_generals} are presented the basic timing requirements depending on the functionalities of each DSM related to the thread.
+Each parameter that sets up the duration can be changed in a header file, see the annex header [?], and the individual functionality can be 
+reviewed in the previous DSM section, \ref{sec:statemachines}.
+%**Here comes a table with the priority for each task**
+\begin{tuhhtable}
+    \begin{tabular}[tp]{L{.3\textwidth}C{.3\textwidth}}
+      \THc{1}{c}{Thread} &  \THc{1}{c}{Release period (ms)} \\
+      \abovebodyrule
+        SOES APP SDM    & 5 to 10     \\\TRc
+        LED SDM         & 33    \\
+        ECAT SDM*        & 100     \\\TRc
+        Temperature SDM & 1000     \\
+      \belowbodyrule
+    \end{tabular}
+    \caption{Basic timing requirements for threads, deadlines are rather desired since the device is non Safety-Critical. \emph{*ECAT SDM 
+        is mainly event driven, nevertheless, in the connected state it has a periodic update}}
+    \label{tbl:threads_generals}
+  \end{tuhhtable}
+
+A final list of priorities and threads is presented in the table \ref{tbl:threads_final} wihtin the section of Results \ref{sec:results}.
+
+%RAte monotonic oder deadline monotonic???
+%EDF ----Scheduling , is this for dynamic priorities?
+
 
 \section{PCB}
+*Redaction style at 90/100
 
-In this section is described the main stages regarding the manufacturing of the PCB. The schematics and PCB layout can be consulted within the annex X ~\ref{appx:pcb}
 
-\subsection{Development}
+%Guidelines
+%   Purpose : to have a prototype
+%              Altium design
+%               Create a framework for hardware development
+%   Based on NUCLEO 
+%   Altium 3D design
+%  ! Foto of real one 
+%       List of issues with a simple solution
+%       List of improvements
+%   
+%   -------------Not necessary
+%   Table with, number of layers, size
+%   BOM, connectors, pcb specifications
+In this section straightforward information regarding the the manufacturing of the PCB proposal is given.
+The schematics and PCB layout can be consulted within the appendix \ref{appx:pcb}. The main idea around this design was introduced in 
+\ref{sec:pcb_proposal} and has the purpose of providing experience in embedded hardware design and a base work for comming projects, where
+the functionalities of this prototype will be merged with other boards. Therefore, to have a physical prototype to recognize
+possible opportunity areas, such as physical connectors, sizes, power source quality and signal integrity, is a corner stone for any 
+future design.
+The overall stages of this design are as follows:
+%75/100
 \begin{description}
-\item[Design] \emph{Altium} PCB design software was used to deliver the \emph{Axis Communication Hub} prototype. During the process the designs from
-\item[Manufacturing]
-\item[Testing] The overall integrity and functioning of the  Overall power-on and SWD-Programming of the STM32 MCU via SWD/JTAG connector on-board, SPI connections/communication with LAN9252 Evaluation Board. Readout of directly addressed memory space, specificaly test and ID register; PWM Outputs over the two channels for WS2812 LED control, 1 per physical connector and 1-wire connection physycally tested by reading 1-wire sensors, as detailed in ~\ref{sec:temperature}.
+\item[Design] \emph{Altium} PCB design software was used to prototype the PCB for this project. During the process the first approach was
+                based on the open files for both the NUCLEO-F446ZE Development Board by ST [?] and LAN9252-EVB-SPI by Microchip[?]. By analizing
+                the general diagrams and selecting and adapting the different modules to adapt the requirements was the main challange. To ensure
+                usage of less extra devices as possible, two voltage regulators were included for 5 and 3.3 V.
+                To meet the routing needs a four layered PCB was selected. The final 3D model can be ssen in figure \ref{fig:pcb3d}
 \end{description}
 
-**Here comes an image of the PCB mounted on top of the LAN9252 Evaluation Board**
+\begin{figure}[ht]
+    \centering
+    \subfigure[ACB 3D view top]{\label{subfig:pcbtop}{\includegraphics[width=0.4\textwidth]{imgs/pcb3d_1.JPG}}}\hfill
+    \subfigure[ACB 3D view bottom]{\label{subfig:pcbbottom}{\includegraphics[width=0.4\textwidth]{imgs/pcb3d_2.JPG}}}
+    \caption{3D model generated by Altium for the final design.}
+    \label{fig:pcb3d}
+\end{figure}
 
 
-** Question. What would happen if the synchronization mode within an EtherCAT network wants to be integrated to those of a TSN???
+\begin{description}
+\item[Manufacturing]    Due to practical reasons, the board manufacturing process was in charge of PCBWay, a PCB manufacturing company. In respect
+                to soldering, it was made in-house.
+
+\item[Testing I] The overall integrity and functioning of the Power-on and SWD-Programming of the STM32 MCU via SWD/JTAG connector on-board was firstly tested with good results. 
+\end{description}
+
+\begin{description}
+\item[Testing II] By this stage, the readout of directly addressed memory space, specificaly test and ID register, of the LAN9252 had been already done
+                    with the NUCLEO board. In this manner, the code was programmed onto the AXB and so, the SPI communication gave good results*. Moreover,
+                    the PWM Outputs over the two channels for WS2812 LED control and the 1-wire connection were also physycally tested.  
+\item[Testing III] This phase is an ongoing task, since depending on the development of all the features, communication speeds and hardware 
+                configurations, different scenarios are continuosly appearing. A more deeper analysis will be taken into account for next versions.
+\end{description}
+
 
 

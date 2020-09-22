@@ -34,6 +34,7 @@
 %%%%% For this projektarbeit
 \usepackage{siunitx}
 
+\usepackage[final]{pdfpages}
 \usepackage{pgf}
 \usepackage{tikz}
 \usepackage[utf8]{inputenc}
@@ -79,7 +80,6 @@
 
 \begin{document}
 
-%\textwidth = 20cm
 
 % The Chapters
 \input{chapter_Introduction}
@@ -103,9 +103,13 @@
 % Feel free to add additional appendix chapters (e.g., measurement setups, etc.)
 %Code should be added as an appendix?
 \begin{tuhhappendix}
-  \input{appendix_pcb}
-  \input{appendix_code.tex}
+  \input{appendix_sms.tex}
+  \input{appendix_ecat.tex}
+  % \input{appendix_pcb}
+  % \includepdf[pages=-,landscape=true]{imgs/Schematic Prints_color.pdf}
+  % \input{appendix_code.tex}
 \end{tuhhappendix}
+
 
 %\input{sms}
 
