@@ -25,7 +25,31 @@ Gerd Behrmann, Alexandre David, and Kim~G Larsen.
 \newblock https://m.beckhoff.com/english/applicat/urban.htm, April 2013.
 \newblock Last visited: 16/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}17}]{beckhoff_datasheet}
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}15}]{beckhoff_enhancements}
+{Beckhoff Automation GmbH}.
+\newblock {ETG.1020 S (R) V1.2.0: Protocol Enhancements}.
+\newblock https://www.beckhoff.com/english/downloadfinder, 2015.
+\newblock Last visited: 24/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}17a}]{beckhoff_overview}
+{Beckhoff Automation GmbH}.
+\newblock {ETG.1000.1 S (R) V1.0.4: Overview}.
+\newblock https://www.beckhoff.com/english/downloadfinder, September 2017.
+\newblock Last visited: 24/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}17b}]{beckhoff_datalink}
+{Beckhoff Automation GmbH}.
+\newblock {ETG.1000.4 Data Link Layer protocol specification}.
+\newblock https://www.beckhoff.com/english/downloadfinder, November 2017.
+\newblock Last visited: 16/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}17c}]{beckhoff_applayer}
+{Beckhoff Automation GmbH}.
+\newblock {ETG.1000.6 Application Layer protocol specification}.
+\newblock https://www.beckhoff.com/english/downloadfinder, November 2017.
+\newblock Last visited: 16/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}17d}]{beckhoff_datasheet}
 {Beckhoff Automation GmbH}.
 \newblock {EtherCAT Slave Controller: Technology}.
 \newblock https://www.beckhoff.com/english/downloadfinder, February 2017.
@@ -37,13 +61,19 @@ Gerd Behrmann, Alexandre David, and Kim~G Larsen.
 \newblock https://www.beckhoff.com/english/downloadfinder, November 2018.
 \newblock Last visited: 16/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20a}]{beckhoff_compatibility}
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20a}]{beckhoff_esi}
+{Beckhoff Automation GmbH}.
+\newblock {ETG.2000 S (R) V1.0.12: ESI Specification}.
+\newblock https://www.beckhoff.com/english/downloadfinder, May 2020.
+\newblock Last visited: 24/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20b}]{beckhoff_compatibility}
 {Beckhoff Automation GmbH}.
 \newblock {EtherCAT - the Ethernet Fieldbus}.
 \newblock https://www.ethercat.org/en/technology.html, January 2020.
 \newblock Last visited: 16/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20b}]{beckhoff_freebsd}
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20c}]{beckhoff_freebsd}
 {Beckhoff Automation GmbH}.
 \newblock {TwinCAT/BSD: operating system for Industrial PCs}.
 \newblock
@@ -108,12 +138,6 @@ G.~{Gross}.
   https://www.computerworld.com/article/2566841/infineon-to-pay--160m-fine-for-dram-price-fixing.html,
   September 2004.
 \newblock Last visited: 17/09/2020.
-
-\bibitem[\textcolor{tuhh_color_bibkey}{{Han}20}]{hans_homepage}
-{Han's Robot Germany}.
-\newblock {Homepage}.
-\newblock http://hansrobot.de/home, September 2020.
-\newblock Last visited: 16/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{HWHP}]{ecatstack_igh}
 W.~Hagemeister, Weber, R.~Hacker, and F.~Pose.
@@ -190,6 +214,12 @@ C.~{Mastalli}, I.~{Havoutis}, M.~{Focchi}, D.~G. {Caldwell}, and C.~{Semini}.
 \newblock Motion planning for quadrupedal locomotion: Coupled planning, terrain
   mapping, and whole-body control.
 \newblock {\em IEEE Transactions on Robotics}, pages 1--14, 2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Mic}15}]{lan9252_data}
+{Microchip Technology Inc}.
+\newblock {DS00001909A: LAN9252 Datasheet}.
+\newblock https://www.microchip.com/wwwproducts/en/LAN9252, January 2015.
+\newblock Last visited: 22/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{Mik}20}]{led_protocol}
 {Mikrocontroller.net Artikelsammlung}.
@@ -296,6 +326,12 @@ SERCOS Staff.
 \newblock https://www.sercos.org/technology/advantages-of-sercos/performance/,
   January 2020.
 \newblock Last visited: 11/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{STM}17}]{hal_drivers}
+{STMicroelectronics}.
+\newblock {UM1725: Description of STM32F4 HAL and LL drivers}.
+\newblock https://www.st.com/en/, February 2017.
+\newblock Last visited: 22/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{STM}19}]{stm32f446_data}
 {STMicroelectronics NV}.

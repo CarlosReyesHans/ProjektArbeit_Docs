@@ -7,47 +7,49 @@ Reallocating 'name_of_file' (item size: 1) to 7 items.
 Database file #1: thesis.bib
 Warning--string name "march" is undefined
 --line 93 of file thesis.bib
+Warning--string name "dic" is undefined
+--line 221 of file thesis.bib
 Warning--empty booktitle in fieldbus_history
 Warning--empty booktitle in opc_tsn_application
-You've used 48 entries,
+You've used 54 entries,
             2545 wiz_defined-function locations,
-            776 strings with 11768 characters,
-and the built_in function-call counts, 16105 in all, are:
-= -- 1575
-> -- 678
-< -- 40
-+ -- 220
-- -- 216
-* -- 928
-:= -- 2599
-add.period$ -- 177
-call.type$ -- 48
-change.case$ -- 276
-chr.to.int$ -- 47
-cite$ -- 50
-duplicate$ -- 632
-empty$ -- 1308
-format.name$ -- 295
-if$ -- 3378
-int.to.chr$ -- 2
+            793 strings with 12286 characters,
+and the built_in function-call counts, 17771 in all, are:
+= -- 1743
+> -- 726
+< -- 46
++ -- 236
+- -- 228
+* -- 1004
+:= -- 2860
+add.period$ -- 201
+call.type$ -- 54
+change.case$ -- 306
+chr.to.int$ -- 49
+cite$ -- 56
+duplicate$ -- 698
+empty$ -- 1458
+format.name$ -- 319
+if$ -- 3732
+int.to.chr$ -- 6
 int.to.str$ -- 0
 missing$ -- 13
-newline$ -- 276
-num.names$ -- 146
-pop$ -- 425
+newline$ -- 312
+num.names$ -- 164
+pop$ -- 479
 preamble$ -- 1
-purify$ -- 324
+purify$ -- 360
 quote$ -- 0
-skip$ -- 559
+skip$ -- 618
 stack$ -- 0
-substring$ -- 513
-swap$ -- 89
-text.length$ -- 40
-text.prefix$ -- 33
+substring$ -- 555
+swap$ -- 95
+text.length$ -- 46
+text.prefix$ -- 39
 top$ -- 0
-type$ -- 384
+type$ -- 432
 warning$ -- 2
-while$ -- 127
-width$ -- 51
-write$ -- 653
-(There were 3 warnings)
+while$ -- 139
+width$ -- 57
+write$ -- 737
+(There were 4 warnings)

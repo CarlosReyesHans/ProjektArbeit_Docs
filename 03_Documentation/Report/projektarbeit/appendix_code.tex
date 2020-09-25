@@ -1,5 +1,4 @@
 \chapter{Source codes}\label{appx:code}
-**Redaction @ 0/100
 % This appendix shows the source code which was self written SMs and auxiliar wrappers. For any other code, namely the one-wire and soes library, since 
 % they are under the GNU* license, it is easy that the reader look for oneself the code:
 % \begin{description}
@@ -9,13 +8,546 @@
 %     \item[SOES Library] Original version without the low level functions. << *** Mention that originally the support for ST is not provided but only for: **look 
 %         the processors natively supported. \ref{sec:soes}.
 % \end{description}
+This appendix enlists the fundamental source codes within this implementation. The order is as follows:
+\begin{itemize}
+    \item Configuration header file for the main features where the full list of errors and events can be seen in ~\ref{lst:definitions}.
+    \item Code for the creation and configuration of threads plus some auxiliary functions in ~\ref{lst:generalSM}.
+    \item Main code for the Event Handler in ~\ref{lst:event}.
+    \item Main code for the ECAT DSM in ~\ref{lst:ecatSM}.
+    \item Main code for the SOES DSM in ~\ref{lst:soesAPP}. 
+    \item Main code for the LED DSM in ~\ref{lst:led}.
+    \item Code for the Temperature Application in ~\ref{lst:tempApp}.
+\end{itemize}
 
-\begin{lstlisting} [label=lst:ecatSM,caption={Part of the source code for ECAT DSM}]
+\begin{lstlisting}[label=lst:definitions,caption={Main definition and configuration header file.}]
     /*
+    * AxisCommHub_definitions.h
+    *
+    *  Created on: Jun 11, 2020
+    *      Author: Carlos Reyes
+    */
+   
+   #ifndef AXISCOMMHUB_DEFINITIONS_H_
+   #define AXISCOMMHUB_DEFINITIONS_H_
+   
+   
+   //	General include files
+   
+   #include "LAN9252_spi.h"
+   #include "main.h"
+   
+   //	Definition of peripherals
+   #define	NUM_OF_SENSORS			15u
+   
+   #define MAX_OF_LEDRINGS			4		//	This values should be modified in the LED library
+   #define NUM_OF_LEDRINGS			2
+   #define NUM_OF_LEDS_PER_RING	5		//	If the number is not the same for all LED Rings, then change directly within the LED library
+   
+   //	Generic definitions
+   #define	TRUE					1
+   #define	FALSE					0
+   #define FAILED					-1
+   
+   //	Timing for SOES
+   #define SOES_REFRESH_CYCLE		20u		//in Systicks
+   
+   // 	Mind the following structure for event flags (See #define MAX_BITS_EVENT_GROUPS     24U)
+   // | 8 reserved bits | 14 bits (16383d) error space | 10 bit individual event flags|
+   
+   //	Declaration of event flags (10 available)
+   #define SYS_EVENT			(1<<0)
+   #define LED_EVENT			(1<<1)
+   #define TSENS_EVENT			(1<<2)
+   #define ECAT_EVENT			(1<<3)
+   #define	TASKM_EVENT			(1<<4)
+   
+   
+   //	Offsets
+   #define ERR_OFFSET				1000u
+   #define EV_OFFSET				2000u
+   #define	SHIFT_OFFSET			10u
+   //	Declaration of errors
+   #define	ERR_SYS_NONE			0
+   #define	ERR_SYS_UNKNOWN			101
+   
+   
+   #define	ERR_TEMP_SENS_INIT		 1101u
+   #define ERR_TEMP_SENS_LOST		 1102u
+   #define ERR_TEMP_SENS_TIMEOUT	 1103u
+   #define ERR_TEMP_SENS_OVERHEAT	 1104u
+   #define	ERR_TEMP_DSM_FAULT		 1105u
+   
+   #define ERR_LED_INIT		 	1201u
+   #define ERR_LED_TIMEOUT		 	1202u
+   #define ERR_LED_SEND		 	1203u
+   #define	ERR_LED_OSTIM		 	1204u
+   #define	ERR_LED_DSM_FAULT	 	1205u
+   
+   #define	ERR_ECAT_INIT			 1301u
+   #define ERR_ECAT_COMM_LOST		 1302u
+   #define ERR_ECAT_TIMEOUT		 1303u
+   #define ERR_ECAT_DSM_FAULT		 1304u
+   #define ERR_ECAT_CMD_FAULT		 1305u
+   #define ERR_ECAT_CMD_SOFTFAULT	 1306u
+   
+   //	Definition of internal events
+   #define EV_TEMP_DSM_INIT	 	2101
+   
+   #define EV_LED_DSM_INIT		 	2201
+   #define EV_LED_UPTD			 	2211
+   
+   #define EV_ECAT_ESC_INIT		 2301
+   #define EV_ECAT_APP_OP			 2311
+   #define EV_ECAT_APP_INIT		 2312
+   #define EV_ECAT_APP_NOOP		 2313
+   #define EV_ECAT_DSM_INIT		 2321
+   #define EV_SOES_RESPAWNED		 2331
+   #define EV_ECAT_CMD_ACK			 2351
+   #define EV_ECAT_CMD_LED_TOGGLE	 2352
+   
+   
+   // 	Mind the following structure for status variable (according to size of errors and events (16383d))
+   // | 14 bits last event space | 14 bits last error space | 4 bit General state |
+   #define	STATUS_OFFSET_FOR_ERR	4u
+   #define	STATUS_OFFSET_FOR_EV	18u
+   
+   #define STATUS_DATA_MASK		0x3FFF
+   #define STATUS_SHORT_MASK		0x0F
+   
+   #define	STATUS_INIT				1u
+   #define	STATUS_STARTED			2u
+   #define	STATUS_NO_ERRORS		4u
+   #define STATUS_SOFT_ERRORS		5u
+   
+   
+   //	Definition of specific timeouts
+   //	ECAT/SOES
+   #define	ESC_INIT_TIMEOUT	5u
+   #define	ESC_REFRESH_TIMEOUT	10000u
+   
+   //	Definitions of ETHERCAT STATE MACHINE
+   //	See esc.h for ALstatus Reg
+   //	e.g. ESCop
+   
+   //	Auxiliar definitions for HAL adaptation
+   
+   #define CHANNEL_FOR_LED1		TIM_CHANNEL_1
+   #define CHANNEL_FOR_LED2		TIM_CHANNEL_2
+   #define CHANNEL_ACTIVE_FOR_LED1	HAL_TIM_ACTIVE_CHANNEL_1
+   #define CHANNEL_ACTIVE_FOR_LED2 HAL_TIM_ACTIVE_CHANNEL_2
+   
+   
+   //	Overall test definitions
+   
+   #define ECAT_UPDT_PERIOD_TEST_IN_MS			10u	//1>> RT	10-15 >> Industrial RT 	100>> Non-critical variables monitoring
+   #define	ECAT_CONNECTION_CHECK_PERIOD_IN_MS	10u
+   #define	ECAT_CHECK_PERIOD_FACTOR			ECAT_CONNECTION_CHECK_PERIOD_IN_MS/ECAT_UPDT_PERIOD_TEST_IN_MS
+   #define COMM_TESTING_TIMES					100u
+   
+   
+   //	Taken from linux definitions and needed by SOES
+   #define BIT(nr) (1UL << (nr))
+   
+   #endif /* AXISCOMMHUB_DEFINITIONS_H_ */
+   
+
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:generalSM,caption={Part of the code to declare threads and other auxiliar functions.}]
+    /*
+    * SMs.c
+    *
+    *  Created on: Jun 3, 2020
+    *      Author: Carlos Reyes
+    */
+   
+   #include "main.h"
+   #include "AxisCommHub_definitions.h"
+   #include "SMs.h"
+   #include "smEcat.h"
+   
+   extern osTimerId_t timerEcatSM,timerEcatSOES;
+   
+   /*-----------------------------------------------TASKS for SMs--------------------------------------------------------------*/
+   // Task Handlers declared within the SMs.h
+   
+   
+   uint32_t tempSensTBuffer[ 192 ];
+   StaticTask_t tempSensTControlBlock;
+   const osThreadAttr_t tempSensT_attributes = {
+           .name = "tempSensT",
+           .stack_mem = &tempSensTBuffer[0],
+           .stack_size = sizeof(tempSensTBuffer),
+           .cb_mem = &tempSensTControlBlock,
+           .cb_size = sizeof(tempSensTControlBlock),
+           .priority = (osPriority_t) osPriorityNormal,
+   };
+   
+   
+   uint32_t ledRingsTBuffer[ 192 ];
+   StaticTask_t ledRingsTControlBlock;
+   const osThreadAttr_t ledRingsT_attributes = {
+           .name = "ledRingsT",
+           .stack_mem = &ledRingsTBuffer[0],
+           .stack_size = sizeof(ledRingsTBuffer),
+           .cb_mem = &ledRingsTControlBlock,
+           .cb_size = sizeof(ledRingsTControlBlock),
+           .priority = (osPriority_t) osPriorityNormal,
+   };
+   
+   
+   uint32_t ecatSMTBuffer[ 192 ];
+   StaticTask_t ecatSMTControlBlock;
+   const osThreadAttr_t ecatSMT_attributes = {
+           .name = "ecatTSM",
+           .stack_mem = &ecatSMTBuffer[0],
+           .stack_size = sizeof(ecatSMTBuffer),
+           .cb_mem = &ecatSMTControlBlock,
+           .cb_size = sizeof(ecatSMTControlBlock),
+           .priority = (osPriority_t) osPriorityNormal,
+   };
+   
+   
+   uint32_t eventHTBuffer[ 128 ];
+   StaticTask_t eventHTControlBlock;
+   const osThreadAttr_t eventHT_attributes = {
+           .name = "eventHT",
+           .stack_mem = &eventHTBuffer[0],
+           .stack_size = sizeof(eventHTBuffer),
+           .cb_mem = &eventHTControlBlock,
+           .cb_size = sizeof(eventHTControlBlock),
+           .priority = (osPriority_t) osPriorityAboveNormal,
+   };
+   
+   /*-----------------------------------------------AUXILIAR TASKS--------------------------------------------------------------*/
+   
+   /*-------------------------ECAT--------------------------------------*/
+   uint32_t ecatTestTBuffer[ 192 ];
+   StaticTask_t ecatTestTControlBlock;
+   const osThreadAttr_t ecatTestT_Attributes = {
+           .name = "ecatTestT",
+           .stack_mem = &ecatTestTBuffer[0],
+           .stack_size = sizeof(ecatTestTBuffer),
+           .cb_mem = &ecatTestTControlBlock,
+           .cb_size = sizeof(ecatTestTControlBlock),
+           .priority = (osPriority_t) osPriorityHigh3,
+   };
+   
+   uint32_t ecatSOESTBuffer[1088];
+   StaticTask_t ecatSOESTControlBlock;
+   const osThreadAttr_t ecatSOEST_Attrbuttes = {
+           .name = "ecatSOEST",
+           .stack_mem = ecatSOESTBuffer,
+           .stack_size = sizeof(ecatSOESTBuffer),
+           .cb_mem = &ecatSOESTControlBlock,
+           .cb_size = sizeof(ecatSOESTControlBlock),
+           .priority = (osPriority_t) osPriorityAboveNormal,
+   };
+   
+   /*----------------------System Monitor--------------------------------*/
+   
+   uint32_t taskManagerTBuffer[ 192 ];
+   StaticTask_t taskManagerTControlBlock;
+   const osThreadAttr_t taskManagerT_Attributes = {
+           .name = "taskManagerT",
+           .stack_mem = &taskManagerTBuffer[0],
+           .stack_size = sizeof(taskManagerTBuffer),
+           .cb_mem = &taskManagerTControlBlock,
+           .cb_size = sizeof(taskManagerTControlBlock),
+           .priority = (osPriority_t) osPriorityHigh,
+   };
+
+  
+   /******************************************* Extern Variables from LED Rings Multichannel *********************************************************************/
+   
+   //volatile uint8_t currentColors[MAX_OF_LEDRINGS];	//Global array for colors to be updated, this will be changed continuously by EventHandler/Notification //CHCKME this is shared memory
+   extern volatile uint8_t dmaLed1_rcvd, dmaLed2_rcvd,refreshTimeoutLed;
+  
+   
+   /******************************************* Variables to debug ****************************************************************/
+   osStatus_t static ecatStatus,uartPrintStatus;
+   uint32_t *heapObserver0,*heapObserver1,*heapObserver2;
+   
+   /*************************************** Var task manager ***********************************************************/
+   static osThreadState_t status_ecatTestT, status_ecatT, status_evHT,status_uartPT,status_tSensT,status_ledsT, status_taskMT,status_ecatSOEST;
+   osTimerId_t timerTsens;	//IMPRVME	This may be a local variable to save memory
+   static uint8_t timedoutTsens;
+   
+
+   
+   /*-------------------------Here start the definitions of the functions needed by SM --------------*/
+   /*----------------------------------- Task Manager functions ---------------------------------------*/
+   /* *
+    * @brief 	This function will update the status for each task and terminate a thread if needed
+    * */
+   
+   void taskManger(void * argument) {
+   
+       osStatus_t status;
+       while (1) {
+           if (restartTaskManFlag) {
+               restartTaskManFlag = FALSE;
+               osDelay(100);
+               status = osThreadSuspend(ecatSOESTHandler);
+               status = osThreadTerminate(ecatSOESTHandler);
+               ecatSOESTHandler = osThreadNew(soes, NULL, &ecatSOEST_Attrbuttes);
+               status = osThreadSuspend(ecatSOESTHandler);
+               osEventFlagsSet(evt_sysSignals, TASKM_EVENT|EV_SOES_RESPAWNED);
+           }
+   
+           status_ecatTestT = osThreadGetState(ecatTestTHandler);
+           status_ecatT = osThreadGetState(ecatSMTHandle);
+           status_ecatSOEST = osThreadGetState(ecatSOESTHandler);
+   
+           //osThreadYield();	//Yield to any other thread that may be ready
+           //osDelay(1000);			//1ms update rate
+           osEventFlagsWait(taskManSignals, TASKM_EVENT,osFlagsWaitAny , osWaitForever);
+   
+           status_ecatSOEST = osThreadGetState(ecatSOESTHandler);
+           status_evHT = osThreadGetState(eventHTHandle);
+           status_uartPT = osThreadGetState(uartPrintTHandler);
+           status_tSensT = osThreadGetState(tempSensTHandle);
+           status_ledsT = osThreadGetState(ledRingsTHandle);
+           status_taskMT = osThreadGetState(taskManagerTHandler);
+       }
+   
+       //osThreadTerminate(taskManagerTHandler);	//If ever jumps out the loop
+   
+   }
+   
+   /* *
+    * @brief	This function adds the threads to be executed to the OS and the general signals
+    * */
+   void addThreads(void) {
+       evt_sysSignals = osEventFlagsNew(NULL);
+       if (evt_sysSignals == NULL){
+           //Handle error
+           __NOP();
+       }
+       taskManSignals = osEventFlagsNew(NULL);
+       if (taskManSignals == NULL){
+           //Handle error
+           __NOP();
+       }
+   
+       heapObserver0 = evt_sysSignals;
+       heapObserver1 = taskManSignals;
+   
+       //	Initializing main threads
+       tempSensTHandle = osThreadNew(tempSens_SM, NULL, &tempSensT_attributes);
+       ledRingsTHandle = osThreadNew(ledRings_SM, NULL, &ledRingsT_attributes);
+       ecatSMTHandle = osThreadNew(ecat_SM, NULL, &ecatSMT_attributes);
+       eventHTHandle = osThreadNew(eventH_SM, NULL, &eventHT_attributes);
+   
+       //	Auxiliar tasks
+   
+       ecatSOESTHandler = osThreadNew(soes, NULL, &ecatSOEST_Attrbuttes);
+       ecatStatus = osThreadSuspend(ecatSOESTHandler);
+       taskManagerTHandler = osThreadNew(taskManger, NULL, &taskManagerT_Attributes);
+   
+       sysState = STATUS_INIT;
+       //Debug tasks
+       //eventTesterTHandler = osThreadNew(eventTesterTask,NULL,&eventTesterT_Attributes);	//Pending This task could start before the system is ready
+   }
+
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:event,caption={Main source code for Event Handler DSM.}]
+    /*
+     * smEvH.c
+     *
+     *  Created on: Jun 26, 2020
+     *      Author: Carlos Reyes
+     */
+    
+    
+    #include "SMs.h"
+    #include "smEvH.h"
+    
+    
+    //External variables
+    
+    
+    /*
+     * @brief Sate Machine for error/event handler
+     *
+     */
+    
+    void eventH_SM (void * argument) {
+    
+        uint32_t status,flags;	
+        uint16_t event_data;
+    
+        while(1) {		//Infinite loop enforced by task execution
+    
+            switch (evH_step) {
+            /*-------------------------------------------------------------------*/
+            case	evh_init:
+                evH_initFlag = TRUE;
+                evH_step = evH_waiting;
+                break;
+            /*-------------------------------------------------------------------*/
+            case	evH_waiting:
+                //	entry:
+                status = osEventFlagsWait(evt_sysSignals, SYS_EVENT, osFlagsWaitAny, osWaitForever);
+                //	exit:
+                evH_step = evH_check;
+                break;
+            /*-------------------------------------------------------------------*/
+            case	evH_check:
+                //	entry:
+                status = osEventFlagsGet(evt_sysSignals);	//TODO check whether the flags are cleared
+                event_data = (status>>SHIFT_OFFSET);
+                if (event_data>EV_OFFSET) {
+                    evH_step = evH_notifHandling;
+                }
+                else if (event_data>ERR_OFFSET) {
+                    evH_step = evH_errHandling;
+                }
+                else {
+                    __NOP();
+                    evH_step = evH_error;
+                }
+    
+                //	exit:
+                break;
+            /*-------------------------------------------------------------------*/
+                case evH_errHandling:
+                    //	entry:
+                    if (event_data == ERR_ECAT_DSM_FAULT ||
+                            ERR_ECAT_CMD_FAULT || ERR_LED_DSM_FAULT ||
+                            ERR_TEMP_DSM_FAULT || ERR_TEMP_SENS_OVERHEAT ||
+                            ERR_ECAT_COMM_LOST
+                            ) {
+                        //	PENDING Add an specific action depending on the error
+                        errorFlag = TRUE;
+                        normalFlag = FALSE;
+                    }	//
+                    else if (event_data == ERR_TEMP_SENS_LOST ||
+                            ERR_ECAT_CMD_SOFTFAULT) {
+                        //	PENDING Add an specific action depending on the warning
+                        warningFlag = TRUE;
+                        normalFlag = FALSE;
+                    }
+                    else {
+                        //	do nothing
+                        warningFlag = TRUE;
+                        __NOP();
+                        evH_step = evH_error;
+                        break;
+                    }
+    
+                    sysState &= ~(STATUS_DATA_MASK<<STATUS_OFFSET_FOR_ERR);
+                    sysState |= ((event_data&STATUS_DATA_MASK)<<STATUS_OFFSET_FOR_ERR);
+    
+                    //exit
+                    flags = osEventFlagsGet(evt_sysSignals);	//	SYS_EVENT flag is cleared while returning from eventsFlagWait functions
+                    osEventFlagsClear(evt_sysSignals,flags);	//	Due to the priorities, it is not possible that another task creates events while this SM is running
+                    evH_step = evH_waiting;
+                    break;
+            /*-------------------------------------------------------------------*/
+                case evH_notifHandling:
+                    //	entry:
+                    if (event_data == EV_TEMP_DSM_INIT) {
+                        //	If needed add an specific action depending on the notification
+                        temp_initFlag = TRUE;
+                    }	//
+                    else if (event_data == EV_LED_DSM_INIT) {
+                        //	If needed add an specific action depending on the notification
+                        led_initFlag = TRUE;
+                    }
+                    else if (event_data == EV_ECAT_DSM_INIT) {
+                        //	If needed add an specific action depending on the notification
+                        ecat_initFlag = TRUE;
+                    }
+                    else if (event_data == EV_ECAT_CMD_ACK) {
+                        //	Add an specific action depending on the ECAT cmd
+                        sysState = 0xFF;
+                        //evH_step = evH_ecatCMD;
+                        //break;
+                    }
+                    else if (event_data == EV_ECAT_APP_OP) {
+                        //	Add an specific action depending on the warning
+                        if ((sysState&STATUS_SHORT_MASK) == STATUS_STARTED ) { //&& ((sysState>>STATUS_OFFSET_FOR_ERR) & STATUS_DATA_MASK) == ERR_SYS_NONE)
+                            warningFlag = FALSE;
+                            normalFlag = TRUE;
+                            if(((sysState>>STATUS_OFFSET_FOR_ERR) & STATUS_DATA_MASK) == ERR_ECAT_COMM_LOST) {
+                                errorFlag = FALSE;
+                            }
+                        }
+    
+                    }
+                    else if (event_data == EV_ECAT_APP_INIT) {
+                        //	If needed add an specific action depending on the notification
+                        warningFlag = TRUE;
+                        normalFlag = FALSE;
+                    }
+                    else if (event_data > EV_ECAT_CMD_ACK) {
+                        //	PENDING This could be either an error or a warning or a shortcut to CMD step
+                        //evH_step = evH_ecatCMD;
+                        __NOP();
+                    }
+                    else {
+                        //	do nothing
+                        __NOP();
+    
+                        evH_step = evH_error;
+                        break;
+                    }
+                    if ((sysState&STATUS_SHORT_MASK) == STATUS_INIT && temp_initFlag && led_initFlag && ecat_initFlag ) {
+                        status = (sysState>>STATUS_OFFSET_FOR_ERR);	//	status used temporary
+                        sysState = STATUS_STARTED|(status<<STATUS_OFFSET_FOR_ERR);
+                    }
+    
+                    sysState &= ~(STATUS_DATA_MASK<<STATUS_OFFSET_FOR_EV);	//	Clearing the previous Event
+                    sysState |= ((event_data&STATUS_DATA_MASK)<<STATUS_OFFSET_FOR_EV);
+    
+                    //exit
+    
+                    flags = osEventFlagsGet(evt_sysSignals);	//	SYS_EVENT flag is cleared while returning from eventsFlagWait functions
+                    osEventFlagsClear(evt_sysSignals,flags);	//	Due to the priorities, it is not possible that another task creates events while this SM is running
+                    evH_step = evH_waiting;
+                    break;
+            /*-------------------------------------------------------------------*/
+                case	evH_ecatCMD:
+                    //	entry:
+                    //	PENDING An specific ecat command handler need to be defined
+                    //eventHandled = TRUE; //Not needed so far since Flag is being cleared
+                    __NOP();
+    
+                    //exit
+                    status = SYS_EVENT |(event_data<<ERR_OFFSET);
+                    osEventFlagsClear(evt_sysSignals, status);
+                    evH_step = evH_waiting;
+                    break;
+            /*-------------------------------------------------------------------*/
+                case	evH_error:
+                    //	entry:
+                    // This DSM terminates since an error in the event handler is critical and should be debugged by programmer.
+                    errorFlag = TRUE;
+                    sysState = ERR_SYS_UNKNOWN;
+    
+                    //	exit
+                    osThreadSuspend(eventHTHandle);
+                    break;
+            /*-------------------------------------------------------------------*/
+                default:
+                    __NOP();
+                }
+        }
+    
+        //osThreadTerminate(eventHTHandle);
+    
+    
+    }
+\end{lstlisting}
+
+\begin{lstlisting} [label=lst:ecatSM,caption={Main source code for ECAT DSM.}]
+/*
  * smEcat.c
  *
  *  Created on: Jun 26, 2020
- *      Author: CarlosReyes
+ *      Author: Carlos Reyes
  */
 
 #include "SMs.h"
@@ -27,7 +559,7 @@
 
 /*--------------------Variable used specially in this SM-----------------------------------------------------*/
 
-volatile uint8_t timedoutEcat,restartEcatFlag;	//CHCKME These might have been substitued by soesTimeoutFlag
+volatile uint8_t timedoutEcat,restartEcatFlag;	
 static uint8_t escAPPok;
 
 /*----------------------------External variables----------------------------------------*/
@@ -79,7 +611,7 @@ void ecat_SM (void * argument) {
 	while(1) {		//Infinite loop enforced by task execution
 
 		switch (ecat_step) {
-		/*--------------------------------------------------------------------------------*/
+		/*--------------------------------------------------*/
 			case	ec_config:
 				//	action
 				if(	ecat_SPIConfig(&hspi4) == FAILED) error++;
@@ -96,7 +628,7 @@ void ecat_SM (void * argument) {
 				}
 
 				break;
-		/*--------------------------------------------------------------------------------*/
+		/*-------------------------------------------------------*/
 			case	ec_checkConnection:
 				//	action
 				timerDelay = 40u;
@@ -124,7 +656,7 @@ void ecat_SM (void * argument) {
 					ecat_step = ec_connected;
 				}
 					break;
-		/*--------------------------------------------------------------------------------*/
+		/*---------------------------------------------------------*/
 			case	ec_waitDMA:	// This state is used only if communication is test before soes app has started
 				osThreadYield();
 				osEventFlagsWait(evt_sysSignals, ECAT_EVENT,osFlagsWaitAny, osWaitForever);
@@ -149,7 +681,7 @@ void ecat_SM (void * argument) {
 					ecat_step = ec_fault;
 				} 	//The timeout callback function modifies this error flag
 				break;
-		/*--------------------------------------------------------------------------------*/
+		/*--------------------------------------------------------*/
 			case	ec_connected:
 				//	entry
 				if (firstExec) {
@@ -180,13 +712,13 @@ void ecat_SM (void * argument) {
 				}
 
 				break;
-		/*--------------------------------------------------------------------------------*/
+		/*------------------------------------------------------*/
 			case	ec_sleep:
 				__NOP();
 				osThreadSuspend(ecatSMTHandle);
 
 				break;
-		/*--------------------------------------------------------------------------------*/
+		/*--------------------------------------------------------*/
 			case	ec_fault:
 				//entry
 
@@ -198,7 +730,7 @@ void ecat_SM (void * argument) {
 				//exit
 				ecat_step = ec_restart;
 				break;
-				/*--------------------------------------------------------------------------------*/
+		/*----------------------------------------------------------*/
 			case	ec_restart:
 				//action
 
@@ -270,17 +802,15 @@ void timeoutSOESCallback(void * argument) {
 
 \end{lstlisting}
 
-
-\begin{lstlisting}[label=lst:soesAPP DSM,caption={Source code for SOES APP DSM}]
+\begin{lstlisting}[label=lst:soesAPP,caption={Main source code for SOES APP DSM.}]
     /*
     * soesApp.c
     *
     *  Created on: Jul 16, 2020
-    *      Author: CarlosReyes
+    *      Author: Carlos Reyes
     *      Comments: Based on the rtl_slavedemo provided within the SOES Library.
     *      	GNU General Public License header copied from the original file
     */
-   
    
    // Comments from original file.
    
@@ -311,7 +841,7 @@ void timeoutSOESCallback(void * argument) {
    extern uint32_t *heapObserver0,*heapObserver1,*heapObserver2;
    
    //	Variables needed mainly for this SOES SM
-   enum enum_soesStates {s_start,s_init1,s_init2,s_timerset,s_slaveloop,s_sleep,s_nostep,s_error}soes_step;
+   enum enum_soesStates {s_start, s_init1, s_init2, s_timerset, s_slaveloop, s_sleep, s_nostep, s_error}soes_step;
    volatile uint8_t soesTimeoutFlag;
    
    /* Application variables */
@@ -319,8 +849,7 @@ void timeoutSOESCallback(void * argument) {
    _Wbuffer    Wb;
    _Cbuffer    Cb;
    
-   
-   uint16_t masterCommand,masterTest0,masterTest1,masterTest2;
+    uint16_t masterCommand,masterTest0,masterTest1,masterTest2;
    
    /*-----Test variables-------------------------------------*/
    uint8_t testInputButton;
@@ -348,55 +877,6 @@ void timeoutSOESCallback(void * argument) {
        masterTest1 = Wb.testVal1;
        masterTest2 = Wb.testVal2;
    
-   }
-   
-   /** Optional: Hook called after state change for application specific
-    * actions for specific state changes.
-    */
-   void post_state_change_hook (uint8_t * as, uint8_t * an)
-   {
-   
-      /* Add specific step change hooks here */
-      if ((*as == BOOT_TO_INIT) && (*an == ESCinit))
-      {
-         boot_inithook ();
-      }
-      else if((*as == INIT_TO_BOOT) && (*an & ESCerror ) == 0)
-      {
-         init_boothook ();
-      }
-   }
-   
-   void post_object_download_hook (uint16_t index, uint8_t subindex,
-                                   uint16_t flags)
-   {
-      switch(index)
-      {
-         case 0x7100:
-         {
-            switch (subindex)
-            {
-               case 0x01:
-               {
-                  //encoder_scale_mirror = encoder_scale;	//Pending The 0x7100 address object could be used afterwards
-                  break;
-               }
-            }
-            break;
-         }
-         case 0x8001:
-         {
-            switch (subindex)
-            {
-               case 0x01:
-               {
-                  Cb.reset_counter = 0;
-                  break;
-               }
-            }
-            break;
-         }
-      }
    }
    
    void soes (void * arg)
@@ -567,4 +1047,340 @@ void timeoutSOESCallback(void * argument) {
           }	//	End switch
       }	//	End while
    }
-    \end{lstlisting}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:led,caption={Main source code for LED DSM.}]
+    /*
+    * smLed.c
+    *
+    *  Created on: Jun 25, 2020
+    *      Author: Carlos Reyes
+    */
+   
+   #include "SMs.h"
+   #include "smLed.h"
+   //#include "WS2812_Lib_MultiChannel.h"
+   
+   osTimerId_t refreshLed,timeoutLed;	//Pending: this could be local or static
+   static volatile uint8_t boolTimeoutLed,boolRefreshTimeoutLed;	//PEnding is this necessary?
+   //	Debug variables
+   volatile uint32_t currentFlags1,currentFlags2;
+   
+   //External variables
+   extern TIM_HandleTypeDef *ledCH1,*ledCH2,*ledCH3,*ledCH4;	//	Declared in WS2812 Libraries
+   
+   /*
+    * @brief Sate Machine for overall task of LED RINGS controlled by PWM
+    *
+    */
+   
+   void ledRings_SM (void * argument) {
+       uint8_t chsetupOK[NUM_OF_LEDRINGS];
+       uint8_t error = 0;
+       uint32_t temp32,eventStatus;
+       osStatus_t timerStatus;
+   
+   
+       timeoutLed = osTimerNew(timeoutCallback_led, osTimerOnce, NULL, NULL);
+       refreshLed = osTimerNew(refreshCallback_led, osTimerOnce, NULL, NULL);
+       if (timeoutLed == NULL) {
+           __NOP();	//Debug the error.
+       }
+   
+       while(1) {
+   
+           switch (led_step) {
+           /*---------------------------------------------------------*/
+               case	L_config:		//Initializes and links the handlers with WS2812 library
+                   //	action
+                   if (NUM_OF_LEDRINGS > 0) {
+                       if(ledDMA_configCh(1,&htim8) != FAILED)
+                           chsetupOK[0] = TRUE;
+                       else {
+                           chsetupOK[0] = FALSE;
+                           error++;
+                       }
+                   }
+                   if (NUM_OF_LEDRINGS > 1) {
+                       if(ledDMA_configCh(2,&htim3) != FAILED)
+                           chsetupOK[1] = TRUE;
+                       else {
+                           chsetupOK[1] = FALSE;
+                           error++;
+                       }
+                   }
+                   //if (NUM_OF_LEDRINGS > 2)
+                   //if (NUM_OF_LEDRINGS > 3)
+   
+   
+                   //	exit
+                   if (error) {
+                       notifyError(ERR_LED_INIT);	//Pending This should notify over ECAT but not stop the overall SM
+                       led_step = L_restart;
+                   }
+                   else {
+                       error = 0;
+                       //Set the Effects
+                       setColorState(color_preop);
+                       temp32 = SYS_EVENT|(EV_LED_DSM_INIT<<SHIFT_OFFSET);
+                       osEventFlagsSet(evt_sysSignals, temp32);	//	System notification
+                       led_step = L_send;
+                   }
+   
+                   break;
+           /*----------------------------------------------------------*/
+               case L_send:
+                   //	action
+                   for (uint8_t i = 1; i <= NUM_OF_LEDRINGS; i++) {
+                       if (ledDMA_send(i) == FAILED)
+                           notifyError(ERR_LED_SEND);
+   
+                   }
+                   timerStatus = osTimerStart(timeoutLed, (uint32_t) 1000U);	//Timeout for DMA
+                   if (timerStatus != osOK) {
+                       notifyError(ERR_LED_OSTIM); //	This is a internal OS error.
+                   }
+   
+                   //exit
+                   led_step = L_waitEvent;
+                   break;
+           /*--------------------------------------------------------------*/
+               case	L_waitEvent:
+                   //	action
+                   osEventFlagsWait(evt_sysSignals, LED_EVENT, osFlagsWaitAny, osWaitForever);
+   
+                   //	exit
+   
+                   if (boolTimeoutLed) {
+                       if (osTimerIsRunning(timeoutLed)){
+                           if (osTimerStop(timeoutLed) != osOK) {
+                               __NOP();//Handle internal OS  error
+                               notifyError(ERR_LED_OSTIM);
+                           }
+                       }
+   
+                       boolTimeoutLed = FALSE;
+                       notifyError(ERR_LED_TIMEOUT);
+                       led_step = L_restart;
+                       break;
+                   }
+                   else if(dmaLed1_rcvd && dmaLed2_rcvd) { //	SAFE: Only updates a color state if no timeout
+                       if (osTimerIsRunning(timeoutLed)) {
+                           if (osTimerStop(timeoutLed) != osOK) {
+                               __NOP();//Handle internal OS error
+                               notifyError(ERR_LED_OSTIM);
+                           }
+                       }
+   
+                       dmaLed1_rcvd = 0;
+                       dmaLed2_rcvd = 0;
+   
+                       led_step = L_updateColorState;
+                       break;
+                   }
+   
+                   break;
+           /*------------------------------------------------------------*/
+               case	L_updateColorState:
+                   //	action
+                   if (errorFlag) {
+                       setColorState(color_error);
+                   }
+                   else if (initFlag) {
+                       __NOP();	//	Keeps the default color
+                   }
+                   else if (ecatCMDFlag) {
+                       setColorState(color_custom);
+                   }
+                   else if (warningFlag) {
+                       setColorState(color_warning);
+                   }
+                   else if (normalFlag) {
+                       setColorState(color_normal);
+                   }
+   
+                   //	exit
+                   //notifyEvent(LED_UPDATED);
+                   led_step = EFFECTS_ACTIVATED ? L_updateEffect : l_waitRefresh;
+   
+                   break;
+           /*------------------------------------------------------------*/
+               case	L_updateEffect:
+                   //	action
+   //				if (led_effectRateUpdt()) {	This function checks whether the current effect needs to be updated
+   //					__NOP();	//PENDING Effects are a future future
+   //				}
+   
+                   //	exit
+                   led_step = l_waitRefresh;
+                   break;
+           /*-----------------------------------------------------------*/
+               case	l_waitRefresh:
+                   // action
+                   if(osTimerStart(refreshLed, (uint32_t)PWM_REFRESH_PERIOD)!= osOK) {
+                       __NOP(); //Handle the OS TIMER starting error.
+                       notifyError(ERR_LED_OSTIM);
+                       led_step = L_restart;
+                       break;
+                   }
+                   //
+                   eventStatus = osEventFlagsGet(evt_sysSignals);
+                   osEventFlagsWait(evt_sysSignals, LED_EVENT, osFlagsWaitAny, osWaitForever);
+   
+                   //exit
+   
+                   //Refreshing time is already elapsed
+                   if (boolRefreshTimeoutLed) {
+                       if(osTimerIsRunning(refreshLed)){
+                           if(osTimerStop(refreshLed)!= osOK) {
+                               __NOP();	//Only for error debugging
+                               notifyError(ERR_LED_OSTIM);
+                               led_step = L_restart;
+                           }
+                       }
+   
+                       boolRefreshTimeoutLed = FALSE;
+                       led_step = L_send;
+                   }
+   
+                   break;
+           /*--------------------------------------------------------*/
+               case	L_restart:		//After timeout or error
+   
+                   if (osTimerIsRunning(timeoutLed))
+                       timerStatus = osTimerStop(timeoutLed);
+   
+                   if (timerStatus != osOK) {
+                       __NOP(); //PENDING Handle the deletion error
+                   }
+   
+                   for (uint8_t i = 1; i<=NUM_OF_LEDRINGS; i++) {
+                       ledDMA_restartCH(i);
+                   }
+   
+                   //exit
+                   led_step = L_config;
+   
+                   break;
+           /*----------------------------------------------------------*/
+               default:
+                   __NOP();
+               }
+       }
+   
+       //osThreadTerminate(ledRingsTHandle);	//If at any moment the cp reaches out of the while loop
+   
+   
+   }
+   
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:tempApp,caption={Main code for Temperature App.}]
+    /*
+    * owApp.c
+    *
+    *  Created on: Aug 19, 2020
+    *      Author: Carlos Reyes
+    *      Based on owApp.c from
+    * 			Author:          Tilen MAJERLE <tilen@majerle.eu>
+    * 			Version:         v3.0.0
+    */
+   
+   #include "AxisCommHub_definitions.h"
+   #include "cmsis_os.h"
+   #include "lwow.h"
+   #include "devices/lwow_device_ds18x20.h"
+   #include "scan_devices.h"
+   //#include "stdio.h"
+   
+   //Creating a new one-wire instance
+   
+   extern const lwow_ll_drv_t lwow_ll_drv_stm32_hal;
+   lwow_t ow_inst;
+   lwow_rom_t rom_ids[20];		//ROM IDs are stored here
+   size_t rom_found;
+   
+   //Definition from MAIN
+   extern UART_HandleTypeDef huart3;
+   
+   //Definition from SM
+   extern int16_t	gv_temperatureData[NUM_OF_SENSORS];
+   
+   //Functions definition
+   static void owApp(void* arg);
+   
+   const osThreadAttr_t oneWireTask_attr = {
+           .priority = osPriorityAboveNormal1,
+           .stack_size = 512
+   };
+   
+   /*
+    * 	@brief Simple function to spawn the application thread
+    *
+    */
+   void initOwApp(void) {
+       ow_inst.arg = &huart3;
+       osThreadNew(owApp, NULL, &oneWireTask_attr);
+   }
+   
+   /**
+    * @brief           Application thread
+    * @param[in]       arg: Thread argument
+    */
+   static void owApp(void* arg) {
+       float avg_temp;
+       size_t avg_temp_count;
+   
+       /* Initialize 1-Wire library and set user argument to NULL */
+       lwow_init(&ow_inst, &lwow_ll_drv_stm32_hal, &huart3);
+   
+       /* Get onewire devices connected on 1-wire port */
+       do {
+           if (scan_onewire_devices(&ow_inst, rom_ids, LWOW_ARRAYSIZE(rom_ids), &rom_found) == lwowOK) {
+               printf("Devices scanned, found %d devices!\r\n", (int)rom_found);
+           } else {
+               printf("Device scan error\r\n");
+           }
+           if (rom_found == 0) {
+               osDelay(1000);
+           }
+       } while (rom_found == 0);
+   
+       if (rom_found > 0) {
+           /* Infinite loop */
+           while (1) {
+               printf("Start temperature conversion\r\n");
+               lwow_ds18x20_start(&ow_inst, NULL);      /* Start conversion on all devices, use protected API */
+               osDelay(1000);                      /* Release thread for 1 second */
+   
+               /* Read temperature on all devices */
+               avg_temp = 0;
+               avg_temp_count = 0;
+               for (size_t i = 0; i < rom_found; i++) {
+                   if (lwow_ds18x20_is_b(&ow_inst, &rom_ids[i])) {
+                       float temp;
+                       uint8_t resolution = lwow_ds18x20_get_resolution(&ow_inst, &rom_ids[i]);
+                       if (lwow_ds18x20_read(&ow_inst, &rom_ids[i], &temp)) {
+                           printf("Sensor %02u temperature is %d.%d degrees (%u bits resolution)\r\n",
+                               (unsigned)i, (int)temp, (int)((temp * 1000.0f) - (((int)temp) * 1000)), (unsigned)resolution);
+                           gv_temperatureData[i] = (uint16_t) temp;
+                           avg_temp += temp;
+                           avg_temp_count++;
+                       } else {
+                           printf("Could not read temperature on sensor %u\r\n", (unsigned)i);
+                       }
+                   }
+               }
+               if (avg_temp_count > 0) {
+                   avg_temp = avg_temp / avg_temp_count;
+               }
+               printf("Average temperature: %d.%d degrees\r\n", (int)avg_temp, (int)((avg_temp * 100.0f) - ((int)avg_temp) * 100));
+           }
+       }
+       printf("Terminating application thread\r\n");
+       osThreadExit();
+   }
+\end{lstlisting}
+
+
+

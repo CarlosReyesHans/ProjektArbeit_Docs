@@ -2,7 +2,9 @@
     "ltex.workspaceFolderDictionary": {
         "en-US": [
             "ECAT",
-            "protoype"
+            "EtherCAT",
+            "protoype",
+            "specifactions"
         ]
     }
 }

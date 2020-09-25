@@ -1,0 +1,103 @@
+\chapter{ESI file definition}\label{app:esi_file}
+The following code does not include the lines for the object dictionary as those are rather too extensive for the document. 
+Nevertheless, the reader is invited to pay attention to the SM descriptors and the EEPROM configuration word that are those that
+need to be adjusted accordingly to the used hardware and the Software Stack.
+For even more information regarding the XML specifications according to EtherCAT protocol, resource~\cite{beckhoff_esi} can be 
+reviewed.
+\begin{lstlisting} [label=lst:esi,caption={Part of the EtherCAT Slave Information file.}]
+    <?xml version="1.0" encoding="utf-8"?>
+    <EtherCATInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EtherCATInfo.xsd" Version="1.2">
+      <Vendor>
+        <Id>#x00485247</Id>
+        <Name>Hans Robot Germany GmbH</Name>
+        <!--Here comes a 16X14 image of the company-->
+      </Vendor>
+      <Descriptions>
+        <Groups>
+          <Group>
+            <Type>COMMBOARD</Type>
+            <Name>AXIS_COMM</Name>
+            <!--Here comes a 16X14 image of the device-->
+          </Group>
+        </Groups>
+        <Devices>
+          <Device Physics="YY">
+            <Type ProductCode="#x12783456" RevisionNo="#x00000001">axcommb</Type>
+            <Name><![CDATA[AxisCommBoard slave]]></Name>
+            <Info>
+              <StateMachine>
+                <Timeout>
+                  <PreopTimeout>8000</PreopTimeout>
+                  <!--4 Times from original value-->
+                  <SafeopOpTimeout>36000</SafeopOpTimeout>
+                  <BackToInitTimeout>20000</BackToInitTimeout>
+                  <BackToSafeopTimeout>800</BackToSafeopTimeout>
+                </Timeout>
+              </StateMachine>
+              <Mailbox>
+                <Timeout>
+                  <RequestTimeout>400</RequestTimeout>
+                  <!--4 Times from original value-->
+                  <ResponseTimeout>8000</ResponseTimeout>
+                </Timeout>
+              </Mailbox>
+            </Info>
+            <!-- Added from SSC TOOL-->
+            <GroupType>COMMBOARD</GroupType>
+            <Profile>
+              <ProfileNo>5001</ProfileNo>
+              <Dictionary>
+                <DataTypes>
+                    <!--DataTypes are omitted-->
+                </DataTypes>
+                <Objects>
+                    <!--Objects are omitted-->
+                </Objects>
+              </Dictionary>
+            </Profile>
+            <!-- Added from SSC TOOL-->
+            <Fmmu>Outputs</Fmmu>
+            <Fmmu>Inputs</Fmmu>
+            <!--Is this Fmmu needed?-->
+            <Fmmu>MBoxState</Fmmu>
+            <!-- ADDRESSES to be checked. So far the addresses match with linux_lan9252 example-->
+            <Sm ControlByte="#x26" DefaultSize="128" Enable="1" StartAddress="#x1000">MBoxOut</Sm>
+            <Sm ControlByte="#x22" DefaultSize="128" Enable="1" StartAddress="#x1080">MBoxIn</Sm>
+            <!--SMs addresses adjusted to from SSC file to SOES-->
+            <Sm DefaultSize="8" StartAddress="#x1100" ControlByte="#x64" Enable="1">Outputs</Sm>
+            <Sm DefaultSize="36" StartAddress="#x1400" ControlByte="#x20" Enable="1">Inputs</Sm>
+            <RxPdo Fixed="true" Mandatory="true" Sm="2">
+              <Index>#x1600</Index>
+              <Name>MasterCMDs process data mapping</Name>
+              <!--Entries are omitted-->
+            </RxPdo>
+            <!-- Added from SSC TOOL-->
+            <TxPdo Fixed="true" Mandatory="true" Sm="3">
+              <Index>#x1A00</Index>
+              <Name>Input mapping 0</Name>
+              <!--Entries are omitted-->
+            </TxPdo>
+            <!-- Added from SSC TOOL-->
+            <Mailbox DataLinkLayer="true">
+              <!-- From SSC TOOL: PDOAssign false, pdoConfig false, CompleteAccess true,segmentsdo true-->
+              <CoE SdoInfo="true" CompleteAccess="false" PdoConfig="false" SegmentedSdo="true" PdoAssign="false" PdoUpload="true"></CoE>
+            </Mailbox>
+            <Dc>
+              <OpMode>
+                <Name>DcOff</Name>
+                <Desc>DC unused</Desc>
+                <AssignActivate>#x0000</AssignActivate>
+              </OpMode>
+            </Dc>
+            <!--This Eeproms config word matches current App -->
+            <Eeprom>
+              <ByteSize>512</ByteSize>
+              <ConfigData>800200cc8813ff00CACA0080</ConfigData>
+              <!--Bootstrap is disabled since FoE is not present-->
+              <!--<BootStrap>0010800080108000</BootStrap>-->
+            </Eeprom>
+          </Device>
+        </Devices>
+      </Descriptions>
+    </EtherCATInfo>
+\end{lstlisting}

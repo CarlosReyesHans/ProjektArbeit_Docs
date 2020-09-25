@@ -1,5 +1,50 @@
-\chapter{Conclusions}\label{cha:conclusions}
+\chapter{Conclusions and further development}\label{cha:conclusions}
 
+Through this document a very helpful introduction to the industrial communication protocols with real time
+capabilities, their standards and current applications has been provided. Highlighting as well its importance 
+in current applications, not only at the industrial field but in academic research, mainly in the field of 
+robotics. An overview of some of current projects that are being developed has been commented as well, making clear 
+how important the relation between open source software and open protocols is, mainly for any company or academic 
+group that wishes to develop devices or improve current technologies. As the Industrial Internet of Things grows
+continuously, so the frameworks and projects do; this is the case for the TSN initiative that looks for homogenizing
+the rather populated industrial protocols and their messy compatibility due to their historic development---full of
+commercial interests that eventually lead to protocols similar in features and still not compatible between each other.
+Before the TSN initiative, during this document it has been frequently commented that the EtherCAT protocol is making its
+way by holding the open and the multi-platform strategy, this of course has changed through the years, but currently
+the development group is fully integrated with the TSN initiative.
+The mentioned protocol's multi-platform approach and the specific necessity of developing interfaces---embedded devices---compatible
+with industrial robots, lead to this project.
+
+The project itself, as detailed throughout the document, covers hardware and software development of a prototype that 
+marks the starting point for a flexible embedded system. Important to mention is the usage of open libraries and their 
+modification and synchronization of their functionalities through the implementation of State Machines and FreeRTOS. The
+latter, besides the overall EtherCAT software stack integration, is of great importance since both are tools that 
+allow the developer to build up firmware in a modular and structural way, such that it provides a platform for further development,
+with several advantages, such as flexibility for integration of new features, multi-task approach, deterministic behavior 
+through event handler and the time management 
+functions of the OS, capabilities for periodic or event-driven tasks, experience in management of libraries, hardware and
+industrial protocols, among others.
+
+The development helped open the doors to new challenges regarding characterization of the firmware performance and capabilities assessment.
+Furthermore, this device represents development potential, for it could expand functionalities and test compatibility under specific standards, 
+for instance---as the device achieved its goal of establishing a stable connection with a EtherCAT master---features like FoE service for firmware
+update over the field bus, DC synchronization for hard-real time capabilities and EoE for Ethernet/IP based cloud access can be planned
+for the future. It could be even candidate for an in-depth dependability analysis, an EtherCAT compliance certification or even FSoE for black channel 
+integration; the previous depending of course on the application, since each of those features would imply different paths that---even when
+they're obviously related---the development cannot be mixed neither done at once.
+Regarding hardware, optimizing the design for integrity of multiple digital signals---asynchronous and synchronous between 
+\SIrange{5}{90}{\mega\bit\per\second}---is also an important point. 
+
+As to the software for embedded systems, new abstraction layers for RTOS can be explored, since the 
+code uses CMSIS that theoretically provides flexibility to change the underlying RTOS to different ones. The latter would make only sense
+if, one, the path to follow is to exploit EoE, there are then unikernel projects that basically are tiny linux kernels running on low-cost MPUs; or, two,
+to explore the safety related functionalities, for which multi-core platforms are appropriate to redundancy approaches---with their related multi-core RTOS. 
+Additionally,
+also in the sense of embedded systems, more complex architectures can be explored, not because the STM32F4xx MCU is not capable enough, but 
+Texas Instruments MCUs emerged during this project as an interesting alternative, as they sometimes offer more features aiming multi-protocol peripherals, 
+even for those 
+that are currently and commonly integrated through ASICs like IO-LINK or BISS-C interfaces.
+Finally, it could be summarized that the Research Project achieved the main goal of developing a flexible device for further industrial interfaces.
 % Overall status: Board and basic SOES features ready for further EtherCAT development.
 
 % Even though, there have been delays due to the libraries being ported, and channels being noisy before having the PCB working, we're in a stage where we can ensure that the PCB manufactured and ported libraries allow to further develop an EtherCAT compatible application. Therefore, in the following calendar days the following tasks will be priorized to complete the main tasks:
