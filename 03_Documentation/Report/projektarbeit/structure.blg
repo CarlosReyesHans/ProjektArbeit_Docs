@@ -6,50 +6,50 @@ The style file: tuhhalpha.bst
 Reallocating 'name_of_file' (item size: 1) to 7 items.
 Database file #1: thesis.bib
 Warning--string name "march" is undefined
---line 93 of file thesis.bib
+--line 36 of file thesis.bib
 Warning--string name "dic" is undefined
---line 221 of file thesis.bib
+--line 164 of file thesis.bib
 Warning--empty booktitle in fieldbus_history
 Warning--empty booktitle in opc_tsn_application
 You've used 54 entries,
             2545 wiz_defined-function locations,
-            793 strings with 12286 characters,
-and the built_in function-call counts, 17771 in all, are:
-= -- 1743
-> -- 726
-< -- 46
-+ -- 236
-- -- 228
-* -- 1004
-:= -- 2860
+            790 strings with 12142 characters,
+and the built_in function-call counts, 17867 in all, are:
+= -- 1752
+> -- 743
+< -- 45
++ -- 245
+- -- 235
+* -- 1016
+:= -- 2877
 add.period$ -- 201
 call.type$ -- 54
-change.case$ -- 306
-chr.to.int$ -- 49
+change.case$ -- 308
+chr.to.int$ -- 47
 cite$ -- 56
-duplicate$ -- 698
+duplicate$ -- 697
 empty$ -- 1458
-format.name$ -- 319
-if$ -- 3732
-int.to.chr$ -- 6
+format.name$ -- 325
+if$ -- 3749
+int.to.chr$ -- 8
 int.to.str$ -- 0
 missing$ -- 13
 newline$ -- 312
 num.names$ -- 164
-pop$ -- 479
+pop$ -- 480
 preamble$ -- 1
-purify$ -- 360
+purify$ -- 362
 quote$ -- 0
-skip$ -- 618
+skip$ -- 619
 stack$ -- 0
 substring$ -- 555
 swap$ -- 95
-text.length$ -- 46
-text.prefix$ -- 39
+text.length$ -- 45
+text.prefix$ -- 38
 top$ -- 0
 type$ -- 432
 warning$ -- 2
-while$ -- 139
-width$ -- 57
+while$ -- 140
+width$ -- 56
 write$ -- 737
 (There were 4 warnings)

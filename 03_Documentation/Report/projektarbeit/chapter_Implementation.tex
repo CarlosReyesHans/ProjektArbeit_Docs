@@ -133,7 +133,7 @@ This IC is an EtherCAT Slave Controller with \SI{4}{\kilo\byte} of Dual Port mem
 Each FMMU performs the task of mapping logical addresses to physical addresses.
 The EtherCAT slave controller also includes four SyncManagers to allow the exchange of data between the EtherCAT master and the 
 local application, further technical details in ~\cite{lan9252_data}.%Reference to LAN9252 datasheet 
-As briefly summarized in Sect.~\ref{sec:ecat_sms}, each SM direction and mode of operation is configured by the EtherCAT master. Two modes of operation 
+ As briefly summarized in Sect.~\ref{sec:ecat_sms}, each SM direction and mode of operation is configured by the EtherCAT master. Two modes of operation 
 are available: buffered mode or mailbox mode. 
 In the buffered mode, both the local microcontroller and EtherCAT master can write to the device concurrently. The buffer within the LAN9252 
 will always contain the latest data. If newer data arrives before the old data can be read out, the old data will be dropped. In mailbox
@@ -220,7 +220,7 @@ There are though transitions that explicitly executes a synchronization edge. Th
 as they are not fully independent. To meet a suitable representation, the previously said is integrated with the approach of UPPAAL 
 software to model timed automata and the reader is invited to look it up in \cite{uppaal_tutorial}.
 As a summary, since the modelling of automata for real time systems demands a synchronization feature, this is represented and attached to the edges between 
-locations (location in the sense that a state is a location constrained to valuated time and other variables) with the symbols $?$ and $!$, the former acting as 
+locations---the latter in the sense that a state is a location constrained to a valuation of time and other variables---with the symbols $?$ and $!$, the former acting as 
 a wait action, while the latter as a notification. Those, clearly can be understood as signals between different threads.
 
 
@@ -280,7 +280,7 @@ reviewed in the previous DSM section.
     \label{tbl:threads_generals}
   \end{tuhhtable}
 
-A final list of priorities and threads is presented in the Table~\ref{tbl:threads_final} within Chapter~\ref{sec:results}.
+A final list of priorities and threads is presented in the Table~\ref{tbl:threads_final} within Chapter~\ref{cha:results}.
 
 %RAte monotonic oder deadline monotonic???
 %EDF ----Scheduling , is this for dynamic priorities?

@@ -9,13 +9,13 @@
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{BB17}]{led_library}
-U.~{Becker} and M.~{Becker}.
+U.~Becker and M.~Becker.
 \newblock {Mikrocontroller}.
 \newblock https://mikrocontroller.bplaced.net/wordpress/, January 2017.
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{BDL06}]{uppaal_tutorial}
-Gerd Behrmann, Alexandre David, and Kim~G Larsen.
+G.~Behrmann, A.~David, and K.~Larsen.
 \newblock A tutorial on uppaal 4.0.
 \newblock {\em Department of computer science, Aalborg university}, 2006.
 
@@ -73,7 +73,13 @@ Gerd Behrmann, Alexandre David, and Kim~G Larsen.
 \newblock https://www.ethercat.org/en/technology.html, January 2020.
 \newblock Last visited: 16/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20c}]{beckhoff_freebsd}
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20c}]{beckhoff_esccomparison}
+{Beckhoff Automation GmbH}.
+\newblock {EtherCAT Slave Controller Overview}.
+\newblock https://www.ethercat.org/en/downloads.html, January 2020.
+\newblock Last visited: 17/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Bec}20d}]{beckhoff_freebsd}
 {Beckhoff Automation GmbH}.
 \newblock {TwinCAT/BSD: operating system for Industrial PCs}.
 \newblock
@@ -81,16 +87,16 @@ Gerd Behrmann, Alexandre David, and Kim~G Larsen.
   2020.
 \newblock Last visited: 16/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Bor}08}]{beckhoff_vs_osadl}
-Detlef {Borchers}.
+\bibitem[\textcolor{tuhh_color_bibkey}{Bor08}]{beckhoff_vs_osadl}
+D.~Borchers.
 \newblock {Open Source trifft die Industrie}.
 \newblock
   https://www.heise.de/newsticker/meldung/Open-Source-trifft-die-Industrie-201855.html,
   April 2008.
 \newblock Last visited: 16/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Car}20}]{fieldbus_shares}
-T.~{Carlsson}.
+\bibitem[\textcolor{tuhh_color_bibkey}{Car20}]{fieldbus_shares}
+T.~Carlsson.
 \newblock {Industrial network market shares 2020 according to HMS Networks}.
 \newblock
   https://www.anybus.com/about-us/news/2020/05/29/industrial-network-market-shares-2020-according-to-hms-networks,
@@ -98,14 +104,20 @@ T.~{Carlsson}.
 \newblock Last visited: 11/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{DC17}]{ecat_xenomai}
-Raimarius Delgado and Byoungwook Choi.
+R.~Delgado and B.~Choi.
 \newblock Real-time servo control using ethercat master on real-time embedded
   linux extensions.
 \newblock {\em International Journal of Applied Engineering Research},
   12:1179--1185, 11 2017.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{emb}20}]{opener_stm32}
-{emb4fun}.
+\bibitem[\textcolor{tuhh_color_bibkey}{{Des}00}]{sercos_origin}
+{Design News}.
+\newblock {SERCOS picks up the pace}.
+\newblock https://www.designnews.com/sercos-picks-pace, August 2000.
+\newblock Last visited: 11/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{emb20}]{opener_stm32}
+emb4fun.
 \newblock {emb4fun's OpENer patch homepage}.
 \newblock https://www.emb4fun.de/archive/chibiosopener/index.html, January
   2020.
@@ -116,19 +128,13 @@ M.~Felser.
 \newblock The fieldbus standards: History and structures.
 \newblock 2002.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{For}12}]{pcb_design_grounding}
-M.~{Fortunato}.
+\bibitem[\textcolor{tuhh_color_bibkey}{For12}]{pcb_design_grounding}
+M.~Fortunato.
 \newblock {SUCCESSFUL PCB GROUNDING WITH MIXED-SIGNAL CHIPS - FOLLOW THE PATH
   OF LEAST IMPEDANCE}.
 \newblock
   https://www.maximintegrated.com/en/design/technical-documents/tutorials/5/5450.html,
   October 2012.
-\newblock Last visited: 17/09/2020.
-
-\bibitem[\textcolor{tuhh_color_bibkey}{Gmb20}]{beckhoff_esccomparison}
-Beckhoff~Automation GmbH.
-\newblock {EtherCAT Slave Controller Overview}.
-\newblock https://www.ethercat.org/en/downloads.html, January 2020.
 \newblock Last visited: 17/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{Gro}04}]{infineon_dramfine}
@@ -142,8 +148,8 @@ G.~{Gross}.
 \bibitem[\textcolor{tuhh_color_bibkey}{HWHP}]{ecatstack_igh}
 W.~Hagemeister, Weber, R.~Hacker, and F.~Pose.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{IEC}20}]{opcua_standard}
-{IEC}.
+\bibitem[\textcolor{tuhh_color_bibkey}{IEC20}]{opcua_standard}
+IEC.
 \newblock {OPC unified architecture - Part 14: PubSub}.
 \newblock https://webstore.iec.ch/publication/61108, July 2020.
 \newblock Last visited: 11/09/2020.
@@ -155,9 +161,15 @@ IEEE.
 \newblock Last visited: 11/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{II20}]{tsn_profile}
-{IEEE} and {IEC}.
+IEEE and IEC.
 \newblock {IEC/IEEE 60802 TSN Profile for Industrial Automation}.
 \newblock https://1.ieee802.org/tsn/iec-ieee-60802/, January 2020.
+\newblock Last visited: 11/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{III17}]{iso8802_ethernet}
+ISO, IEC, and IEEE.
+\newblock {8802-3:2017 Part 3: Standard for Ethernet}.
+\newblock https://www.iso.org/standard/72048.html, 2017.
 \newblock Last visited: 11/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{Inf}18}]{infineon_esc}
@@ -166,14 +178,8 @@ IEEE.
 \newblock https://www.infineon.com/cms/en/product/, September 2018.
 \newblock Last visited: 17/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{ISO}17}]{iso8802_ethernet}
-{IEEE} {ISO}, {IEC}.
-\newblock {8802-3:2017 Part 3: Standard for Ethernet}.
-\newblock https://www.iso.org/standard/72048.html, 2017.
-\newblock Last visited: 11/09/2020.
-
 \bibitem[\textcolor{tuhh_color_bibkey}{JDH02}]{standards_coop}
-B.~C. {Johnson}, D.~G. {Dunn}, and R.~{Hulett}.
+B.~Johnson, D.~Dunn, and R.~Hulett.
 \newblock A comparison of the ieee and iec standards processes.
 \newblock In {\em Record of Conference Papers. Industry Applications Society.
   Forty-Ninth Annual Conference. 2002 Petroleum and Chemical Industry Technical
@@ -185,8 +191,8 @@ Sanghoon Ji, Donguk Yu, Hoseok Jung, and Hong~Seong Park.
 \newblock In Antoni Grau and Zhuping Wang, editors, {\em Industrial Robotics},
   chapter~6. IntechOpen, Rijeka, 2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{MAj}20}]{temp_library}
-T.~{MAjerle}.
+\bibitem[\textcolor{tuhh_color_bibkey}{Maj20}]{temp_library}
+T.~Majerle.
 \newblock {LwOW Lightweight, platform independent library to interface 1-Wire
   devices over UART protocol}.
 \newblock
@@ -203,7 +209,7 @@ T.~{MAjerle}.
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{MGSR20}]{tsn_and_sdn}
-M.~A. {Metaal}, R.~{Guillaume}, R.~{Steinmetz}, and A.~{Rizk}.
+M.~{Metaal}, R.~{Guillaume}, R.~{Steinmetz}, and A.~{Rizk}.
 \newblock Integrated industrial ethernet networks: Time-sensitive networking
   over sdn infrastructure for mixed applications.
 \newblock In {\em 2020 IFIP Networking Conference (Networking)}, pages
@@ -222,28 +228,28 @@ C.~{Mastalli}, I.~{Havoutis}, M.~{Focchi}, D.~G. {Caldwell}, and C.~{Semini}.
 \newblock Last visited: 22/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{Mik}20}]{led_protocol}
-{Mikrocontroller.net Artikelsammlung}.
+{Mikrocontroller Artikelsammlung}.
 \newblock {WS2812 Ansteuerung}.
 \newblock https://www.mikrocontroller.net/articles/WS2812$\_$Ansteuerung,
   January 2020.
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{MLH{\etalchar{+}}17}]{middleware_xbotcore}
-L.~{Muratore}, A.~{Laurenzi}, E.~M. {Hoffman}, A.~{Rocchi}, D.~G. {Caldwell},
-  and N.~G. {Tsagarakis}.
+L.~{Muratore}, A.~{Laurenzi}, E.~{Hoffman}, A.~{Rocchi}, D.~{Caldwell}, and
+  N.~{Tsagarakis}.
 \newblock Xbotcore: A real-time cross-robot software platform.
 \newblock In {\em 2017 First IEEE International Conference on Robotic Computing
   (IRC)}, pages 77--80, 2017.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{MLT18}]{middleware_xbotcloud}
-L.~{Muratore}, B.~{Lennox}, and N.~G. {Tsagarakis}.
+L.~{Muratore}, B.~{Lennox}, and N.~{Tsagarakis}.
 \newblock Xbotcloud: A scalable cloud computing infrastructure for xbot powered
   robots.
 \newblock In {\em 2018 IEEE/RSJ International Conference on Intelligent Robots
   and Systems (IROS)}, pages 1--9, 2018.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Nor}20}]{ecat_industrial}
-M.~{Norris}.
+\bibitem[\textcolor{tuhh_color_bibkey}{Nor20}]{ecat_industrial}
+M.~Norris.
 \newblock {A Cannabis Equipment Supplier Turns to Automation to Extract CBD at
   Commercial Scale}.
 \newblock
@@ -257,8 +263,8 @@ M.~{Norris}.
 \newblock http://eipstackgroup.github.io/OpENer/index.html, January 2020.
 \newblock Last visited: 11/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{OSA}19}]{open62541_homepage}
-{OSADL}.
+\bibitem[\textcolor{tuhh_color_bibkey}{OSA19}]{open62541_homepage}
+OSADL.
 \newblock {Building an Open Source OPC UA/TSN Ecosystem}.
 \newblock
   https://www.osadl.org/uploads/media/OSADL-OPC-UA-TSN-Open-Source-Ecosystem-LoI-2nd-edition-V6.pdf,
@@ -286,17 +292,24 @@ M.~{Norris}.
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{{Ser}18}]{sercos_tsn}
-{Sercos}.
+{Sercos International eV}.
 \newblock {Ethernet TSN heralds a new era of industrial communication}.
 \newblock
   https://www.sercos.org/technology/sercos-in-connection-with-tsn-opc-ua/sercos-in-connection-with-tsn/,
   January 2018.
 \newblock Last visited: 11/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Ser}20}]{sercos_stacks}
-{Sercos}.
+\bibitem[\textcolor{tuhh_color_bibkey}{{Ser}20a}]{sercos_stacks}
+{Sercos International eV}.
 \newblock {Driver Software}.
 \newblock https://www.sercos.org/technology/implementation/driver-software,
+  January 2020.
+\newblock Last visited: 11/09/2020.
+
+\bibitem[\textcolor{tuhh_color_bibkey}{{Ser}20b}]{sercos_performance}
+{Sercos International eV}.
+\newblock {SERCOS performance}.
+\newblock https://www.sercos.org/technology/advantages-of-sercos/performance/,
   January 2020.
 \newblock Last visited: 11/09/2020.
 
@@ -307,28 +320,15 @@ S.~Schriegel, T.~Kobzan, and J.~Jasperneite.
 \newblock In {\em 2018 14th IEEE International Workshop on Factory
   Communication Systems (WFCS)}, pages 1--10, 2018.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Son}20}]{texasi_esc}
-Maneesh {Soni}.
+\bibitem[\textcolor{tuhh_color_bibkey}{Son20}]{texasi_esc}
+M.~Soni.
 \newblock {EtherCAT on Sitara Processors}.
 \newblock Technical report, Arm Microprocessor Group Texas Instruments, April
   2020.
 \newblock Last visited: 17/09/2020.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{Sta00}]{sercos_origin}
-DN~Staff.
-\newblock {SERCOS picks up the pace}.
-\newblock https://www.designnews.com/sercos-picks-pace, August 2000.
-\newblock Last visited: 11/09/2020.
-
-\bibitem[\textcolor{tuhh_color_bibkey}{Sta20}]{sercos_performance}
-SERCOS Staff.
-\newblock {SERCOS performance}.
-\newblock https://www.sercos.org/technology/advantages-of-sercos/performance/,
-  January 2020.
-\newblock Last visited: 11/09/2020.
-
 \bibitem[\textcolor{tuhh_color_bibkey}{{STM}17}]{hal_drivers}
-{STMicroelectronics}.
+{STMicroelectronics NV}.
 \newblock {UM1725: Description of STM32F4 HAL and LL drivers}.
 \newblock https://www.st.com/en/, February 2017.
 \newblock Last visited: 22/09/2020.
@@ -342,13 +342,13 @@ SERCOS Staff.
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{VZS19}]{future_iiot}
-S.~{Vitturi}, C.~{Zunino}, and T.~{Sauter}.
+S.~Vitturi, C.~Zunino, and T.~Sauter.
 \newblock Industrial communication systems and their future challenges:
   Next-generation ethernet, iiot, and 5g.
 \newblock {\em Proceedings of the IEEE}, 107(6):944--961, 2019.
 
-\bibitem[\textcolor{tuhh_color_bibkey}{{Weg}19}]{stm32_dmaapp}
-J.~{Wegrzyn}.
+\bibitem[\textcolor{tuhh_color_bibkey}{Weg19}]{stm32_dmaapp}
+J.~Wegrzyn.
 \newblock {OPTIMIZING RENDERING PERFORMANCE ON STM32 USING DMA2D}.
 \newblock
   https://auto.siili.com/blog/optimizing-rendering-performance-on-stm32-using-dma2d,
@@ -356,7 +356,7 @@ J.~{Wegrzyn}.
 \newblock Last visited: 20/09/2020.
 
 \bibitem[\textcolor{tuhh_color_bibkey}{XJY11}]{ecat_sercos}
-Hu~Xing, Huan Jia, and Liu Yanqianga.
+H.~Xing, H.~Jia, and L.~Yanqianga.
 \newblock Motion control system using sercos over ethercat.
 \newblock {\em Procedia Engineering}, 24:749--753, 12 2011.
 

@@ -31,9 +31,9 @@
 \contentsline {subsection}{\numberline {5.2.2}Further development}{35}{subsection.5.2.2}%
 \contentsline {section}{\numberline {5.3}SOES library integration}{36}{section.5.3}%
 \contentsline {chapter}{\numberline {6}Conclusions and further development}{39}{chapter.6}%
-\contentsline {chapter}{\nonumberline Bibliography}{41}{chapter*.25}%
+\contentsline {chapter}{\nonumberline Bibliography}{41}{chapter*.24}%
 \contentsline {chapter}{\numberline {A}Introduction to EtherCAT}{45}{appendix.A}%
-\contentsline {subsubsection}{\nonumberline The data frame and the Synchronization Managers}{47}{subsubsection*.29}%
+\contentsline {subsubsection}{\nonumberline The data frame and the Synchronization Managers}{47}{subsubsection*.28}%
 \contentsline {chapter}{\numberline {B}Device State Machines (DSMs)}{51}{appendix.B}%
 \contentsline {chapter}{\numberline {C}PCB drawings and layout}{55}{appendix.C}%
 \contentsline {chapter}{\numberline {D}ESI file definition}{59}{appendix.D}%
