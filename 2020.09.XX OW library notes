@@ -1,0 +1,44 @@
+2020.08.19
+Notes about the 1-Wire Library
+
+
+UART byte time is equivalent to 1 bit at 1-Wire level
+	Diagram could be added to Report
+	
+If application gets preempted with more important task, 1-Wire line will be in idle state for longer time. This is not an issue by 1-Wire specification
+
+Watching/following the execution of the program
+
+OK
+lwow_init() << Initializes the peripheral assigning the hal pointer and a hardware handler
+	if LWOW_CFG_OS active, which is a RTOS Flag
+		lwow_sys_mutex_create<<< Creates a mutex by employing the CMSIS API
+	
+NOK
+scan_onewire_devices():
+	lwow_onewire_devices():	<< low level search for devices
+		lwow_protect()<<Protect the device >>> OK REsult
+		lwow_search_devices_with_command_raw()
+			lwow_search_reset_raw(ow) << This is executed within a for-scope
+		lwow_search_with_command_raw(lwow_t* const ow, const uint8_t cmd, lwow_rom_t* const rom_id) << main function
+			res = lwow_reset_raw(ow) << resetting al devices
+			
+			
+/*-----------------------------------Tracing back the error------------------------------------------------*/
+
+res = lwow_reset_raw(ow)  << whithin the search of 1wire devices
+	Step1: incompplete
+		Error lwowERRTXRX; <<< Means an error with the data exchange
+		Reset byte is 0xF0 <<< 
+		Sets to 9600 bps OK
+		sends and receive the data  NOK
+			transmit_receive(const uint8_t* tx, uint8_t* rx, size_t len, void* arg) << HAL compatible function
+			
+		
+		The problem could be during the configuration of pins
+		    GPIO_InitStruct.Pull = GPIO_NOPULL;//GPIO_PULLUP; << stm32hal_msp.c+
+			
+/*----------------------------------The reason why the the half duplex is not working---------------------------------------*/
+
+Half duplex as a single wire
+Full Duplex with two pins <<<

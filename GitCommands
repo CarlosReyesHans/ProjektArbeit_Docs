@@ -40,13 +40,25 @@ git remote update
 /////	Match origin from local folder to remote started git repository
 ##	Create the repository and get the link to it
 ##	Go to the local directory
-git init
+git init`
 touch .gitignore
+#An alternative to avoid merging problems
+git remote add origin THE_GIT_LINK
+git pull 
+#now we can add the new contents
+
 git add .
 git commit 
-git remote add origin THE_GIT_LINK
+
 git remote -v ## Verifies
 git push origin master
+
+
+ATENTION!
+Solution
+The error is resolved by toggling the allow-unrelated-histories switch. After a git pull or git merge command, add the following tag:
+
+git pull origin master --allow-unrelated-histories
 
 ///// 	TO UPDATE A PROJECT FROM THE REVISED VERSION TO AN OLD ONE
 

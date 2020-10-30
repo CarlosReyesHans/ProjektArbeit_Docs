@@ -3,3 +3,28 @@ Synchronization Manager 5.6.7.4.9
 Explanation of the SSC STACK methodes: Application Notes ET9300, section 16. (SW SSC)
 Formal ESC Registers description #Ethercat official , EtherCAT ESC datasheet (In protocol)
 Info about porting SDK to SSC (ECAT/LAN9252 Stack)
+
+EtherCAT frame in  References: ETG.1000.4 – EtherCAT frame structure | ETG.1000.6 – CoE coding
+
+The Slave synchronization modes: ETG.1020 - Synchronization and ETG.2000 - DC
+
+
+References for last presentation
+
+
+[DC17] R. Delgado and B. Choi. Real-time servo control using ethercat master on real-time embedded linux extensions. International Journal of Applied Engineering Research, 12:1179–1185,
+11 2017
+[MHF+20]C. Mastalli, I. Havoutis, M. Focchi, D. G. Caldwell, and C. Semini. Motion planning for
+quadrupedal locomotion: Coupled planning, terrain mapping, and whole-body control. IEEE
+Transactions on Robotics, pages 1–14, 2020
+[Bec20b] Beckhoff Automation GmbH. EtherCAT - the Ethernet Fieldbus.
+https://www.ethercat.org/en/technology.html, January 2020. Last visited: 16/09/2020
+[BDL06] G. Behrmann, A. David, and K. Larsen. A tutorial on uppaal 4.0. Department of computer
+science, Aalborg university, 2006
+[Arm20] Arm Ltd. Real-Time Operating System: API and RTX Reference Implementation.
+https://www.keil.com/pack/doc/CMSIS/RTOS2/html/index.html, April 2020. Last visited:
+20/09/2020.
+[Bec17b] Beckhoff Automation GmbH. ETG.1000.4 Data Link Layer protocol specification. https://www.beckhoff.com/english/downloadfinder, November 2017. Last visited:
+16/09/2020.
+[Bec17b] Beckhoff Automation GmbH. ETG.1000.4 Data Link Layer protocol specification. https://www.beckhoff.com/english/downloadfinder, November 2017. Last visited:
+16/09/2020.
