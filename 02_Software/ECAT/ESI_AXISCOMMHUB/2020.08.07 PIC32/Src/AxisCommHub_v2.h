@@ -4,20 +4,20 @@
 */
 
 /**
- * \addtogroup AxisCommHub_test AxisCommHub_test
+ * \addtogroup AxisCommHub_v2 AxisCommHub_v2
  * @{
  */
 
 /**
-\file AxisCommHub_test.h
-\brief AxisCommHub_test function prototypes and defines
+\file AxisCommHub_v2.h
+\brief AxisCommHub_v2 function prototypes and defines
 
 \version 1.0.0.11
  */
 
  
- #ifndef _AXIS_COMM_HUB_TEST_H_
-#define _AXIS_COMM_HUB_TEST_H_
+ #ifndef _AXIS_COMM_HUB_V2_H_
+#define _AXIS_COMM_HUB_V2_H_
 
 
 /*-----------------------------------------------------------------------------------------
@@ -35,13 +35,13 @@
 ------
 -----------------------------------------------------------------------------------------*/
 
-#endif //_AXIS_COMM_HUB_TEST_H_
+#endif //_AXIS_COMM_HUB_V2_H_
 
 //include custom application object dictionary 
-#include "AxisCommHub_testObjects.h"
+#include "AxisCommHub_v2Objects.h"
 
 
-#if defined(_AXIS_COMM_HUB_TEST_) && (_AXIS_COMM_HUB_TEST_ == 1)
+#if defined(_AXIS_COMM_HUB_V2_) && (_AXIS_COMM_HUB_V2_ == 1)
     #define PROTO
 #else
     #define PROTO extern

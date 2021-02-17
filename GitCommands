@@ -41,10 +41,13 @@ git remote update
 ##	Create the repository and get the link to it
 ##	Go to the local directory
 git init`
-touch .gitignore
+
 #An alternative to avoid merging problems
 git remote add origin THE_GIT_LINK
+git fetch origin
+git checkout -b master --track origin/master # origin/master is clone's default
 git pull 
+touch .gitignore
 #now we can add the new contents
 
 git add .
@@ -77,6 +80,15 @@ git merge --no-ff master	//master privails as develop has the last changes from 
 
 git checkout feature
 git merge --no-ff develop	//now feature has incorporated the updated version of develop, hence feature has the master's changes as well
+
+/*-----------Changing from https to ssh authentication--------------------*/
+$ git remote -v
+	> origin  https://github.com/USERNAME/REPOSITORY.git (fetch)
+	> origin  https://github.com/USERNAME/REPOSITORY.git (push)
+$ git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+$ git remote -v		//	verifying
+	> origin  git@github.com:USERNAME/REPOSITORY.git (fetch)
+	> origin  git@github.com:USERNAME/REPOSITORY.git (push)
 
 **************************************************************
 *	USING STASH

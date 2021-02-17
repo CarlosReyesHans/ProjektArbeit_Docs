@@ -205,7 +205,7 @@ V4.00 ECAT 7: The return values for the AL-StatusCode were changed to UINT16
 #include    "emcy.h"
 
 
-#include "AxisCommHub_test.h"
+#include "AxisCommHub_v2.h"
 
 /*--------------------------------------------------------------------------------------
 ------

@@ -4,12 +4,12 @@
 */
 
 /**
-\addtogroup AxisCommHub_test AxisCommHub_test
+\addtogroup AxisCommHub_v2 AxisCommHub_v2
 @{
 */
 
 /**
-\file AxisCommHub_test.c
+\file AxisCommHub_v2.c
 \brief Implementation
 
 \version 1.0.0.11
@@ -25,9 +25,9 @@
 
 #include "applInterface.h"
 
-#define _AXIS_COMM_HUB_TEST_ 1
-#include "AxisCommHub_test.h"
-#undef _AXIS_COMM_HUB_TEST_
+#define _AXIS_COMM_HUB_V2_ 1
+#include "AxisCommHub_v2.h"
+#undef _AXIS_COMM_HUB_V2_
 /*--------------------------------------------------------------------------------------
 ------
 ------    local types and defines

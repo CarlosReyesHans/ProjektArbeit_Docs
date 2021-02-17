@@ -122,7 +122,7 @@ V4.00 ECAT 1: The handling of the Sync Manager Parameter was included according 
 
 
 /*Add Application specific Objects*/
-#include "AxisCommHub_test.h"
+#include "AxisCommHub_v2.h"
 
 
 #undef _OBJD_

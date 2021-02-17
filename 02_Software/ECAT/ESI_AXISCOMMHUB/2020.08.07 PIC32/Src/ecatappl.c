@@ -138,7 +138,7 @@ V4.00 APPL 6: The main function was split in MainInit and MainLoop
 #include "applInterface.h"
 #undef _APPL_INTERFACE_
 
-#include "AxisCommHub_test.h"
+#include "AxisCommHub_v2.h"
 
 
 

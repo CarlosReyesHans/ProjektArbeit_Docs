@@ -68,10 +68,6 @@
 								<BitSize>1</BitSize>
 							</DataType>
 							<DataType>
-								<Name>INT</Name>
-								<BitSize>16</BitSize>
-							</DataType>
-							<DataType>
 								<Name>DT1018</Name>
 								<BitSize>144</BitSize>
 								<SubItem>
@@ -161,7 +157,7 @@
 							</DataType>
 							<DataType>
 								<Name>DT1600</Name>
-								<BitSize>144</BitSize>
+								<BitSize>272</BitSize>
 								<SubItem>
 									<SubIdx>0</SubIdx>
 									<Name>SubIndex 000</Name>
@@ -212,10 +208,50 @@
 										<Access>ro</Access>
 									</Flags>
 								</SubItem>
+								<SubItem>
+									<SubIdx>5</SubIdx>
+									<Name>SubIndex 005</Name>
+									<Type>UDINT</Type>
+									<BitSize>32</BitSize>
+									<BitOffs>144</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>6</SubIdx>
+									<Name>SubIndex 006</Name>
+									<Type>UDINT</Type>
+									<BitSize>32</BitSize>
+									<BitOffs>176</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>7</SubIdx>
+									<Name>SubIndex 007</Name>
+									<Type>UDINT</Type>
+									<BitSize>32</BitSize>
+									<BitOffs>208</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>8</SubIdx>
+									<Name>SubIndex 008</Name>
+									<Type>UDINT</Type>
+									<BitSize>32</BitSize>
+									<BitOffs>240</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
 							</DataType>
 							<DataType>
 								<Name>DT1A00</Name>
-								<BitSize>592</BitSize>
+								<BitSize>624</BitSize>
 								<SubItem>
 									<SubIdx>0</SubIdx>
 									<Name>SubIndex 000</Name>
@@ -402,6 +438,16 @@
 									<Type>UDINT</Type>
 									<BitSize>32</BitSize>
 									<BitOffs>560</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>19</SubIdx>
+									<Name>SubIndex 019</Name>
+									<Type>UDINT</Type>
+									<BitSize>32</BitSize>
+									<BitOffs>592</BitOffs>
 									<Flags>
 										<Access>ro</Access>
 									</Flags>
@@ -766,7 +812,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>1</SubIdx>
-									<Name>TEMPERATURE0</Name>
+									<Name>TEMPERATURE1</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>16</BitOffs>
@@ -777,7 +823,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>2</SubIdx>
-									<Name>TEMPERATURE1</Name>
+									<Name>TEMPERATURE2</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>32</BitOffs>
@@ -788,7 +834,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>3</SubIdx>
-									<Name>TEMPERATURE2</Name>
+									<Name>TEMPERATURE3</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>48</BitOffs>
@@ -799,7 +845,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>4</SubIdx>
-									<Name>TEMPERATURE3</Name>
+									<Name>TEMPERATURE4</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>64</BitOffs>
@@ -810,7 +856,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>5</SubIdx>
-									<Name>TEMPERATURE4</Name>
+									<Name>TEMPERATURE5</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>80</BitOffs>
@@ -821,7 +867,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>6</SubIdx>
-									<Name>TEMPERATURE5</Name>
+									<Name>TEMPERATURE6</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>96</BitOffs>
@@ -832,7 +878,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>7</SubIdx>
-									<Name>TEMPERATURE6</Name>
+									<Name>TEMPERATURE7</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>112</BitOffs>
@@ -843,7 +889,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>8</SubIdx>
-									<Name>TEMPERATURE7</Name>
+									<Name>TEMPERATURE8</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>128</BitOffs>
@@ -854,7 +900,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>9</SubIdx>
-									<Name>TEMPERATURE8</Name>
+									<Name>TEMPERATURE9</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>144</BitOffs>
@@ -865,7 +911,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>10</SubIdx>
-									<Name>TEMPERATURE9</Name>
+									<Name>TEMPERATURE10</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>160</BitOffs>
@@ -876,7 +922,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>11</SubIdx>
-									<Name>TEMPERATURE10</Name>
+									<Name>TEMPERATURE11</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>176</BitOffs>
@@ -887,7 +933,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>12</SubIdx>
-									<Name>TEMPERATURE11</Name>
+									<Name>TEMPERATURE12</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>192</BitOffs>
@@ -898,7 +944,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>13</SubIdx>
-									<Name>TEMPERATURE12</Name>
+									<Name>TEMPERATURE13</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>208</BitOffs>
@@ -909,7 +955,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>14</SubIdx>
-									<Name>TEMPERATURE13</Name>
+									<Name>TEMPERATURE14</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>224</BitOffs>
@@ -920,7 +966,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>15</SubIdx>
-									<Name>TEMPERATURE14</Name>
+									<Name>TEMPERATURE15</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>240</BitOffs>
@@ -932,7 +978,7 @@
 							</DataType>
 							<DataType>
 								<Name>DT6001</Name>
-								<BitSize>64</BitSize>
+								<BitSize>80</BitSize>
 								<SubItem>
 									<SubIdx>0</SubIdx>
 									<Name>SubIndex 000</Name>
@@ -957,7 +1003,7 @@
 								<SubItem>
 									<SubIdx>2</SubIdx>
 									<Name>EVENT</Name>
-									<Type>INT</Type>
+									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>32</BitOffs>
 									<Flags>
@@ -976,10 +1022,21 @@
 										<PdoMapping>t</PdoMapping>
 									</Flags>
 								</SubItem>
+								<SubItem>
+									<SubIdx>4</SubIdx>
+									<Name>CMD-Status</Name>
+									<Type>UINT</Type>
+									<BitSize>16</BitSize>
+									<BitOffs>64</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+										<PdoMapping>t</PdoMapping>
+									</Flags>
+								</SubItem>
 							</DataType>
 							<DataType>
 								<Name>DT7000</Name>
-								<BitSize>80</BitSize>
+								<BitSize>144</BitSize>
 								<SubItem>
 									<SubIdx>0</SubIdx>
 									<Name>SubIndex 000</Name>
@@ -992,7 +1049,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>1</SubIdx>
-									<Name>COMMAND</Name>
+									<Name>Data0</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>16</BitOffs>
@@ -1003,7 +1060,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>2</SubIdx>
-									<Name>TEST VALUE0</Name>
+									<Name>Data1</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>32</BitOffs>
@@ -1014,7 +1071,7 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>3</SubIdx>
-									<Name>TEST VALUE1</Name>
+									<Name>Data2</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>48</BitOffs>
@@ -1025,10 +1082,54 @@
 								</SubItem>
 								<SubItem>
 									<SubIdx>4</SubIdx>
-									<Name>TEST VALUE2</Name>
+									<Name>Data3</Name>
 									<Type>UINT</Type>
 									<BitSize>16</BitSize>
 									<BitOffs>64</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>5</SubIdx>
+									<Name>Data4</Name>
+									<Type>UINT</Type>
+									<BitSize>16</BitSize>
+									<BitOffs>80</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>6</SubIdx>
+									<Name>Data5</Name>
+									<Type>UINT</Type>
+									<BitSize>16</BitSize>
+									<BitOffs>96</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>7</SubIdx>
+									<Name>Data6</Name>
+									<Type>UINT</Type>
+									<BitSize>16</BitSize>
+									<BitOffs>112</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>8</SubIdx>
+									<Name>Command</Name>
+									<Type>UINT</Type>
+									<BitSize>16</BitSize>
+									<BitOffs>128</BitOffs>
 									<Flags>
 										<Access>rw</Access>
 										<PdoMapping>r</PdoMapping>
@@ -1209,12 +1310,12 @@
 								<Index>#x1600</Index>
 								<Name>MasterCMDs process data mapping</Name>
 								<Type>DT1600</Type>
-								<BitSize>144</BitSize>
+								<BitSize>272</BitSize>
 								<Info>
 									<SubItem>
 										<Name>SubIndex 000</Name>
 										<Info>
-											<DefaultData>04</DefaultData>
+											<DefaultData>08</DefaultData>
 										</Info>
 									</SubItem>
 									<SubItem>
@@ -1241,18 +1342,42 @@
 											<DefaultData>10040070</DefaultData>
 										</Info>
 									</SubItem>
+									<SubItem>
+										<Name>SubIndex 005</Name>
+										<Info>
+											<DefaultData>10050070</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 006</Name>
+										<Info>
+											<DefaultData>10060070</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 007</Name>
+										<Info>
+											<DefaultData>10070070</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 008</Name>
+										<Info>
+											<DefaultData>10080070</DefaultData>
+										</Info>
+									</SubItem>
 								</Info>
 							</Object>
 							<Object>
 								<Index>#x1A00</Index>
 								<Name>Input mapping 0</Name>
 								<Type>DT1A00</Type>
-								<BitSize>592</BitSize>
+								<BitSize>624</BitSize>
 								<Info>
 									<SubItem>
 										<Name>SubIndex 000</Name>
 										<Info>
-											<DefaultData>12</DefaultData>
+											<DefaultData>13</DefaultData>
 										</Info>
 									</SubItem>
 									<SubItem>
@@ -1361,6 +1486,12 @@
 										<Name>SubIndex 018</Name>
 										<Info>
 											<DefaultData>10030160</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 019</Name>
+										<Info>
+											<DefaultData>10040160</DefaultData>
 										</Info>
 									</SubItem>
 								</Info>
@@ -1525,12 +1656,12 @@
 								<Index>#x6001</Index>
 								<Name>SystemStatus</Name>
 								<Type>DT6001</Type>
-								<BitSize>64</BitSize>
+								<BitSize>80</BitSize>
 								<Info>
 									<SubItem>
 										<Name>SubIndex 000</Name>
 										<Info>
-											<DefaultData>03</DefaultData>
+											<DefaultData>04</DefaultData>
 										</Info>
 									</SubItem>
 								</Info>
@@ -1539,12 +1670,12 @@
 								<Index>#x7000</Index>
 								<Name>MasterCMDs</Name>
 								<Type>DT7000</Type>
-								<BitSize>80</BitSize>
+								<BitSize>144</BitSize>
 								<Info>
 									<SubItem>
 										<Name>SubIndex 000</Name>
 										<Info>
-											<DefaultData>04</DefaultData>
+											<DefaultData>08</DefaultData>
 										</Info>
 									</SubItem>
 								</Info>
@@ -1577,8 +1708,8 @@
 				<Fmmu>MBoxState</Fmmu>
 				<Sm MinSize="#x22" MaxSize="#x100" DefaultSize="#x80" StartAddress="#x1000" ControlByte="#x26" Enable="1">MBoxOut</Sm>
 				<Sm MinSize="#x22" MaxSize="#x100" DefaultSize="#x80" StartAddress="#x1080" ControlByte="#x22" Enable="1">MBoxIn</Sm>
-				<Sm DefaultSize="8" StartAddress="#x1100" ControlByte="#x64" Enable="1">Outputs</Sm>
-				<Sm DefaultSize="36" StartAddress="#x1400" ControlByte="#x20" Enable="1">Inputs</Sm>
+				<Sm DefaultSize="16" StartAddress="#x1100" ControlByte="#x64" Enable="1">Outputs</Sm>
+				<Sm DefaultSize="38" StartAddress="#x1400" ControlByte="#x20" Enable="1">Inputs</Sm>
 				<RxPdo Fixed="true" Mandatory="true" Sm="2">
 					<Index>#x1600</Index>
 					<Name>MasterCMDs process data mapping</Name>
@@ -1586,28 +1717,56 @@
 						<Index>#x7000</Index>
 						<SubIndex>1</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>COMMAND</Name>
+						<Name>Data0</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x7000</Index>
 						<SubIndex>2</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEST VALUE0</Name>
+						<Name>Data1</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x7000</Index>
 						<SubIndex>3</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEST VALUE1</Name>
+						<Name>Data2</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x7000</Index>
 						<SubIndex>4</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEST VALUE2</Name>
+						<Name>Data3</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>5</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>Data4</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>6</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>Data5</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>7</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>Data6</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>8</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>Command</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 				</RxPdo>
@@ -1618,105 +1777,105 @@
 						<Index>#x6000</Index>
 						<SubIndex>1</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE0</Name>
+						<Name>TEMPERATURE1</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>2</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE1</Name>
+						<Name>TEMPERATURE2</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>3</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE2</Name>
+						<Name>TEMPERATURE3</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>4</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE3</Name>
+						<Name>TEMPERATURE4</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>5</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE4</Name>
+						<Name>TEMPERATURE5</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>6</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE5</Name>
+						<Name>TEMPERATURE6</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>7</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE6</Name>
+						<Name>TEMPERATURE7</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>8</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE7</Name>
+						<Name>TEMPERATURE8</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>9</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE8</Name>
+						<Name>TEMPERATURE9</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>10</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE9</Name>
+						<Name>TEMPERATURE10</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>11</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE10</Name>
+						<Name>TEMPERATURE11</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>12</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE11</Name>
+						<Name>TEMPERATURE12</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>13</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE12</Name>
+						<Name>TEMPERATURE13</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>14</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE13</Name>
+						<Name>TEMPERATURE14</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6000</Index>
 						<SubIndex>15</SubIndex>
 						<BitLen>16</BitLen>
-						<Name>TEMPERATURE14</Name>
+						<Name>TEMPERATURE15</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
@@ -1731,13 +1890,20 @@
 						<SubIndex>2</SubIndex>
 						<BitLen>16</BitLen>
 						<Name>EVENT</Name>
-						<DataType>INT</DataType>
+						<DataType>UINT</DataType>
 					</Entry>
 					<Entry>
 						<Index>#x6001</Index>
 						<SubIndex>3</SubIndex>
 						<BitLen>16</BitLen>
 						<Name>ERROR</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x6001</Index>
+						<SubIndex>4</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>CMD-Status</Name>
 						<DataType>UINT</DataType>
 					</Entry>
 				</TxPdo>
